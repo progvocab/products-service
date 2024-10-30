@@ -1,0 +1,23 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters":{
+	"MyKeyPair" 	   : {
+		"Default" : "tech-conclave" ,
+		"Type": "AWS::EC2::KeyPair::KeyName",
+		"Description" : " Existing key pair name"
+	}
+
+  },
+  "Resources": {
+    "ExampleEc2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "InstanceType": "t2.micro",
+        "ImageId" : "ami-0f403e3180720dd7e",
+	"KeyName": {
+           "Ref": "MyKeyPair"
+        }
+      }
+    }
+  }
+}
