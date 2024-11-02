@@ -1,0 +1,55 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create an EC2 instance with an existing key pair
+
+Parameters:
+  KeyPairName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+    Type: String
+    Default: mykeypair  # Replace with the default key pair name, or leave blank to input during deployment
+
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+    ConstraintDescription: Must be a valid EC2 instance type
+
+  InstanceAMI:
+    Description: AMI ID for the EC2 instance
+    Type: String
+    Default: ami-0c55b159cbfafe1f0  # Default AMI ID (this one is for Amazon Linux 2 in us-east-1)
+  
+Resources:
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      KeyName: !Ref KeyPairName
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref InstanceAMI
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+
+  InstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0  # WARNING: Allows SSH access from anywhere; use your specific IP range for security
+
+Outputs:
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref EC2Instance
+  PublicIP:
+    Description: Public IP of the EC2 instance
+    Value: !GetAtt EC2Instance.PublicIp
+  SecurityGroupId:
+    Description: Security Group ID for the EC2 instance
+    Value: !Ref InstanceSecurityGroup

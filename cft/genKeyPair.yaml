@@ -1,0 +1,7 @@
+
+Resources:
+  MyKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Sub "${AWS::StackName}-keypair"
+      KeyType: rsa # Options are "rsa" or "ed25519"

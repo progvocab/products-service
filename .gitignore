@@ -37,3 +37,4 @@ python/venv/*
 
 python/__pycache__/*
 .mvn/*
+*.swp

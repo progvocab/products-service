@@ -1,0 +1,33 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create an S3 bucket
+
+Resources:
+  MyS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub '${AWS::StackName}-bucket'  # Optional: specify a custom bucket name
+      AccessControl: Private                       # Set the access control (e.g., Private, PublicRead)
+
+      # Optional bucket policies and configurations
+      VersioningConfiguration:
+        Status: Enabled                            # Enable versioning for the bucket
+      
+      LifecycleConfiguration:                      # Optional: configure lifecycle policies
+        Rules:
+          - Id: "ExpireOldObjects"
+            Status: Enabled
+            ExpirationInDays: 365                  # Delete objects after 365 days
+            NoncurrentVersionExpirationInDays: 30  # Delete non-current versions after 30 days
+
+      # Optional logging configuration
+      LoggingConfiguration:
+        DestinationBucketName: !Sub '${AWS::StackName}-logs' # Define the logging bucket if needed
+        LogFilePrefix: 'access-logs/'                         # Prefix for log files
+
+Outputs:
+  BucketName:
+    Description: "Name of the created S3 bucket"
+    Value: !Ref MyS3Bucket
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketName"
