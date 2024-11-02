@@ -13,7 +13,8 @@ phases:
   pre_build:
     commands:
       - echo "Running pre-build tests..."
-      - pytest  # Run tests if you have any with pytest (optional)
+      - pwd
+      - echo $EC2_DNS
 
   build:
     commands:
@@ -23,8 +24,8 @@ phases:
   post_build:
     commands:
       - echo "Starting deployment to EC2..."
-      - scp -o StrictHostKeyChecking=no -i mykeypair.pem app.zip ec2-user@{EC2_DNS}:/home/ec2-user/
-      - ssh -o StrictHostKeyChecking=no -i mykeypair.pem ec2-user@{EC2_DNS} <<EOF
+      - scp -o StrictHostKeyChecking=no -i mykeypair.pem app.zip ec2-user@$EC2_DNS:/home/ec2-user/
+      - ssh -o StrictHostKeyChecking=no -i mykeypair.pem ec2-user@$EC2_DNS <<EOF
           echo "Unzipping application files..."
           unzip -o /home/ec2-user/app.zip -d /home/ec2-user/app
           cd /home/ec2-user/app
