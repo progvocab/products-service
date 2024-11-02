@@ -7,6 +7,7 @@ phases:
       python: 3.8  # Specify the Python version your Falcon API uses
     commands:
       - echo "Installing dependencies..."
+      - cd python
       - pip install -r requirements.txt
 
   pre_build:
@@ -22,8 +23,8 @@ phases:
   post_build:
     commands:
       - echo "Starting deployment to EC2..."
-      - scp -o StrictHostKeyChecking=no -i /path/to/key.pem app.zip ec2-user@<EC2_PUBLIC_IP>:/home/ec2-user/
-      - ssh -o StrictHostKeyChecking=no -i /path/to/key.pem ec2-user@<EC2_PUBLIC_IP> <<EOF
+      - scp -o StrictHostKeyChecking=no -i mykeypair.pem app.zip ec2-user@{EC2_DNS}:/home/ec2-user/
+      - ssh -o StrictHostKeyChecking=no -i mykeypair.pem ec2-user@{EC2_DNS} <<EOF
           echo "Unzipping application files..."
           unzip -o /home/ec2-user/app.zip -d /home/ec2-user/app
           cd /home/ec2-user/app
