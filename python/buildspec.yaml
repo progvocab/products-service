@@ -24,6 +24,7 @@ phases:
   post_build:
     commands:
       - echo "Starting deployment to EC2..."
+      - sudo chmod 400 mykeypair.pem
       - scp -o StrictHostKeyChecking=no -i mykeypair.pem app.zip ec2-user@$EC2_DNS:/home/ec2-user/
       - ssh -o StrictHostKeyChecking=no -i mykeypair.pem ec2-user@$EC2_DNS <<EOF
           echo "Unzipping application files..."
