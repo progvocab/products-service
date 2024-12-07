@@ -32,9 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
-python/venv/*
+python/rest-api/venv/*
 
 
-python/__pycache__/*
+python/rest-api/__pycache__/*
 .mvn/*
 *.swp
