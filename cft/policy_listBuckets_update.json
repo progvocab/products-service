@@ -1,0 +1,14 @@
+{
+	"Version": "2012-10-17",
+	"Statement" : [{
+		"Sid" : "test1",
+		"Effect" :"Allow",
+		"Action" : [ 
+			"s3:ListBucket",
+			"s3:ListAllMyBuckets"
+			],
+		"Resource" : "arn:aws:s3:::cf-templates-1rybmhtlsymzv-ap-southeast-2"
+	}]
+}
+
+

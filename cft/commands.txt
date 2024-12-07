@@ -1,0 +1,6 @@
+aws s3 ls
+aws 
+aws iam create-policy --policy-name s3_use --policy-document file://cft/policy_listBuckets.json
+aws iam attach-group-policy --group-name MyUserGroup --policy-arn arn:aws:iam::307946657424:policy/s3_use
+
+aws iam create-policy-version --policy-arn arn:aws:iam::307946657424:policy/s3_use --policy-document file://cft/policy_listBuckets_update.json

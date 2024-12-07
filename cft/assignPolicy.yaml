@@ -1,0 +1,27 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Attach S3 Read Access Policy to an Existing IAM Group
+
+Resources:
+  # IAM Policy for S3 Read Access
+  S3ReadPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: "S3ReadOnlyPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "s3:ListBucket"
+              - "s3:GetObject"
+            Resource:
+              - "arn:aws:s3:::example-bucket"            # Replace with your bucket ARN
+              - "arn:aws:s3:::example-bucket/*"          # Replace with your bucket ARN
+      Groups:
+        - "ExistingGroupName"  # Replace with the name of your existing IAM group
+
+Outputs:
+  PolicyName:
+    Description: The name of the IAM policy created
+    Value: !Ref S3ReadPolicy

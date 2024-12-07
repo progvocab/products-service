@@ -1,0 +1,26 @@
+
+  IAMUserGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: "MyUserGroup"
+      Policies:
+        - PolicyName: "RoleAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "ec2:DescribeInstances"
+                  - "ec2:StartInstances"
+                  - "ec2:StopInstances"
+                Resource: "*"
+      Policies:
+        - PolicyName: "BasicAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:ListBucket"
+                  - "s3:GetObject"
+                Resource: "*"

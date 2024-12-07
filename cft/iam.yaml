@@ -1,0 +1,59 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AWS IAM User, Role, and User Group Creation
+
+Resources:
+  # IAM User Group
+  IAMUserGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: "MyUserGroup"
+      Policies:
+        - PolicyName: "RoleAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "ec2:DescribeInstances"
+                  - "ec2:StartInstances"
+                  - "ec2:StopInstances"
+                Resource: "*"
+
+  # IAM Role
+  IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "MyIAMRole"
+      AssumeRolePolicyDocument: # The trust policy that is associated with this role. Trust policies define which entities can assume the role
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "RoleAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "ec2:DescribeInstances"
+                  - "ec2:StartInstances"
+                  - "ec2:StopInstances"
+                Resource: "*"
+
+  # IAM User
+  IAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "MyIAMUser"
+      Groups:
+        - !Ref IAMUserGroup
+
+Outputs: IAMUserName: Description: The name of the IAM user created Value: !Ref
+IAMUser IAMRoleName: Description: The name of the IAM role created Value: !Ref
+IAMRole IAMGroupName: Description: The name of the IAM user group created
+Value: !Ref IAMUserGroup
