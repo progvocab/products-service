@@ -118,3 +118,110 @@ predictor.delete_endpoint()
 ```
 
 By following these steps, you can effectively use AWS SageMaker to train and deploy a model that converts grayscale images to color.
+
+The `train.py` script is the main training script for your deep learning model. It contains the logic for loading data, defining the model architecture, training the model, and saving the trained model. Here’s a breakdown of what `train.py` should contain and where to place it:
+
+### Content of `train.py`
+
+1. **Imports**:
+   Import necessary libraries for data handling, model building, and training.
+
+   ```python
+   import tensorflow as tf
+   from tensorflow.keras.models import Sequential
+   from tensorflow.keras.layers import Conv2D, UpSampling2D, Input, BatchNormalization
+   from tensorflow.keras.optimizers import Adam
+   import argparse
+   import os
+   ```
+
+2. **Argument Parsing**:
+   Parse command-line arguments for hyperparameters and paths.
+
+   ```python
+   parser = argparse.ArgumentParser()
+   parser.add_argument('--epochs', type=int, default=50)
+   parser.add_argument('--batch_size', type=int, default=32)
+   parser.add_argument('--learning_rate', type=float, default=0.001)
+   parser.add_argument('--model_dir', type=str, default=os.environ['SM_MODEL_DIR'])
+   parser.add_argument('--train_data', type=str, default=os.environ['SM_CHANNEL_TRAINING'])
+   args = parser.parse_args()
+   ```
+
+3. **Data Loading**:
+   Load and preprocess the grayscale and color images from the S3 bucket.
+
+   ```python
+   def load_data(data_dir):
+       # Implement loading and preprocessing logic
+       # For example: Use tf.data.Dataset to load images from directories
+       return train_dataset, val_dataset
+
+   train_dataset, val_dataset = load_data(args.train_data)
+   ```
+
+4. **Model Definition**:
+   Define the model architecture (e.g., U-Net).
+
+   ```python
+   def build_model():
+       model = Sequential()
+       model.add(Input(shape=(256, 256, 1)))
+       model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
+       model.add(BatchNormalization())
+       # Add more layers...
+       model.add(UpSampling2D((2, 2)))
+       model.add(Conv2D(3, (3, 3), activation='relu', padding='same'))
+       return model
+
+   model = build_model()
+   ```
+
+5. **Compile and Train**:
+   Compile the model and train it on the dataset.
+
+   ```python
+   model.compile(optimizer=Adam(learning_rate=args.learning_rate), loss='mse')
+   model.fit(train_dataset, validation_data=val_dataset, epochs=args.epochs, batch_size=args.batch_size)
+   ```
+
+6. **Save the Model**:
+   Save the trained model to the specified directory.
+
+   ```python
+   model.save(os.path.join(args.model_dir, 'model.h5'))
+   ```
+
+### Where to Place `train.py`
+
+1. **Local Development**:
+   - Place `train.py` in your project directory on your local machine. Ensure it’s accessible by the SageMaker environment when you upload it.
+
+2. **Upload to S3**:
+   - Before starting the training job, upload `train.py` to an S3 bucket. This is optional but recommended for versioning and accessibility.
+
+   ```bash
+   aws s3 cp train.py s3://your-bucket-name/path/to/train.py
+   ```
+
+3. **Specify in SageMaker Estimator**:
+   When setting up the SageMaker estimator in your Jupyter Notebook or local script, specify the path to `train.py`.
+
+   ```python
+   from sagemaker.tensorflow import TensorFlow
+
+   estimator = TensorFlow(entry_point='train.py',
+                          source_dir='path/to/source/directory',  # Local directory with train.py
+                          role='SageMakerRole',
+                          framework_version='2.4.1',
+                          py_version='py37',
+                          instance_count=1,
+                          instance_type='ml.p3.2xlarge',
+                          hyperparameters={
+                              'epochs': 50,
+                          })
+
+   estimator.fit({'training': 's3://your-bucket/path-to-training-data'})
+   ```
+
+By following this structure, `train.py` will serve as a robust script for training your image colorization model on AWS SageMaker.
