@@ -225,3 +225,87 @@ The `train.py` script is the main training script for your deep learning model. 
    ```
 
 By following this structure, `train.py` will serve as a robust script for training your image colorization model on AWS SageMaker.
+
+When preparing your training data for image colorization on AWS SageMaker, it’s essential to organize the images in a structured manner that facilitates easy loading and processing. Here’s a recommended structure and approach for organizing your grayscale and color images:
+
+### Recommended Directory Structure
+
+```plaintext
+s3://your-bucket-name/path-to-training-data/
+├── train/
+│   ├── grayscale/
+│   │   ├── image1.jpg
+│   │   ├── image2.jpg
+│   │   └── ...
+│   └── color/
+│       ├── image1.jpg
+│       ├── image2.jpg
+│       └── ...
+└── val/
+    ├── grayscale/
+    │   ├── image1.jpg
+    │   ├── image2.jpg
+    │   └── ...
+    └── color/
+        ├── image1.jpg
+        ├── image2.jpg
+        └── ...
+```
+
+### Explanation:
+- **`train/`**: Contains the training dataset.
+  - **`grayscale/`**: Contains grayscale images (input to the model).
+  - **`color/`**: Contains the corresponding color images (target output for the model).
+- **`val/`**: Contains the validation dataset (similar structure to the training dataset).
+
+### Guidelines for Organizing Data
+
+1. **Pairing**: Ensure that each grayscale image has a corresponding color image with the same filename (e.g., `image1.jpg` in both `grayscale/` and `color/` directories).
+
+2. **Splitting**: Split the dataset into `train` and `val` sets to evaluate the model’s performance on unseen data.
+
+3. **Format**: Use standard image formats like `.jpg` or `.png` for consistency.
+
+4. **Resolution**: Ensure all images have the same resolution (e.g., 256x256 pixels). You can resize images during preprocessing if necessary.
+
+### Uploading to S3
+Once your data is organized locally, upload it to an S3 bucket for SageMaker to access.
+
+```bash
+aws s3 cp /path-to-local-data/train s3://your-bucket-name/path-to-training-data/train --recursive
+aws s3 cp /path-to-local-data/val s3://your-bucket-name/path-to-training-data/val --recursive
+```
+
+### Loading the Data in `train.py`
+In your `train.py` script, you’ll need to load these images and preprocess them. Here’s a basic example using TensorFlow’s `tf.data` API:
+
+```python
+import tensorflow as tf
+
+def load_data(data_dir):
+    def parse_image(grayscale_path, color_path):
+        grayscale_img = tf.io.read_file(grayscale_path)
+        grayscale_img = tf.image.decode_jpeg(grayscale_img, channels=1)
+        grayscale_img = tf.image.resize(grayscale_img, [256, 256])
+        
+        color_img = tf.io.read_file(color_path)
+        color_img = tf.image.decode_jpeg(color_img, channels=3)
+        color_img = tf.image.resize(color_img, [256, 256])
+        
+        return grayscale_img / 255.0, color_img / 255.0
+
+    grayscale_paths = tf.data.Dataset.list_files(f'{data_dir}/grayscale/*.jpg')
+    color_paths = tf.data.Dataset.list_files(f'{data_dir}/color/*.jpg')
+    
+    dataset = tf.data.Dataset.zip((grayscale_paths, color_paths))
+    dataset = dataset.map(parse_image)
+    dataset = dataset.shuffle(buffer_size=1000).batch(32)
+    
+    return dataset
+
+train_dataset = load_data('/opt/ml/input/data/training/train')
+val_dataset = load_data('/opt/ml/input/data/training/val')
+```
+
+### Summary
+Organizing your training data in a clear, structured way ensures efficient loading and processing during model training. By following this directory structure and loading approach, you can set up your SageMaker environment for a smooth training experience.
