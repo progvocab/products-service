@@ -1,0 +1,1 @@
+create a grpc server and host it in EKS ,call the endpoint via Network Load Balancer host.
