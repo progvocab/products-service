@@ -1,24 +1,24 @@
-Port number	Service	Protocol
-20	FTP (data transfer)	TCP
-21	FTP (control)	TCP
-22	SSH	TCP
-23	Telnet	TCP
-25	SMTP	TCP
-53	DNS	TCP/UDP
-67/68	DHCP	UDP
-69	TFTP	UDP
-80	HTTP	TCP
-110	POP3	TCP
-123	NTP	UDP
-137/138/139	NetBIOS	TCP/UDP
-143	IMAP	TCP
-161/162	SNMP	TCP/UDP
-179	BGP	TCP
-389	LDAP	TCP/UDP
-443	HTTPS	TCP
-636	LDAPS	TCP/UDP
-989/990	FTPS	TCP
-3306	MySQL	TCP
-8080	Alternative to HTTP (web)	TCP
-8443	Alternative to HTTPS (web)	TCP
-Additionally, consider selecting a por
+### Port number	Service	Protocol
+- 20	FTP (data transfer)	TCP
+- 21	FTP (control)	TCP
+- 22	SSH	TCP
+- 23	Telnet	TCP
+- 25	SMTP	TCP
+- 53	DNS	TCP/UDP
+- 67/68	DHCP	UDP
+- 69	TFTP	UDP
+- 80	HTTP	TCP
+- 110	POP3	TCP
+- 123	NTP	UDP
+- 137/138/139	NetBIOS	TCP/UDP
+- 143	IMAP	TCP
+- 161/162	SNMP	TCP/UDP
+- 179	BGP	TCP
+- 389	LDAP	TCP/UDP
+- 443	HTTPS	TCP
+- 636	LDAPS	TCP/UDP
+- 989/990	FTPS	TCP
+- 3306	MySQL	TCP
+- 8080	Alternative to HTTP (web)	TCP
+- 8443	Alternative to HTTPS (web)	TCP
+- Additionally, consider selecting a por
