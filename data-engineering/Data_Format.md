@@ -1,4 +1,4 @@
-### **Comparison of Parquet, ORC, Avro, Protobuf with CSV and JSON**
+8### **Comparison of Parquet, ORC, Avro, Protobuf with CSV and JSON**
 
 Here’s a detailed comparison of the file formats based on **performance, structure, compression, and use cases**:
 
@@ -122,3 +122,155 @@ Here’s a detailed comparison of the file formats based on **performance, struc
 - **Avro & Protobuf**: Best for fast serialization, real-time systems, and streaming.
 
 Let me know if you'd like detailed examples or code snippets!
+
+Here is a list of 5 employees represented in **CSV**, **JSON**, **Parquet**, **ORC**, **Avro**, and **Protobuf** formats. 
+
+---
+
+### **1. CSV Format**
+```csv
+EmployeeID,Name,Age,Department,Salary
+1,John Doe,30,Engineering,70000
+2,Jane Smith,25,Marketing,50000
+3,Michael Brown,40,Sales,60000
+4,Sarah Johnson,35,HR,55000
+5,David Lee,28,Engineering,75000
+```
+
+---
+
+### **2. JSON Format**
+```json
+[
+    {"EmployeeID": 1, "Name": "John Doe", "Age": 30, "Department": "Engineering", "Salary": 70000},
+    {"EmployeeID": 2, "Name": "Jane Smith", "Age": 25, "Department": "Marketing", "Salary": 50000},
+    {"EmployeeID": 3, "Name": "Michael Brown", "Age": 40, "Department": "Sales", "Salary": 60000},
+    {"EmployeeID": 4, "Name": "Sarah Johnson", "Age": 35, "Department": "HR", "Salary": 55000},
+    {"EmployeeID": 5, "Name": "David Lee", "Age": 28, "Department": "Engineering", "Salary": 75000}
+]
+```
+
+---
+
+### **3. Parquet Format**
+You can save the data in Parquet format using PySpark or Pandas:
+
+#### **Python Code (Using Pandas)**:
+```python
+import pandas as pd
+
+data = [
+    {"EmployeeID": 1, "Name": "John Doe", "Age": 30, "Department": "Engineering", "Salary": 70000},
+    {"EmployeeID": 2, "Name": "Jane Smith", "Age": 25, "Department": "Marketing", "Salary": 50000},
+    {"EmployeeID": 3, "Name": "Michael Brown", "Age": 40, "Department": "Sales", "Salary": 60000},
+    {"EmployeeID": 4, "Name": "Sarah Johnson", "Age": 35, "Department": "HR", "Salary": 55000},
+    {"EmployeeID": 5, "Name": "David Lee", "Age": 28, "Department": "Engineering", "Salary": 75000}
+]
+
+df = pd.DataFrame(data)
+df.to_parquet("employees.parquet", index=False)
+```
+
+---
+
+### **4. ORC Format**
+You can save the data in ORC format using PySpark:
+
+#### **Python Code (Using PySpark)**:
+```python
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("ORC Example").getOrCreate()
+
+data = [
+    (1, "John Doe", 30, "Engineering", 70000),
+    (2, "Jane Smith", 25, "Marketing", 50000),
+    (3, "Michael Brown", 40, "Sales", 60000),
+    (4, "Sarah Johnson", 35, "HR", 55000),
+    (5, "David Lee", 28, "Engineering", 75000)
+]
+
+columns = ["EmployeeID", "Name", "Age", "Department", "Salary"]
+df = spark.createDataFrame(data, columns)
+
+df.write.orc("employees.orc")
+```
+
+---
+
+### **5. Avro Format**
+You can save the data in Avro format using PySpark:
+
+#### **Python Code (Using PySpark)**:
+```python
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("Avro Example").config("spark.jars.packages", "org.apache.spark:spark-avro_2.12:3.3.0").getOrCreate()
+
+data = [
+    (1, "John Doe", 30, "Engineering", 70000),
+    (2, "Jane Smith", 25, "Marketing", 50000),
+    (3, "Michael Brown", 40, "Sales", 60000),
+    (4, "Sarah Johnson", 35, "HR", 55000),
+    (5, "David Lee", 28, "Engineering", 75000)
+]
+
+columns = ["EmployeeID", "Name", "Age", "Department", "Salary"]
+df = spark.createDataFrame(data, columns)
+
+df.write.format("avro").save("employees.avro")
+```
+
+---
+
+### **6. Protobuf Format**
+
+#### **Protobuf Schema**
+Define a schema for your employees in a `.proto` file:
+```proto
+syntax = "proto3";
+
+message Employee {
+    int32 EmployeeID = 1;
+    string Name = 2;
+    int32 Age = 3;
+    string Department = 4;
+    double Salary = 5;
+}
+
+message EmployeeList {
+    repeated Employee employees = 1;
+}
+```
+
+#### **Serialized Example**
+You can use the Protobuf library in Python to serialize the data:
+```python
+from employee_pb2 import Employee, EmployeeList
+
+# Create employees
+employee_list = EmployeeList()
+employee_data = [
+    {"EmployeeID": 1, "Name": "John Doe", "Age": 30, "Department": "Engineering", "Salary": 70000},
+    {"EmployeeID": 2, "Name": "Jane Smith", "Age": 25, "Department": "Marketing", "Salary": 50000},
+    {"EmployeeID": 3, "Name": "Michael Brown", "Age": 40, "Department": "Sales", "Salary": 60000},
+    {"EmployeeID": 4, "Name": "Sarah Johnson", "Age": 35, "Department": "HR", "Salary": 55000},
+    {"EmployeeID": 5, "Name": "David Lee", "Age": 28, "Department": "Engineering", "Salary": 75000}
+]
+
+for emp in employee_data:
+    employee = employee_list.employees.add()
+    employee.EmployeeID = emp["EmployeeID"]
+    employee.Name = emp["Name"]
+    employee.Age = emp["Age"]
+    employee.Department = emp["Department"]
+    employee.Salary = emp["Salary"]
+
+# Serialize to file
+with open("employees.protobuf", "wb") as f:
+    f.write(employee_list.SerializeToString())
+```
+
+---
+
+Let me know if you'd like any further explanation or help!
