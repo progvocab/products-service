@@ -153,6 +153,124 @@ Would you like help customizing this code for a specific use case?
   - Launch an EMR cluster with Spark installed.
   - Use an S3 bucket for EMR logs and intermediate data storage.
 
+Here is the Python code using **Boto3** to launch an **EMR cluster** with Spark installed. This includes configuring an S3 bucket for storing logs and intermediate data:
+
+---
+
+### **Prerequisites**
+1. Install Boto3:
+   ```bash
+   pip install boto3
+   ```
+2. Ensure your AWS credentials and permissions are configured to create EMR clusters and interact with S3.
+
+---
+
+### **Python Code**
+
+```python
+import boto3
+
+# Initialize the EMR client
+emr_client = boto3.client('emr', region_name='us-east-1')  # Replace 'us-east-1' with your desired region
+
+# Configuration
+CLUSTER_NAME = "Spark-EMR-Cluster"
+LOG_URI = "s3://your-log-bucket/emr-logs/"  # Replace with your S3 bucket for logs
+INTERMEDIATE_DATA_URI = "s3://your-data-bucket/emr-intermediate-data/"  # Replace with your S3 bucket for data storage
+
+def create_emr_cluster():
+    response = emr_client.run_job_flow(
+        Name=CLUSTER_NAME,
+        LogUri=LOG_URI,
+        ReleaseLabel="emr-6.5.0",  # EMR version with Spark installed
+        Instances={
+            "InstanceGroups": [
+                {
+                    "Name": "Master node",
+                    "Market": "ON_DEMAND",
+                    "InstanceRole": "MASTER",
+                    "InstanceType": "m5.xlarge",
+                    "InstanceCount": 1,
+                },
+                {
+                    "Name": "Core nodes",
+                    "Market": "ON_DEMAND",
+                    "InstanceRole": "CORE",
+                    "InstanceType": "m5.xlarge",
+                    "InstanceCount": 2,  # Number of worker nodes
+                },
+            ],
+            "KeepJobFlowAliveWhenNoSteps": True,
+            "TerminationProtected": False,
+            "Ec2KeyName": "your-ec2-keypair-name",  # Replace with your EC2 key pair name
+        },
+        Applications=[{"Name": "Hadoop"}, {"Name": "Spark"}],  # Install Spark and Hadoop
+        Configurations=[
+            {
+                "Classification": "spark",
+                "Properties": {
+                    "maximizeResourceAllocation": "true",  # Allocate all available resources to Spark
+                },
+            }
+        ],
+        ServiceRole="EMR_DefaultRole",  # Ensure the EMR_DefaultRole exists
+        JobFlowRole="EMR_EC2_DefaultRole",  # Ensure the EMR_EC2_DefaultRole exists
+        VisibleToAllUsers=True,
+        Tags=[
+            {"Key": "Environment", "Value": "Development"},
+            {"Key": "Project", "Value": "SparkETL"},
+        ],
+    )
+    print(f"Cluster created with ID: {response['JobFlowId']}")
+    return response["JobFlowId"]
+
+# Run the function to create the cluster
+cluster_id = create_emr_cluster()
+print(f"EMR Cluster ID: {cluster_id}")
+```
+
+---
+
+### **Key Parameters Explained**
+1. **Cluster Name**: `CLUSTER_NAME` specifies the name of the EMR cluster.
+2. **Log URI**: `LOG_URI` specifies the S3 bucket for EMR logs.
+3. **Intermediate Data URI**: `INTERMEDIATE_DATA_URI` can be used for your job's intermediate data.
+4. **Release Label**: The EMR version (e.g., `emr-6.5.0`) determines the Spark and Hadoop versions.
+5. **Instance Groups**: Defines the types and number of instances for the **master** and **core** nodes.
+6. **Applications**: Specifies the software to install (e.g., Spark, Hadoop).
+7. **Configurations**: Configures Spark properties, such as maximizing resource allocation.
+8. **Roles**:
+   - `EMR_DefaultRole` (service role): Grants permissions to EMR services.
+   - `EMR_EC2_DefaultRole` (instance profile): Grants EC2 instances permissions for resources like S3.
+
+---
+
+### **Verify the Cluster**
+1. Log in to the **AWS Management Console**.
+2. Navigate to **EMR** > **Clusters**.
+3. Find your cluster in the list, and check its status.
+
+---
+
+### **S3 Bucket Setup**
+Ensure the specified S3 bucket exists and has proper permissions for EMR to write logs and store data:
+1. Create the S3 bucket (if not already created):
+   ```bash
+   aws s3 mb s3://your-log-bucket
+   aws s3 mb s3://your-data-bucket
+   ```
+2. Attach an appropriate bucket policy allowing EMR to write logs.
+
+---
+
+### **Run Spark Jobs**
+Once the EMR cluster is running, you can SSH into the master node and submit Spark jobs using the `spark-submit` command.
+
+---
+
+Would you like help writing a Spark job or configuring a step for this cluster?
+
 ---
 
 #### **2. Configure the AWS Glue ETL Job**
