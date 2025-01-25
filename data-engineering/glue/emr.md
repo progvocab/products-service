@@ -17,6 +17,138 @@ In this workflow, AWS Glue handles the ETL (Extract, Transform, Load) orchestrat
 - **AWS Glue**:
   - Create an AWS Glue Data Catalog for your source and target data.
   - Define databases and tables in the Glue Catalog.
+
+Here’s how to create an **AWS Glue Data Catalog**, databases, and tables programmatically using **AWS CLI** and **Boto3 (Python SDK)**.
+
+---
+
+## **Using AWS CLI**
+
+### 1. **Create a Glue Database**
+Run the following AWS CLI command to create a database in the Glue Data Catalog:
+
+```bash
+aws glue create-database \
+    --database-input '{"Name": "my_database", "Description": "My Glue database for ETL"}'
+```
+
+- Replace `my_database` with the desired database name.
+- Optionally, add a `LocationUri` to specify where the data resides (e.g., an S3 bucket).
+
+---
+
+### 2. **Create a Glue Table**
+Run the following AWS CLI command to create a table in the Glue Data Catalog:
+
+```bash
+aws glue create-table \
+    --database-name my_database \
+    --table-input '{
+        "Name": "my_table",
+        "Description": "Sample Glue Table",
+        "StorageDescriptor": {
+            "Columns": [
+                {"Name": "id", "Type": "int"},
+                {"Name": "name", "Type": "string"},
+                {"Name": "age", "Type": "int"}
+            ],
+            "Location": "s3://my-bucket/my-folder/",
+            "InputFormat": "org.apache.hadoop.mapred.TextInputFormat",
+            "OutputFormat": "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
+            "SerdeInfo": {
+                "SerializationLibrary": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+                "Parameters": {"field.delim": ","}
+            }
+        },
+        "TableType": "EXTERNAL_TABLE"
+    }'
+```
+
+- Replace `my_database` and `my_table` with your database and table names.
+- Update the **`Location`** to point to your data in S3.
+
+---
+
+## **Using Python (Boto3)**
+
+### **Setup**
+Install the AWS SDK for Python (Boto3) if not already installed:
+
+```bash
+pip install boto3
+```
+
+### **Code to Create Glue Data Catalog, Database, and Table**
+
+```python
+import boto3
+
+# Initialize the Glue client
+glue = boto3.client('glue', region_name='us-east-1')  # Replace with your region
+
+# Create a Glue Database
+def create_database():
+    response = glue.create_database(
+        DatabaseInput={
+            'Name': 'my_database',
+            'Description': 'My Glue database for ETL'
+        }
+    )
+    print("Database created:", response)
+
+# Create a Glue Table
+def create_table():
+    response = glue.create_table(
+        DatabaseName='my_database',
+        TableInput={
+            'Name': 'my_table',
+            'Description': 'Sample Glue Table',
+            'StorageDescriptor': {
+                'Columns': [
+                    {'Name': 'id', 'Type': 'int'},
+                    {'Name': 'name', 'Type': 'string'},
+                    {'Name': 'age', 'Type': 'int'}
+                ],
+                'Location': 's3://my-bucket/my-folder/',
+                'InputFormat': 'org.apache.hadoop.mapred.TextInputFormat',
+                'OutputFormat': 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat',
+                'SerdeInfo': {
+                    'SerializationLibrary': 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe',
+                    'Parameters': {'field.delim': ','}
+                }
+            },
+            'TableType': 'EXTERNAL_TABLE'
+        }
+    )
+    print("Table created:", response)
+
+# Run the functions
+create_database()
+create_table()
+```
+
+---
+
+### **Explanation of Key Parameters**
+- **Database Name**: Name of the database to be created.
+- **Table Name**: Name of the table within the database.
+- **Columns**: Schema of the table (name and type of each column).
+- **Location**: Path to the data stored in S3.
+- **Input/Output Format**: Specifies the file format for reading/writing data.
+- **SerdeInfo**: Serialization and deserialization properties (e.g., delimiter for CSV).
+
+---
+
+### **Verify the Created Catalog**
+1. Log in to the **AWS Management Console**.
+2. Navigate to **AWS Glue** > **Data Catalog** > **Databases**.
+3. Check if the database and table are listed.
+
+---
+
+Would you like help customizing this code for a specific use case?
+
+
 - **Amazon EMR**:
   - Launch an EMR cluster with Spark installed.
   - Use an S3 bucket for EMR logs and intermediate data storage.
