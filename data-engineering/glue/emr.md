@@ -113,6 +113,161 @@ In the AWS Glue job configuration, specify the following:
 - Trigger the Glue ETL job from the AWS Management Console, AWS CLI, or programmatically using the AWS SDK.
 - Monitor the job status in AWS Glue and EMR (logs can be found in Amazon CloudWatch or the specified S3 log path).
 
+To create an **AWS Glue job that submits a Spark job to an EMR cluster** using the AWS CLI, you need to configure the Glue job to use the EMR cluster as the Spark execution environment. Below are the steps and a detailed example to achieve this.
+
+---
+
+### **1. Pre-requisites**
+1. **Create an EMR Cluster**:
+   - Launch an EMR cluster with Spark installed. You can use the following AWS CLI command:
+   ```bash
+   aws emr create-cluster \
+       --name "ETL Cluster" \
+       --release-label emr-6.5.0 \
+       --applications Name=Spark Name=Hadoop \
+       --instance-type m5.xlarge \
+       --instance-count 3 \
+       --use-default-roles \
+       --log-uri s3://my-log-bucket/emr-logs/ \
+       --auto-terminate
+   ```
+
+   Take note of the **Cluster ID** and **Master Node DNS** for later use.
+
+2. **Prepare the Spark Script**:
+   - Save your Spark job script (e.g., `etl_script.py`) to an S3 bucket, as Glue jobs require access to this script.
+
+3. **IAM Roles**:
+   - Ensure you have an **IAM role** with sufficient permissions to interact with Glue, EMR, and S3.
+
+---
+
+### **2. Create the Glue Job Using AWS CLI**
+Here’s how to create a Glue job to submit your Spark script to the EMR cluster.
+
+#### **Command to Create the Glue Job**
+```bash
+aws glue create-job \
+    --name my-emr-glue-job \
+    --role AWSGlueServiceRole \
+    --command '{"Name": "glueetl", "ScriptLocation": "s3://my-scripts-bucket/etl_script.py"}' \
+    --default-run-properties '{"--job-bookmark-option": "job-bookmark-enable"}' \
+    --connections Connections="MyEMRClusterConnection" \
+    --glue-version "2.0" \
+    --number-of-workers 5 \
+    --worker-type Standard \
+    --execution-class FLEX \
+    --description "Glue job to submit Spark job to EMR"
+```
+
+---
+
+### **Explanation of Key Parameters**
+- **`--name`**: The name of your Glue job.
+- **`--role`**: The IAM role that Glue will use to access EMR, S3, and other resources.
+- **`--command`**: Specifies the Spark script location in S3 and the type of job (`glueetl`).
+  - `ScriptLocation`: The path to the Spark script in S3.
+- **`--connections`**: Use an **EMR connection** to link the Glue job to the EMR cluster.
+- **`--glue-version`**: Glue version (2.0 or 3.0) that determines the underlying Spark and Python versions.
+- **`--number-of-workers`**: Number of Glue workers for the job.
+- **`--worker-type`**: Type of workers (`Standard`, `G.1X`, or `G.2X`).
+- **`--execution-class`**: `FLEX` for cost-optimized execution or `STANDARD` for low-latency.
+
+---
+
+### **3. Create the EMR Connection**
+You need to create a Glue connection to your EMR cluster. This allows Glue to communicate with the EMR master node.
+
+#### **Command to Create Connection**
+```bash
+aws glue create-connection \
+    --name MyEMRClusterConnection \
+    --connection-input '{"Name": "MyEMRClusterConnection", 
+                         "ConnectionType": "NETWORK", 
+                         "ConnectionProperties": { 
+                             "HOST": "emr-master-node-dns", 
+                             "PORT": "8998", 
+                             "USERNAME": "emr-user", 
+                             "PASSWORD": "emr-password" 
+                         }
+                        }'
+```
+
+- Replace **`emr-master-node-dns`** with the DNS name of your EMR master node.
+- Replace **`emr-user`** and **`emr-password`** with appropriate credentials for the EMR cluster.
+
+---
+
+### **4. Start the Glue Job**
+Once the Glue job is created, you can run it using the following AWS CLI command:
+
+#### **Command to Start the Glue Job**
+```bash
+aws glue start-job-run \
+    --job-name my-emr-glue-job
+```
+
+---
+
+### **5. Monitor the Glue Job**
+To check the status of the Glue job, use:
+
+#### **Command to Check Job Status**
+```bash
+aws glue get-job-run \
+    --job-name my-emr-glue-job \
+    --run-id <job-run-id>
+```
+
+Replace `<job-run-id>` with the Job Run ID returned when you started the job.
+
+---
+
+### **6. Logs and Debugging**
+- **Glue Logs**: Available in Amazon CloudWatch under the Glue job's log group.
+- **EMR Logs**: Available in the S3 bucket specified during EMR cluster creation (e.g., `s3://my-log-bucket/emr-logs/`).
+
+---
+
+### **7. Sample Spark Script (etl_script.py)**
+
+Here’s a basic Spark script to process data from S3 and save the output:
+
+```python
+from pyspark.sql import SparkSession
+
+# Initialize SparkSession
+spark = SparkSession.builder \
+    .appName("EMR Glue Job Example") \
+    .getOrCreate()
+
+# Read data from S3
+input_path = "s3://my-input-bucket/raw-data/"
+output_path = "s3://my-output-bucket/processed-data/"
+
+df = spark.read.csv(input_path, header=True, inferSchema=True)
+
+# Perform some transformations
+df_transformed = df.filter(df['age'] > 30)
+
+# Write the transformed data back to S3
+df_transformed.write.parquet(output_path, mode="overwrite")
+
+spark.stop()
+```
+
+---
+
+### **Advantages of Using AWS Glue with EMR**
+1. **Scalability**: EMR handles large-scale Spark workloads, while Glue manages orchestration.
+2. **Cost-Effective**: Use Glue’s serverless nature and EMR’s auto-scaling for optimized cost.
+3. **Ease of Management**: Glue simplifies job scheduling and integrates seamlessly with other AWS services.
+4. **Flexible Execution**: Leverage Glue's integration with an external Spark runtime (EMR).
+
+---
+
+Would you like more details on a specific step or customization for your use case?
+
 ---
 
 ### **Architecture Diagram**
