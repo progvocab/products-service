@@ -271,6 +271,205 @@ Once the EMR cluster is running, you can SSH into the master node and submit Spa
 
 Would you like help writing a Spark job or configuring a step for this cluster?
 
+To submit a Spark job on the EMR cluster, you can do it in two ways:  
+
+1. **Using the AWS Management Console**  
+2. **Automating with Boto3 (Python SDK)**  
+
+Below is the guide to run a Spark job on your EMR cluster.
+
+---
+
+### **Step 1: Prepare the Spark Job Script**
+Create a Spark job script (`example_spark_job.py`) and upload it to an S3 bucket. Below is a simple example:
+
+```python
+from pyspark.sql import SparkSession
+
+# Initialize SparkSession
+spark = SparkSession.builder.appName("ExampleSparkJob").getOrCreate()
+
+# Read data from S3
+input_path = "s3://your-data-bucket/input-data/"
+output_path = "s3://your-data-bucket/output-data/"
+
+df = spark.read.csv(input_path, header=True, inferSchema=True)
+
+# Perform a transformation
+result_df = df.filter(df['age'] > 30)
+
+# Write the result back to S3
+result_df.write.parquet(output_path, mode="overwrite")
+
+print("Spark job completed successfully!")
+
+spark.stop()
+```
+
+Upload the script to S3:
+```bash
+aws s3 cp example_spark_job.py s3://your-s3-bucket-name/
+```
+
+---
+
+### **Step 2: Add a Step to EMR Cluster Using Boto3**
+
+You can submit the job as a step to the EMR cluster programmatically using **Boto3**.
+
+#### **Python Code to Submit a Spark Job**
+```python
+import boto3
+
+# Initialize the EMR client
+emr_client = boto3.client('emr', region_name='us-east-1')  # Replace with your region
+
+# Define the step to run the Spark job
+def add_spark_step(cluster_id):
+    response = emr_client.add_job_flow_steps(
+        JobFlowId=cluster_id,
+        Steps=[
+            {
+                'Name': 'Run Spark Job',
+                'ActionOnFailure': 'TERMINATE_CLUSTER',  # You can use 'CONTINUE' to keep the cluster alive
+                'HadoopJarStep': {
+                    'Jar': 'command-runner.jar',
+                    'Args': [
+                        'spark-submit',
+                        '--deploy-mode', 'cluster',
+                        '--master', 'yarn',
+                        's3://your-s3-bucket-name/example_spark_job.py'
+                    ]
+                }
+            }
+        ]
+    )
+    step_id = response['StepIds'][0]
+    print(f"Step added with ID: {step_id}")
+    return step_id
+
+# Replace with your EMR cluster ID
+cluster_id = "j-XXXXXXXXXXXXX"  # Replace with the ID of your running EMR cluster
+
+# Add the step
+step_id = add_spark_step(cluster_id)
+print(f"Step ID: {step_id}")
+```
+
+---
+
+### **Step 3: Monitor the Job**
+1. **From the Console**:  
+   - Navigate to **EMR > Clusters > [Your Cluster] > Steps** to monitor the step's progress.
+2. **Using AWS CLI**:  
+   Check the status of the step:
+   ```bash
+   aws emr describe-step --cluster-id j-XXXXXXXXXXXXX --step-id s-YYYYYYYYYYYYYY
+   ```
+
+---
+
+### **Step 4: Verify the Output**
+Once the job is completed, the transformed data will be saved in your output S3 bucket (`s3://your-data-bucket/output-data/`).
+
+---
+
+### **Step 5: Automating the Entire Workflow**
+
+If you'd like to automate the entire process of **creating an EMR cluster**, **adding a Spark job step**, and **terminating the cluster**, here’s an end-to-end script:
+
+#### **Automated Workflow Script**
+```python
+import boto3
+import time
+
+# Initialize the EMR client
+emr_client = boto3.client('emr', region_name='us-east-1')
+
+# Define cluster configurations
+CLUSTER_NAME = "Automated-Spark-Cluster"
+LOG_URI = "s3://your-log-bucket/emr-logs/"
+SCRIPT_URI = "s3://your-s3-bucket-name/example_spark_job.py"
+OUTPUT_URI = "s3://your-data-bucket/output-data/"
+
+def create_emr_cluster():
+    response = emr_client.run_job_flow(
+        Name=CLUSTER_NAME,
+        LogUri=LOG_URI,
+        ReleaseLabel="emr-6.5.0",
+        Instances={
+            "InstanceGroups": [
+                {
+                    "Name": "Master node",
+                    "Market": "ON_DEMAND",
+                    "InstanceRole": "MASTER",
+                    "InstanceType": "m5.xlarge",
+                    "InstanceCount": 1,
+                },
+                {
+                    "Name": "Core nodes",
+                    "Market": "ON_DEMAND",
+                    "InstanceRole": "CORE",
+                    "InstanceType": "m5.xlarge",
+                    "InstanceCount": 2,
+                },
+            ],
+            "KeepJobFlowAliveWhenNoSteps": False,  # Cluster will terminate after steps complete
+            "TerminationProtected": False,
+        },
+        Applications=[{"Name": "Hadoop"}, {"Name": "Spark"}],
+        Configurations=[
+            {
+                "Classification": "spark",
+                "Properties": {"maximizeResourceAllocation": "true"},
+            }
+        ],
+        ServiceRole="EMR_DefaultRole",
+        JobFlowRole="EMR_EC2_DefaultRole",
+        VisibleToAllUsers=True,
+    )
+    cluster_id = response["JobFlowId"]
+    print(f"Cluster created with ID: {cluster_id}")
+    return cluster_id
+
+def add_spark_step(cluster_id):
+    response = emr_client.add_job_flow_steps(
+        JobFlowId=cluster_id,
+        Steps=[
+            {
+                'Name': 'Run Spark Job',
+                'ActionOnFailure': 'TERMINATE_CLUSTER',
+                'HadoopJarStep': {
+                    'Jar': 'command-runner.jar',
+                    'Args': [
+                        'spark-submit',
+                        '--deploy-mode', 'cluster',
+                        '--master', 'yarn',
+                        SCRIPT_URI
+                    ]
+                }
+            }
+        ]
+    )
+    step_id = response['StepIds'][0]
+    print(f"Step added with ID: {step_id}")
+    return step_id
+
+# Automate cluster creation and job submission
+cluster_id = create_emr_cluster()
+time.sleep(60)  # Wait for the cluster to initialize
+add_spark_step(cluster_id)
+```
+
+---
+
+### **Workflow Summary**
+1. The script creates an EMR cluster.
+2. A Spark job is submitted as a step.
+3. After the step completes, the cluster terminates automatically (if `KeepJobFlowAliveWhenNoSteps=False`).
+
+Would you like to explore adding multiple steps or scheduling jobs?
+
 ---
 
 #### **2. Configure the AWS Glue ETL Job**
