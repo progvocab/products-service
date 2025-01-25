@@ -267,6 +267,90 @@ Ensure the specified S3 bucket exists and has proper permissions for EMR to writ
 ### **Run Spark Jobs**
 Once the EMR cluster is running, you can SSH into the master node and submit Spark jobs using the `spark-submit` command.
 
+Here’s the basic command for submitting a Spark job using `spark-submit`. You can use this command from the **master node** of an EMR cluster or directly within your environment.
+
+---
+
+### **Command Syntax**
+```bash
+spark-submit \
+  --master <master-url> \
+  --deploy-mode <deploy-mode> \
+  --conf <configuration-settings> \
+  <path-to-your-script> \
+  [application-arguments]
+```
+
+---
+
+### **Command Example for AWS EMR**
+Assume you have the Spark script (`example_spark_job.py`) stored in an S3 bucket.
+
+```bash
+spark-submit \
+  --master yarn \
+  --deploy-mode cluster \
+  --conf spark.executor.memory=4g \
+  --conf spark.executor.cores=2 \
+  --conf spark.dynamicAllocation.enabled=true \
+  --conf spark.dynamicAllocation.minExecutors=1 \
+  --conf spark.dynamicAllocation.maxExecutors=10 \
+  s3://your-s3-bucket-name/example_spark_job.py
+```
+
+---
+
+### **Explanation of Options**
+1. **`--master`**:  
+   - Specifies the master URL. Use `yarn` for EMR.
+   - For local environments, use `local` or `local[N]` (where `N` is the number of cores).
+
+2. **`--deploy-mode`**:  
+   - `cluster`: Runs the driver program on the EMR cluster.
+   - `client`: Runs the driver program on the machine submitting the job.
+
+3. **`--conf`**:  
+   - **`spark.executor.memory`**: Memory allocated to each executor.
+   - **`spark.executor.cores`**: Number of cores per executor.
+   - **`spark.dynamicAllocation`**: Enables dynamic allocation of executors.
+
+4. **`<path-to-your-script>`**:  
+   - Path to your Spark application (can be local or on S3 for EMR).
+
+5. **Application Arguments**:  
+   - Additional arguments for the script, such as file paths, can be passed after the script path.
+
+---
+
+### **Example with Arguments**
+If your Spark script accepts arguments (e.g., input and output paths), pass them after the script:
+
+```bash
+spark-submit \
+  --master yarn \
+  --deploy-mode cluster \
+  --conf spark.executor.memory=4g \
+  --conf spark.executor.cores=2 \
+  s3://your-s3-bucket-name/example_spark_job.py \
+  s3://your-input-bucket/data/ \
+  s3://your-output-bucket/results/
+```
+
+- The script can then parse these arguments using `sys.argv` in Python.
+
+---
+
+### **Submitting the Job from EMR Master Node**
+1. SSH into the EMR master node:
+   ```bash
+   ssh -i your-key.pem hadoop@<master-node-dns>
+   ```
+2. Run the `spark-submit` command from the master node.
+
+---
+
+Would you like help with customizing your script or parsing arguments?
+
 ---
 
 Would you like help writing a Spark job or configuring a step for this cluster?
