@@ -2,12 +2,20 @@
 ## Prerequisites
 
 * Install uv 
+* Install git
+* Install docker ( colima )
+* Install kubernetes ( mini kube )
+* Install Mysql
 
+```
+git clone https://github.com/apache/airflow.git
+```
 
 ## 1. Create Virtual Environment
 
 ```
-cd git\airflow
+mkdir ~/airflow
+cd git/airflow
 uv venv
 ```
 ## 2. Start virtual environment
@@ -19,6 +27,13 @@ source .venv/bin/activate
 ```
 uv pip install -e ".[devel,google]" \
   --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-main/constraints-source-providers-3.9.txt"
+```
+run the below in case of error ```  1278 | #include "sqlfront.h"
+            |          ^~~~~~~~~~~~```
+
+```
+brew install freetd
+pip install pymssql
 ```
 ```
 uv sync --extra devel --extra devel-tests --extra google
