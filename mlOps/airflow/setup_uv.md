@@ -1,17 +1,79 @@
+
+## Prerequisites
+
+* Install uv 
+
+
+## 1. Create Virtual Environment
+
+```
+cd git\airflow
 uv venv
-
+```
+## 2. Start virtual environment
+```
 source .venv/bin/activate
+```
 
+### run the following within virtual environment
+```
 uv pip install -e ".[devel,google]" \
   --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-main/constraints-source-providers-3.9.txt"
-
+```
+```
 uv sync --extra devel --extra devel-tests --extra google
+```
 
 
+### DB setup
+```
+airflow db migrate
+```
+* In case of errors
+
+```
+airflow db reset
+```
+
+### Start Airflow Scheduler 
+```
+airflow scheduler
+```
+
+### Start Airflow Webserver
+```
   airflow webserver --port 8080
+```
 
+### Create User 
+ 
+Run the following command to create a user:
+
+```sh
+airflow users create \
+    --username admin \
+    --password admin \
+    --firstname John \
+    --lastname Doe \
+    --role Admin \
+    --email admin@example.com
+```
+
+### Run test
+
+* All tests
+```
+pytest --with-db-init
+```
+* Single File 
+
+
+## 3. Start Docker
+
+```
 colima start
-
+```
+## 4. Start kubernates
 minikube start
 ### **Creating a User with a Password in Apache Airflow from the Terminal**  
 
@@ -27,18 +89,6 @@ airflow db init
 
 ---
 
-### **2. Create a New User with a Password**
-Run the following command to create a user:
-
-```sh
-airflow users create \
-    --username admin \
-    --password admin123 \
-    --firstname John \
-    --lastname Doe \
-    --role Admin \
-    --email admin@example.com
-```
 
 📌 **Parameters Explanation:**
 - `--username` → The login username  
