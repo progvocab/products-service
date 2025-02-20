@@ -102,3 +102,107 @@ Namespaces help organize and isolate Kubernetes resources. Here's why these spec
 ---
 
 Let me know if you'd like to dive deeper into any of these namespaces!
+
+
+### **Namespaced in Kubernetes**  
+
+In **Kubernetes**, a **namespace** is a way to logically partition a cluster into multiple virtual clusters. It helps in organizing and isolating resources for different teams, applications, or environments within the same physical cluster.
+
+---
+
+## **1️⃣ What Does "Namespaced" Mean?**
+When a Kubernetes resource is **namespaced**, it means:
+- It belongs to a specific **namespace**.
+- It is **isolated** from resources in other namespaces.
+- It **cannot interact** with resources outside its namespace unless explicitly configured.
+
+By default, Kubernetes comes with **four namespaces**:
+- **default** → The default namespace for resources.
+- **kube-system** → Reserved for system resources like CoreDNS.
+- **kube-public** → Publicly readable resources.
+- **kube-node-lease** → Manages node heartbeats.
+
+---
+
+## **2️⃣ Namespaced vs. Non-Namespaced Resources**
+Some resources **must** exist within a namespace, while others are **cluster-wide**.
+
+| **Namespaced Resources** | **Non-Namespaced Resources** |
+|----------------------|----------------------|
+| Pods, Deployments, Services | Nodes |
+| ConfigMaps, Secrets | PersistentVolumes |
+| Role (RBAC), ServiceAccounts | ClusterRole (RBAC) |
+| NetworkPolicies | Cluster-wide StorageClasses |
+
+---
+
+## **3️⃣ Creating & Using Namespaces**
+### **📌 Create a Namespace**
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-environment
+```
+Apply it:
+```sh
+kubectl apply -f namespace.yaml
+```
+
+---
+
+### **📌 Deploy a Pod in a Specific Namespace**
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  namespace: dev-environment
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+```
+---
+
+### **📌 List Resources in a Namespace**
+```sh
+kubectl get pods --namespace=dev-environment
+```
+
+or set a default namespace:
+```sh
+kubectl config set-context --current --namespace=dev-environment
+kubectl get pods  # No need to specify --namespace now
+```
+
+---
+
+## **4️⃣ Communication Between Namespaces**
+By default, namespaces **isolate** resources. To communicate across namespaces, you need:
+- **Explicit Service discovery** (e.g., `service-name.namespace.svc.cluster.local`)
+- **NetworkPolicies** to allow traffic
+- **RBAC rules** for access control
+
+Example:  
+A pod in `namespace-A` can access a service in `namespace-B` using:
+```sh
+curl http://my-service.namespace-B.svc.cluster.local
+```
+
+---
+
+## **5️⃣ Deleting a Namespace**
+**⚠️ This will delete all resources inside the namespace!**
+```sh
+kubectl delete namespace dev-environment
+```
+
+---
+
+## **6️⃣ When to Use Namespaces?**
+✅ **Multi-Tenant Clusters** – Different teams can have isolated environments.  
+✅ **Environment Separation** – Separate namespaces for `dev`, `staging`, `prod`.  
+✅ **Resource Management** – Set **quotas and limits** per namespace.  
+
+Would you like examples on **RBAC, quotas, or inter-namespace networking**? 🚀
