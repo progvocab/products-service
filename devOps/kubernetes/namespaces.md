@@ -206,3 +206,164 @@ kubectl delete namespace dev-environment
 ✅ **Resource Management** – Set **quotas and limits** per namespace.  
 
 Would you like examples on **RBAC, quotas, or inter-namespace networking**? 🚀
+
+### **RBAC, Resource Quotas, and Inter-Namespace Networking in Kubernetes**  
+
+Namespaces in Kubernetes provide isolation, but you often need to manage **access control (RBAC)**, **resource quotas**, and **networking between namespaces**. Let's dive into each aspect with practical examples.
+
+---
+
+# **1️⃣ Role-Based Access Control (RBAC) in Namespaces**
+RBAC in Kubernetes allows fine-grained permissions by **assigning roles to users, groups, or service accounts**.
+
+## **📌 Example: Create a Role & Bind It to a User**
+### **Step 1: Create a Role in a Namespace**
+This role allows users to manage pods but not other resources.
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev-environment
+  name: pod-manager
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "create", "delete"]
+```
+Apply it:
+```sh
+kubectl apply -f role.yaml
+```
+
+---
+
+### **Step 2: Bind the Role to a User**
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: user-binding
+  namespace: dev-environment
+subjects:
+  - kind: User
+    name: developer1  # Change this to your actual username
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-manager
+  apiGroup: rbac.authorization.k8s.io
+```
+Apply it:
+```sh
+kubectl apply -f rolebinding.yaml
+```
+✅ Now, `developer1` can **manage pods** in `dev-environment` but cannot create services or modify other resources.
+
+---
+
+# **2️⃣ Resource Quotas in Namespaces**
+To prevent one namespace from consuming too many resources, we use **ResourceQuotas**.
+
+## **📌 Example: Set CPU, Memory, and Pod Limits**
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dev-quota
+  namespace: dev-environment
+spec:
+  hard:
+    pods: "10"
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "10"
+    limits.memory: "16Gi"
+```
+Apply it:
+```sh
+kubectl apply -f resource-quota.yaml
+```
+✅ This ensures that:
+- Maximum **10 pods** can run in `dev-environment`
+- **CPU requests** cannot exceed **4 vCPUs**
+- **Memory requests** cannot exceed **8GiB**
+- **CPU & memory limits** ensure fair usage
+
+To check quota usage:
+```sh
+kubectl get resourcequota dev-quota --namespace=dev-environment
+```
+
+---
+
+# **3️⃣ Inter-Namespace Networking**
+Namespaces isolate resources, but **pods can communicate across namespaces** if networking policies allow it.
+
+## **📌 Example: Allow Traffic Between Namespaces**
+By default, all namespaces **can** communicate unless a **NetworkPolicy** is enforced.
+
+### **Deny All Incoming Traffic in `dev-environment`**
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+  namespace: dev-environment
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+```
+✅ This **blocks** all incoming traffic to any pod in `dev-environment`.
+
+---
+
+### **Allow Traffic from a Specific Namespace (`staging-environment`)**
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-staging
+  namespace: dev-environment
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: staging-environment
+```
+✅ This allows **only pods from `staging-environment`** to access `dev-environment`.
+
+---
+
+# **4️⃣ Testing Cross-Namespace Communication**
+- **Create a service in `dev-environment`**
+```sh
+kubectl run nginx --image=nginx --namespace=dev-environment
+kubectl expose pod nginx --port=80 --target-port=80 --namespace=dev-environment
+```
+
+- **Try accessing it from `staging-environment`**
+```sh
+kubectl run test-client --image=busybox --namespace=staging-environment --rm -it -- /bin/sh
+wget -O- nginx.dev-environment.svc.cluster.local
+```
+✅ If `NetworkPolicy` allows it, this request will succeed. Otherwise, it will fail.
+
+---
+
+# **5️⃣ Summary Table**
+| **Concept** | **Description** | **Example YAML** |
+|------------|---------------|---------------|
+| **RBAC Role** | Restrict users to specific actions | `role.yaml` |
+| **RoleBinding** | Assign role to a user/service | `rolebinding.yaml` |
+| **Resource Quota** | Limit CPU, memory, pods per namespace | `resource-quota.yaml` |
+| **NetworkPolicy (Deny All)** | Block all ingress traffic | `deny-all.yaml` |
+| **NetworkPolicy (Allow Specific Namespace)** | Allow traffic from `staging-environment` | `allow-staging.yaml` |
+
+✅ Now you understand **RBAC, quotas, and networking in namespaces!**  
+Would you like examples on **service discovery, DNS resolution, or namespace deletion safety**? 🚀
