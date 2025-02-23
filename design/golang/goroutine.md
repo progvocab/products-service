@@ -292,3 +292,109 @@ Goroutines enable building microservices that efficiently handle concurrent requ
 - **`select` statement** handles multiple goroutines.
 
 Would you like **more advanced examples**, such as **worker pools or parallel processing**?
+
+
+### **Threads in Golang**  
+
+Go does not expose **raw OS threads** to developers directly. Instead, it provides **goroutines**, which are lightweight **user-space threads** managed by the Go runtime. However, Go still relies on **OS threads** under the hood.
+
+---
+
+## **1. How Go Uses Threads Internally**
+Go employs an **M:N scheduling model**, where:
+- **M Goroutines** run on **N OS Threads**.
+- The Go runtime manages goroutines efficiently, **multiplexing them onto OS threads**.
+
+### **Go's Scheduler Components**
+| Component | Description |
+|-----------|-------------|
+| **G (Goroutine)** | A lightweight function executing concurrently. |
+| **M (Machine/Thread)** | OS thread on which goroutines run. |
+| **P (Processor)** | Logical processor managing execution of goroutines on threads. |
+
+**Example:** If a Go program has 1000 goroutines but only **4 OS threads**, Go dynamically schedules goroutines on those 4 threads.
+
+---
+
+## **2. Go’s Runtime Scheduler (Goroutines vs Threads)**
+- Go does **not** create an OS thread per goroutine.
+- The **Go scheduler** assigns goroutines to available OS threads.
+- If a goroutine **blocks** (e.g., I/O operation), Go may **move another goroutine** to a free OS thread.
+
+---
+
+## **3. Controlling OS Threads in Go**
+Go allows **some control** over OS threads via `runtime` package.
+
+### **Forcing a Function to Run on a Single OS Thread**
+Use **`runtime.LockOSThread()`** to bind a goroutine to an OS thread.
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+)
+
+func main() {
+	runtime.LockOSThread() // Ensures this goroutine stays on the same OS thread
+	defer runtime.UnlockOSThread()
+
+	fmt.Println("This goroutine is locked to an OS thread")
+}
+```
+🔹 Useful for interacting with **C libraries** or **UI frameworks** that require thread affinity.
+
+---
+
+### **4. Checking Number of OS Threads**
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+)
+
+func main() {
+	fmt.Println("Total OS Threads:", runtime.GOMAXPROCS(0))
+}
+```
+- `runtime.GOMAXPROCS(n)` sets **the number of OS threads** Go can use.
+- Default: **Number of CPU cores**.
+
+---
+
+## **5. When Go Creates OS Threads**
+1. **At Program Start** → Go creates a pool of OS threads.  
+2. **When Needed** → If goroutines **block on syscalls**, Go may spawn more OS threads.  
+3. **Manual Control** → If `runtime.GOMAXPROCS(n)` is set, Go limits OS thread usage.  
+
+---
+
+## **6. Threads vs Goroutines in Go**
+| Feature | OS Thread | Goroutine |
+|---------|----------|-----------|
+| **Creation Cost** | High (system call) | Low (managed by Go runtime) |
+| **Memory Usage** | 1MB stack per thread | ~2KB stack per goroutine |
+| **Switching Overhead** | Slow (OS context switch) | Fast (user-space scheduling) |
+| **Managed By** | OS Kernel | Go Runtime |
+| **Parallel Execution** | Yes | Yes (if GOMAXPROCS > 1) |
+
+---
+
+## **7. When to Use Threads in Go**
+✅ When calling **C libraries** that require a specific thread.  
+✅ When working with **UI frameworks** that require the same thread.  
+✅ When handling **low-level OS interactions**.
+
+However, in most cases, **Goroutines** are preferable over raw OS threads for efficiency.
+
+---
+
+## **Conclusion**
+- **Go does not expose raw threads**; it provides **goroutines** instead.
+- **The Go runtime dynamically manages OS threads** for optimal performance.
+- **`runtime.LockOSThread()` can bind a goroutine to a specific OS thread** when necessary.
+- **Use goroutines for concurrency, OS threads only when required (e.g., C bindings).**
