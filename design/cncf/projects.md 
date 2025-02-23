@@ -1,0 +1,71 @@
+The **Cloud Native Computing Foundation (CNCF)** categorizes projects into three maturity levels: **Sandbox, Incubating, and Graduated**. These levels indicate the project's adoption, stability, governance, and overall maturity.
+
+---
+
+## **1. Sandbox Project**  
+**🔹 Early-stage projects**  
+- New and experimental projects in cloud-native computing.  
+- Not yet widely adopted but have potential.  
+- Developers can experiment, contribute, and test feasibility.  
+
+**🔹 Requirements to Become a Sandbox Project**  
+- Must align with CNCF’s mission.  
+- Have a healthy **open-source community** and public roadmap.  
+- Must be unique or provide significant benefits over existing CNCF projects.  
+
+**🔹 Examples of CNCF Sandbox Projects**  
+- **Backstage** (Developer portals)  
+- **Cilium** (eBPF-powered networking)  
+
+---
+
+## **2. Incubating Project**  
+**🔹 Growing projects with early adoption**  
+- More stable and gaining industry adoption.  
+- Must follow **CNCF best practices** (security, governance, documentation).  
+- May have commercial support from vendors.  
+
+**🔹 Requirements to Become an Incubating Project**  
+- Real-world production use in multiple organizations.  
+- Clear **governance model** and contributor community.  
+- Must pass a **security review**.  
+
+**🔹 Examples of CNCF Incubating Projects**  
+- **Argo** (GitOps & CI/CD)  
+- **OpenTelemetry** (Observability)  
+
+---
+
+## **3. Graduated Project**  
+**🔹 Fully mature and widely adopted**  
+- Used in **large-scale production environments**.  
+- Proven track record of security, governance, and long-term support.  
+- Strong, sustainable **open-source community**.  
+
+**🔹 Requirements to Become a Graduated Project**  
+- Must follow **CNCF best practices** (security, governance, open-source contributions).  
+- Adopted by **multiple enterprises** and cloud providers.  
+- Must have a **strong contributor base** and a **well-defined governance model**.  
+
+**🔹 Examples of CNCF Graduated Projects**  
+- **Kubernetes** (Container orchestration)  
+- **Prometheus** (Monitoring)  
+- **Envoy** (Service mesh)  
+
+---
+
+## **Summary Table**
+| CNCF Stage  | Maturity Level | Adoption | Examples |
+|------------|---------------|----------|----------|
+| **Sandbox** | Experimental & Early-stage | Low | Backstage, Cilium |
+| **Incubating** | Growing & Gaining Adoption | Medium | Argo, OpenTelemetry |
+| **Graduated** | Fully Mature & Widely Used | High | Kubernetes, Prometheus |
+
+---
+
+### **Key Takeaways**
+✅ **Sandbox** → **New and experimental**, open for contributions.  
+✅ **Incubating** → **Growing adoption**, proven use cases.  
+✅ **Graduated** → **Stable, widely adopted**, industry standard.  
+
+Graduated projects are **battle-tested** and production-ready, while sandbox and incubating projects are in earlier stages of adoption.
