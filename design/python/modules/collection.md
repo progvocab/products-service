@@ -162,6 +162,59 @@ print(settings['language']) # Output: English (fallback to defaults)
 
 Would you like more **real-world examples** for any of these?
 
+In `collections.abc`, **`abc` stands for "Abstract Base Classes."**  
+
+### **🔹 What Are Abstract Base Classes (ABCs)?**  
+Abstract Base Classes (ABCs) in Python **define a blueprint for other classes**. They specify methods that must be implemented in any subclass.  
+
+- ABCs **enforce a structure** for classes without providing full implementations.  
+- You **cannot instantiate** an abstract class directly.  
+- They are useful for **creating custom collection types** that behave like built-in types (e.g., lists, dicts).  
+
+---
+
+### **🔹 Where Do ABCs Come From?**  
+Python provides `abc` (Abstract Base Class) support in the `abc` module and in `collections.abc`.  
+
+- The `abc` module provides the base `ABC` class and `@abstractmethod` decorator.  
+- The `collections.abc` module provides **ABCs for collection types** like `Iterable`, `Mapping`, `Sequence`, etc.  
+
+---
+
+### **✅ Example: Using ABCs in `collections.abc`**  
+Here’s how `collections.abc` ensures a class follows the dictionary structure:
+
+```python
+from collections.abc import Mapping
+
+class MyDict(Mapping):
+    def __init__(self, data):
+        self._data = data
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
+
+# my_dict = MyDict({'a': 1, 'b': 2}) ✅ Works
+# my_dict = Mapping() ❌ TypeError: Can't instantiate abstract class
+
+print(isinstance(my_dict, Mapping))  # ✅ True
+```
+
+---
+
+### **🚀 Summary**  
+- `abc` = **Abstract Base Classes**  
+- **`collections.abc` provides base classes** for collections (like `Mapping`, `Sequence`, `Iterable`).  
+- **Prevents errors** by enforcing structure in custom classes.  
+
+Would you like an example using a different ABC?
+
 ### **🔹 `collections.abc` in Python**
 The **`collections.abc`** module in Python provides **abstract base classes (ABCs)** for built-in collection types like **lists, sets, dictionaries, and iterators**. These ABCs help define a standard **interface** that custom data structures can follow.
 
