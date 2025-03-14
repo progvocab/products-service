@@ -367,3 +367,260 @@ kubectl auth can-i list services --as=dev@example.com
 ✅ **OIDC users authenticate & get assigned permissions automatically**  
 
 Would you like to **integrate external logging & monitoring (e.g., Prometheus, Grafana, AWS CloudWatch)?** 🚀
+
+### **🔹 Implementing IAM-Based Access Control for Kubernetes with AWS IAM Roles**  
+We’ll configure **AWS IAM authentication** for your **Kind Kubernetes cluster**, allowing users to authenticate using **IAM roles instead of static credentials**.
+
+---
+
+## **🔹 1. Install AWS IAM Authenticator**
+### **1️⃣ Install `aws-iam-authenticator`**
+```bash
+curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.22.2/2021-11-02/bin/linux/amd64/aws-iam-authenticator
+chmod +x aws-iam-authenticator
+mv aws-iam-authenticator /usr/local/bin/
+```
+Verify Installation:
+```bash
+aws-iam-authenticator version
+```
+
+---
+
+## **🔹 2. Enable IAM Authentication in Kind Cluster**
+### **1️⃣ Modify `kind` Config to Use IAM Authenticator**
+```yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: kind-iam
+kubeadmConfigPatches:
+- |
+  apiVersion: kubeadm.k8s.io/v1beta3
+  kind: ClusterConfiguration
+  apiServer:
+    extraArgs:
+      authentication-token-webhook-config-file: "/etc/kubernetes/aws-iam-authenticator.yaml"
+nodes:
+- role: control-plane
+- role: worker
+```
+
+Create the **AWS IAM Authenticator Config File** (`aws-iam-authenticator.yaml`):
+```yaml
+apiVersion: v1
+kind: Config
+clusters:
+  - name: kind-iam-cluster
+    cluster:
+      server: https://kind-control-plane:6443
+users:
+  - name: iam-auth-user
+    user:
+      exec:
+        apiVersion: client.authentication.k8s.io/v1beta1
+        command: aws-iam-authenticator
+        args:
+          - token
+          - -i
+          - kind-iam-cluster
+contexts:
+  - name: kind-iam-context
+    context:
+      cluster: kind-iam-cluster
+      user: iam-auth-user
+current-context: kind-iam-context
+```
+
+Apply Config:
+```bash
+kubectl apply -f aws-iam-authenticator.yaml
+```
+
+---
+
+## **🔹 3. Map IAM Roles to Kubernetes RBAC**
+### **1️⃣ Create IAM Role for Kubernetes Users**
+Create an IAM Role:
+```bash
+aws iam create-role --role-name KubernetesAdmin \
+  --assume-role-policy-document file://assume-role-policy.json
+```
+
+`assume-role-policy.json`:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::123456789012:user/dev-user"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+
+Attach a Policy to Allow Kubernetes Access:
+```bash
+aws iam attach-role-policy --role-name KubernetesAdmin \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+```
+
+### **2️⃣ Map IAM Role to Kubernetes RBAC**
+Create a `ConfigMap` to Associate IAM Role with Kubernetes Group:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::123456789012:role/KubernetesAdmin
+      username: admin-user
+      groups:
+        - system:masters
+```
+Apply ConfigMap:
+```bash
+kubectl apply -f aws-auth-configmap.yaml
+```
+
+---
+
+## **🔹 4. Authenticate with IAM Role**
+### **1️⃣ Generate an AWS IAM Token**
+```bash
+TOKEN=$(aws eks get-token --cluster-name kind-iam-cluster --role KubernetesAdmin | jq -r .status.token)
+```
+### **2️⃣ Configure `kubectl` to Use the IAM Token**
+```bash
+kubectl config set-credentials iam-user --token=$TOKEN
+kubectl config set-context kind-iam-context --cluster=kind-iam-cluster --user=iam-user
+kubectl config use-context kind-iam-context
+```
+
+### **3️⃣ Test IAM-Based Access**
+```bash
+kubectl auth can-i get pods --as=admin-user
+```
+
+---
+
+## **🔹 Summary**
+✅ **AWS IAM authentication for Kubernetes**  
+✅ **IAM roles mapped to Kubernetes RBAC**  
+✅ **No need for static user credentials**  
+
+Would you like **AWS OIDC Federated Authentication for Single Sign-On (SSO) with AWS IAM?** 🚀
+
+### **🔹 Implementing AWS OIDC Federated Authentication for Kubernetes (SSO with AWS IAM)**  
+We will integrate **AWS IAM OIDC authentication** with Kubernetes, allowing users to log in with **AWS SSO or an external identity provider (IdP)** (e.g., Okta, Google Workspace, Azure AD).
+
+---
+
+## **🔹 1. Set Up AWS OIDC Provider**
+### **1️⃣ Create an OIDC Identity Provider in AWS IAM**
+1. **Get the OIDC Issuer URL for Your IdP** (e.g., Okta, Google Workspace, Azure AD)
+   ```bash
+   aws eks describe-cluster --name my-cluster --query "cluster.identity.oidc.issuer" --output text
+   ```
+   Example Output:  
+   ```
+   https://oidc.eks.<region>.amazonaws.com/id/EXAMPLE-ID
+   ```
+2. **Create the OIDC Provider in AWS IAM**
+   ```bash
+   aws iam create-open-id-connect-provider \
+       --url "https://oidc.eks.<region>.amazonaws.com/id/EXAMPLE-ID" \
+       --client-id-list sts.amazonaws.com \
+       --thumbprint-list <THUMBPRINT>
+   ```
+   - Replace `<THUMBPRINT>` with the fingerprint of the provider certificate.
+
+---
+
+## **🔹 2. Create an IAM Role for Kubernetes Users**
+### **1️⃣ Create an IAM Role for Kubernetes Access**
+```bash
+aws iam create-role --role-name OIDC-Kubernetes-Access \
+  --assume-role-policy-document file://assume-role-policy.json
+```
+`assume-role-policy.json`:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::<AWS_ACCOUNT_ID>:oidc-provider/oidc.eks.<region>.amazonaws.com/id/EXAMPLE-ID"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.<region>.amazonaws.com/id/EXAMPLE-ID:sub": "system:serviceaccount:kube-system:oidc-auth"
+        }
+      }
+    }
+  ]
+}
+```
+Replace `<AWS_ACCOUNT_ID>` and `<region>` accordingly.
+
+### **2️⃣ Attach Permissions to the IAM Role**
+```bash
+aws iam attach-role-policy --role-name OIDC-Kubernetes-Access \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+```
+
+---
+
+## **🔹 3. Map the IAM Role to Kubernetes RBAC**
+Create an `aws-auth` ConfigMap:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::<AWS_ACCOUNT_ID>:role/OIDC-Kubernetes-Access
+      username: oidc-user
+      groups:
+        - system:masters
+```
+Apply the ConfigMap:
+```bash
+kubectl apply -f aws-auth.yaml
+```
+
+---
+
+## **🔹 4. Authenticate with OIDC & AWS IAM**
+### **1️⃣ Generate an AWS STS Token for Authentication**
+```bash
+TOKEN=$(aws eks get-token --cluster-name my-cluster | jq -r .status.token)
+```
+### **2️⃣ Configure `kubectl` to Use OIDC Token**
+```bash
+kubectl config set-credentials oidc-user --token=$TOKEN
+kubectl config set-context oidc-context --cluster=my-cluster --user=oidc-user
+kubectl config use-context oidc-context
+```
+### **3️⃣ Verify Authentication**
+```bash
+kubectl auth can-i get pods --as=oidc-user
+```
+
+---
+
+## **🔹 Summary**
+✅ **AWS OIDC authentication for Kubernetes**  
+✅ **Users log in via AWS SSO or an external IdP**  
+✅ **IAM role-based Kubernetes RBAC access**  
+
+Would you like **to enable multi-cluster authentication across AWS regions?** 🚀
