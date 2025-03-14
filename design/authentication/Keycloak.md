@@ -164,3 +164,24 @@ Keycloak can be integrated with applications using:
 ---
 
 Keycloak is a robust, flexible IAM solution, making it an excellent choice for organizations looking to secure applications and streamline user authentication workflows.
+
+Keycloak can function as both an **Identity Provider (IdP)** and an **OpenID Connect (OIDC) Provider**, depending on the use case:
+
+1. **Identity Provider (IdP)**: Keycloak acts as an identity provider by managing user authentication and providing identity information to client applications. It supports integration with external identity providers such as Azure AD, LDAP, or other Keycloak instances, enabling single sign-on (SSO) and centralized user management[1][6][8].
+
+2. **OIDC Provider**: Keycloak is also an OIDC-compliant provider, meaning it implements the OpenID Connect protocol to authenticate users and issue tokens (e.g., ID tokens, access tokens). This allows it to serve as an authentication server for applications that use OIDC for secure communication and user authentication[2][4].
+
+In summary, Keycloak is both an identity provider and an OIDC provider, offering flexibility for various authentication and identity federation scenarios.
+
+Citations:
+[1] https://documentation.cloud-iam.com/resources/keycloak-authentications/identity-provider-oidc.html
+[2] https://docs.nginx.com/nginx-instance-manager/admin-guide/authentication/oidc/keycloak-setup/
+[3] https://docs.nginx.com/nginx-management-suite/admin-guides/authentication/oidc/oidc-keycloak/
+[4] https://dev.to/kayesislam/keycloak-as-oidc-provider-42ip
+[5] https://stackoverflow.com/questions/62410603/create-a-custom-identity-provider-and-configure-it-with-keycloak
+[6] https://learn.microsoft.com/en-us/answers/questions/418800/azure-ad-as-keycloak-identity-provider
+[7] https://www.youtube.com/watch?v=YIgkIBaTGFE
+[8] https://medium.com/@antonio_berben/sso-multiple-identity-providers-with-keycloak-tutorial-ca293b835474
+
+---
+Answer from Perplexity: https://www.perplexity.ai/search/keycloak-is-identity-provider-D7RrAAqKSGqFsA5UHrgR1g?utm_source=copy_output
