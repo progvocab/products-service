@@ -175,3 +175,82 @@ pg_restore -U postgres -d my_database -v "backup.dump"
 | Drop User | `DROP USER username;` |
 
 Would you like more details on any specific command?
+
+
+The error **"permission denied for schema public, SQL state 42501"** in PostgreSQL means that the **user does not have the required privileges** on the `public` schema.
+
+---
+
+### **🔍 Why Does This Happen?**
+1. **User lacks required privileges** (SELECT, INSERT, UPDATE, DELETE, etc.).
+2. **The schema ownership was changed**, and the user is not granted access.
+3. **Database roles have restrictive privileges** (e.g., a read-only user).
+4. **PostgreSQL version 15+ by default restricts permissions** on `public` schema.
+
+---
+
+### **✅ Solution 1: Grant Usage and Privileges on Schema**
+Run the following SQL command as a **superuser** (e.g., `postgres`):
+
+```sql
+GRANT USAGE ON SCHEMA public TO your_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO your_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO your_user;
+```
+🔹 **Explanation:**
+- `GRANT USAGE` → Allows access to the schema.
+- `GRANT SELECT, INSERT, UPDATE, DELETE` → Grants full table access.
+- `GRANT ALL PRIVILEGES ON SEQUENCES` → Allows sequence updates (needed for `SERIAL` columns).
+
+---
+
+### **✅ Solution 2: Grant Future Table Privileges**
+Ensure that new tables created in the schema inherit the privileges:
+
+```sql
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO your_user;
+```
+
+---
+
+### **✅ Solution 3: Change the Schema Owner**
+If `public` schema ownership was changed, reset it:
+
+```sql
+ALTER SCHEMA public OWNER TO your_user;
+```
+
+---
+
+### **✅ Solution 4: Grant Superuser Role (Not Recommended)**
+If you trust the user and need full access:
+
+```sql
+ALTER USER your_user WITH SUPERUSER;
+```
+
+---
+
+### **📌 How to Check Current Privileges**
+Run the following query:
+
+```sql
+SELECT grantee, privilege_type
+FROM information_schema.role_schema_grants
+WHERE schema_name = 'public';
+```
+
+This will show which users have what permissions.
+
+---
+
+### **🔹 Summary**
+| Issue | Solution |
+|--------|-----------|
+| **User has no schema access** | `GRANT USAGE ON SCHEMA public TO your_user;` |
+| **User lacks table privileges** | `GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO your_user;` |
+| **New tables are inaccessible** | `ALTER DEFAULT PRIVILEGES` command |
+| **Schema owner is different** | `ALTER SCHEMA public OWNER TO your_user;` |
+
+Would you like help debugging which permission is missing in your case?
