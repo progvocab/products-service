@@ -192,3 +192,57 @@ print(dijkstra(graph, 1))
 5. **Use Cases:** Networking, Recommendations, Maps, Web Crawling.
 
 Would you like help with a **specific graph problem**? 🚀
+
+The difference between **O(N)**, **O(V)**, and **O(V + E)** lies in what each notation represents in terms of input size:  
+
+- **O(N)**: Generic notation that represents complexity depending on **N**, where **N** can be **vertices (V), edges (E), or any input size**.  
+- **O(V)**: Complexity depends **only on the number of vertices (V)** in a graph.  
+- **O(V + E)**: Complexity depends on both **vertices (V) and edges (E)**, common in **graph algorithms**.
+
+---
+
+### **🚀 Differences in Graph Algorithms**
+| **Algorithm** | **Complexity** | **Why?** |
+|--------------|--------------|---------|
+| **Iterating all nodes (vertices)** | `O(V)` | Only touches vertices. |
+| **Iterating all edges** | `O(E)` | Only touches edges. |
+| **BFS / DFS** | `O(V + E)` | Visits every vertex (`V`) and every edge (`E`). |
+| **Dijkstra (Priority Queue)** | `O((V + E) log V)` | Uses BFS + heap operations (`log V`). |
+| **Adjacency List Storage** | `O(V + E)` | Stores each vertex and its edges. |
+| **Adjacency Matrix Storage** | `O(V²)` | Requires `V × V` space. |
+
+---
+
+### **📌 Example: BFS Complexity Analysis**
+```python
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+
+    while queue:
+        node = queue.popleft()
+        if node not in visited:
+            print(node, end=" ")
+            visited.add(node)
+            queue.extend(graph.get(node, []))
+
+graph = {1: [2, 3], 2: [4, 5], 3: [6], 4: [], 5: [], 6: []}
+bfs(graph, 1)
+```
+✅ **Complexity:** `O(V + E)`, because:  
+- Each **vertex** is visited **once** → `O(V)`.  
+- Each **edge** is processed **once** → `O(E)`.  
+
+---
+
+### **📌 Key Takeaways**
+1. **O(V)** - Graph operations that depend **only on vertices** (e.g., iterating all nodes).  
+2. **O(E)** - Graph operations that depend **only on edges** (e.g., counting edges).  
+3. **O(V + E)** - Traversal algorithms that depend **on both vertices & edges** (e.g., BFS, DFS).  
+
+Let me know if you need a real-world example! 🚀
+
+
+[search](search.md)
