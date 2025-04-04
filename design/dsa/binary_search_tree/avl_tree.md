@@ -802,3 +802,44 @@ tree.inorder(tree.root)  # Output: 10 20 25 30 40 50 (balanced)
 | **Best For** | Read-heavy applications | Insert-heavy applications |
 
 Would you like performance benchmarks comparing them?
+
+
+
+### **Maximum Number of Nodes in an AVL Tree Before Stack Overflow**
+The maximum number of nodes an **AVL Tree** can hold before encountering a **stack overflow** depends on:
+1. **Stack Memory Size:** This varies based on system architecture and runtime environment.
+2. **Recursion Depth:** In a worst-case scenario, the recursion depth follows **O(log N)** for insert operations.
+
+#### **Key Considerations**
+- **Recursion Depth:** Since AVL Tree insertion follows a height-balanced structure, the recursion depth is approximately **O(log N)**.
+- **Stack Limit:** In most environments (e.g., Linux/macOS/Windows), the default stack size per thread is **8MB** or **1MB**.
+- **Frame Size per Function Call:** In Python, Java, or C++, each recursive function call takes some stack memory (typically **a few KB**).
+
+### **Approximate Maximum Nodes Before Stack Overflow**
+For a **default stack size of 8MB**:
+- **If each function call uses ~1KB of stack memory**, then the recursion depth can reach about **8,000**.
+- Since the recursion depth in an **AVL tree insertion is log(N)**, solving **log₂(N) = 8000** gives:
+  
+  \[
+  N ≈ 2^{8000}
+  \]
+
+  which is **astronomically large**, meaning stack overflow will not occur for practical AVL Tree sizes.
+
+---
+
+### **Practical Limits in Real Systems**
+| System | Default Stack Size | Max Nodes in AVL Tree (Approximate) |
+|--------|------------------|--------------------------------|
+| Linux (64-bit) | 8MB | **2³⁰ ≈ 1 Billion Nodes** |
+| Windows (64-bit) | 1MB | **2²⁰ ≈ 1 Million Nodes** |
+| macOS (64-bit) | 8MB | **2³⁰ ≈ 1 Billion Nodes** |
+
+### **Avoiding Stack Overflow**
+If dealing with **millions or billions of nodes**, it's recommended to:
+1. **Use Iterative Insertions:** Instead of recursion, maintain an explicit stack or loop.
+2. **Increase Stack Size:** Modify stack memory limits (`ulimit -s unlimited` in Linux).
+3. **Use Tail Recursion Optimization (TCO):** In languages that support it, optimize tail recursion.
+4. **Use an Explicit Stack in Large AVL Implementations:** Implement insert and delete operations iteratively.
+
+Would you like an **iterative AVL insertion** example to avoid recursion limits?
