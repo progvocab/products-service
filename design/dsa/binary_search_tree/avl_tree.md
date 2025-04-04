@@ -843,3 +843,72 @@ If dealing with **millions or billions of nodes**, it's recommended to:
 4. **Use an Explicit Stack in Large AVL Implementations:** Implement insert and delete operations iteratively.
 
 Would you like an **iterative AVL insertion** example to avoid recursion limits?
+
+
+### **Maximum Number of Nodes Before Stack Overflow in Various BST Variants**  
+
+Since insertion operations in self-balancing trees involve **recursive function calls**, the recursion depth affects the **stack overflow limit**. The key factor is the **height (h) of the tree**, which determines the recursion depth. The number of nodes **(N) is related to the height (h) as follows:**
+
+1. **Simple Binary Search Tree (BST)**
+2. **AVL Tree (Height-Balanced)**
+3. **Red-Black Tree (Loosely Balanced)**
+4. **B-Tree (Used in Databases, Disk-Based Storage)**
+
+---
+
+## **1. Simple Binary Search Tree (BST)**
+### **Worst-Case (Skewed Tree)**
+- A **badly unbalanced BST** (e.g., inserting sorted numbers) behaves like a **linked list** with height **h = N**.
+- **Recursion Depth = O(N)**.
+- If the stack size is **8MB** and each function call takes ~1KB, it supports only **~8000 nodes** before overflow.
+
+### **Balanced BST (Random Insertions)**
+- Height: **h ≈ log₂(N)**
+- Can support **millions of nodes** before stack overflow.
+
+---
+
+## **2. AVL Tree (Strictly Height-Balanced)**
+- Height: **h ≈ log₂(N)** due to rebalancing after insertions.
+- **Recursion Depth = O(log N)**.
+- Can support **billions of nodes** in a 64-bit system before overflow.
+- **No practical stack overflow issue.**
+
+---
+
+## **3. Red-Black Tree (Loosely Balanced)**
+- Less strictly balanced than AVL but still maintains **O(log N) height**.
+- Height: **h ≈ 2 * log₂(N)** in the worst case.
+- **Recursion Depth = O(log N)**.
+- Can handle **hundreds of millions of nodes** before hitting stack limits.
+
+---
+
+## **4. B-Tree (Used in Databases)**
+- Unlike BSTs, B-Trees are optimized for **disk-based storage**.
+- A B-tree of order **m** has height:  
+  \[
+  h = O(\log_m N)
+  \]
+- **Very shallow trees** due to high branching factors.
+- **Not affected by stack overflow** because depth is very small.
+
+---
+
+### **Comparing the Maximum Number of Nodes Before Stack Overflow**
+| **Tree Type**    | **Worst-Case Height** | **Recursion Depth** | **Max Nodes Before Stack Overflow (~8MB stack, 1KB per frame)** |
+|-----------------|-----------------|----------------|----------------------------------|
+| **Skewed BST**  | **O(N)** | **O(N)** | **~8,000 Nodes** (BAD for large N) |
+| **Balanced BST** | **O(log N)** | **O(log N)** | **> 1 Billion Nodes** |
+| **AVL Tree**    | **O(log N)** | **O(log N)** | **> 1 Billion Nodes** |
+| **Red-Black Tree** | **O(log N)** | **O(log N)** | **> 1 Billion Nodes** |
+| **B-Tree (Disk-Based)** | **O(log_m N)** | **O(log_m N)** | **No Stack Overflow Risk** |
+
+---
+
+### **Key Takeaways**
+1. **Skewed BSTs (without balancing) suffer from stack overflow.** Avoid using simple BSTs for large-scale insertions unless balanced.
+2. **AVL Trees, Red-Black Trees, and Balanced BSTs handle billions of nodes** without hitting stack overflow.
+3. **B-Trees avoid recursion issues** due to their shallow depth.
+
+Would you like a **Python or Java implementation** of any of these trees?
