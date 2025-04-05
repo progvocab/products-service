@@ -192,6 +192,7 @@ print(avl.inorder_traversal(root))  # Output: [10, 20, 25, 30, 40, 50]
 ---
 
 ### **Time Complexity**
+
 | Operation | Complexity |
 |-----------|-----------|
 | Insertion | **O(log n)** |
@@ -213,6 +214,7 @@ AVL trees and Red-Black trees are both **self-balancing Binary Search Trees (BST
 ---
 
 ### **1. Key Differences Between AVL Tree and Red-Black Tree**
+
 | Feature | **AVL Tree** | **Red-Black Tree** |
 |---------|------------|----------------|
 | **Balancing Factor** | Uses **height balancing** (balance factor: -1, 0, or 1). | Uses **color balancing** (Red/Black rules). |
@@ -249,6 +251,7 @@ AVL trees and Red-Black trees are both **self-balancing Binary Search Trees (BST
 ---
 
 ### **3. When to Use Which?**
+
 | Scenario | Preferred Tree |
 |----------|---------------|
 | **Frequent reads/searches** | **AVL Tree** (because of better balance and faster lookups). |
@@ -563,6 +566,7 @@ class RedBlackTree {
 ---
 
 ### **Summary**
+
 | Feature | **AVL Tree** | **Red-Black Tree** |
 |---------|------------|----------------|
 | **Read Performance** | Faster | Slightly slower |
@@ -794,6 +798,7 @@ tree.inorder(tree.root)  # Output: 10 20 25 30 40 50 (balanced)
 ---
 
 ### **Summary of Differences**
+
 | Feature | **AVL Tree** | **Red-Black Tree** |
 |---------|------------|----------------|
 | **Balancing** | Strict balancing | Less strict balancing |
@@ -829,6 +834,7 @@ For a **default stack size of 8MB**:
 ---
 
 ### **Practical Limits in Real Systems**
+
 | System | Default Stack Size | Max Nodes in AVL Tree (Approximate) |
 |--------|------------------|--------------------------------|
 | Linux (64-bit) | 8MB | **2³⁰ ≈ 1 Billion Nodes** |
@@ -896,6 +902,7 @@ Since insertion operations in self-balancing trees involve **recursive function 
 ---
 
 ### **Comparing the Maximum Number of Nodes Before Stack Overflow**
+
 | **Tree Type**    | **Worst-Case Height** | **Recursion Depth** | **Max Nodes Before Stack Overflow (~8MB stack, 1KB per frame)** |
 |-----------------|-----------------|----------------|----------------------------------|
 | **Skewed BST**  | **O(N)** | **O(N)** | **~8,000 Nodes** (BAD for large N) |
