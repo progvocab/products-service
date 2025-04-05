@@ -198,3 +198,49 @@ This reverts selected files to their state in `origin/master` while leaving the 
 ---
 
 Let me know if you’re working on a branch other than master, or if you’d like a visual workflow.
+
+
+If you want to:
+
+- **Ignore (discard) all modified files**
+- **Keep only the new/untracked files**
+  
+Here’s how to do it cleanly:
+
+---
+
+### **Discard All Modified Files (But Keep Untracked/New Files)**
+
+```bash
+git restore .
+```
+
+This will revert all **modified files** in the working directory to the last committed version, but it **does not touch new/untracked files**.
+
+---
+
+### **Alternative: Discard All Changes Except New Files**
+
+```bash
+git reset --hard   # Discards commits and modified files (doesn't affect untracked)
+git clean -fd      # WARNING: This deletes untracked (new) files and dirs
+```
+
+If you want to **keep new files**, skip `git clean`.
+
+---
+
+### To See What Will Be Kept
+
+Before running any command, check the status:
+
+```bash
+git status
+```
+
+- Modified files will be discarded with `git restore .`
+- Untracked (new) files will stay
+
+---
+
+Let me know if you also want to move those new files to staging or a specific directory for backup.
