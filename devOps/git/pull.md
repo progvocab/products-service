@@ -139,3 +139,62 @@ git log origin/your-branch..HEAD --oneline    # what's new locally
 ---
 
 Let me know which direction you're syncing (remote-to-local or local-to-remote), and I can help with the exact commands or safeguards.
+
+
+
+Got it! You want to:
+
+- **Keep your uncommitted local changes (unstaged/staged changes)**
+- **Discard local commits**
+- **Sync your branch’s committed state to match remote (e.g., `origin/master`)**
+- **Revert any conflicting or diverging files to match remote**
+  
+This is a perfect use case for a **soft reset** or **checkout-based selective reset**.
+
+---
+
+### **Option 1: Soft Reset to Remote, Keep Uncommitted Changes**
+
+```bash
+git fetch origin
+git reset --soft origin/master
+```
+
+- Keeps **uncommitted changes** (files in your working directory).
+- Removes local commits so you can **recommit** or discard selectively.
+- Index and working directory remain unchanged.
+
+> Any files modified in conflicting commits will show up as changes.
+
+---
+
+### **Option 2: Hard Reset Commits, But Stash & Restore Uncommitted Changes**
+
+```bash
+git stash push -m "temp changes"
+git fetch origin
+git reset --hard origin/master
+git stash pop
+```
+
+- Temporarily stashes your uncommitted work.
+- Resets your branch to match `origin/master`.
+- Restores your local uncommitted work afterward.
+
+> This will keep only your uncommitted changes and the rest exactly as in remote.
+
+---
+
+### **Option 3: Restore Specific Files to Match Remote**
+If you want to **reset only files that are causing conflicts**, use:
+
+```bash
+git fetch origin
+git restore --source origin/master path/to/file1 path/to/file2
+```
+
+This reverts selected files to their state in `origin/master` while leaving the rest untouched.
+
+---
+
+Let me know if you’re working on a branch other than master, or if you’d like a visual workflow.
