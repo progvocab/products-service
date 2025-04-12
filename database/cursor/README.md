@@ -152,3 +152,109 @@ While ANSI SQL defines a basic `CURSOR` construct (mainly in embedded SQL for C/
 
 Would you like a comparison with other databases like PostgreSQL or SQL Server for cursors?
 
+
+Here's a **comparison of cursors in Oracle, PostgreSQL, and SQL Server** against ANSI SQL, highlighting the differences in implementation, syntax, and capabilities:
+
+---
+
+### **1. Cursor Basics**
+
+| Feature                  | **Oracle**                             | **PostgreSQL**                        | **SQL Server (T-SQL)**                | **ANSI SQL**         |
+|--------------------------|----------------------------------------|---------------------------------------|---------------------------------------|----------------------|
+| Basic Cursor Support     | Yes (PL/SQL)                           | Yes (PL/pgSQL)                        | Yes (T-SQL)                           | Yes (Embedded SQL)   |
+| Explicit Cursor Syntax   | `OPEN`, `FETCH`, `CLOSE`               | Same                                  | Same                                  | Yes                  |
+| Implicit Cursors         | Yes (`SQL%FOUND`, etc.)                | Yes (in loops)                        | No                                    | No                   |
+| Cursor Attributes        | Yes (`%FOUND`, `%ROWCOUNT`)            | Limited (`FOUND`, `NOTFOUND`)         | No built-in cursor attributes          | No                   |
+| Cursor FOR Loops         | Yes (simplified syntax)                | Yes                                   | No                                    | No                   |
+
+---
+
+### **2. Advanced Features**
+
+| Feature                       | **Oracle**                   | **PostgreSQL**                 | **SQL Server**               | **ANSI SQL**        |
+|-------------------------------|------------------------------|--------------------------------|------------------------------|---------------------|
+| Parameterized Cursors         | Yes                          | No (use `EXECUTE`)             | No (use dynamic SQL)         | No                  |
+| Cursor Variables (REF Cursor) | Yes                          | Yes (cursor variables supported) | No (uses `sp_cursor`)       | No                  |
+| Dynamic Cursors               | Via `REF CURSOR`             | Via `EXECUTE` with cursors     | Yes (`FAST_FORWARD`, `STATIC`, etc.) | No       |
+| Cursor as Procedure Param     | Yes (IN/OUT parameters)      | Yes                            | Partially (complex)          | No                  |
+| FETCH Orientation             | Basic                        | Yes (forward/backward, scroll) | Yes                          | Yes (in CLI)        |
+
+---
+
+### **3. Cursor Use Cases & Examples**
+
+#### **Oracle (PL/SQL)**
+
+```sql
+DECLARE
+  CURSOR emp_cursor IS SELECT emp_name FROM employees;
+  name employees.emp_name%TYPE;
+BEGIN
+  OPEN emp_cursor;
+  LOOP
+    FETCH emp_cursor INTO name;
+    EXIT WHEN emp_cursor%NOTFOUND;
+    DBMS_OUTPUT.PUT_LINE(name);
+  END LOOP;
+  CLOSE emp_cursor;
+END;
+```
+
+---
+
+#### **PostgreSQL (PL/pgSQL)**
+
+```sql
+DO $$
+DECLARE
+  emp_cursor CURSOR FOR SELECT emp_name FROM employees;
+  name TEXT;
+BEGIN
+  OPEN emp_cursor;
+  LOOP
+    FETCH emp_cursor INTO name;
+    EXIT WHEN NOT FOUND;
+    RAISE NOTICE '%', name;
+  END LOOP;
+  CLOSE emp_cursor;
+END $$;
+```
+
+---
+
+#### **SQL Server (T-SQL)**
+
+```sql
+DECLARE emp_cursor CURSOR FOR
+SELECT emp_name FROM employees;
+
+DECLARE @name NVARCHAR(100);
+
+OPEN emp_cursor;
+FETCH NEXT FROM emp_cursor INTO @name;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+  PRINT @name;
+  FETCH NEXT FROM emp_cursor INTO @name;
+END;
+
+CLOSE emp_cursor;
+DEALLOCATE emp_cursor;
+```
+
+---
+
+### **Conclusion**
+
+| Feature                     | Oracle | PostgreSQL | SQL Server | ANSI SQL |
+|-----------------------------|--------|------------|------------|-----------|
+| Best procedural support     | Yes    | Good       | Good       | Basic     |
+| Cursor variables            | Yes    | Yes        | Limited    | No        |
+| Rich cursor attributes      | Yes    | Partial    | No         | No        |
+| Suitable for heavy logic    | Yes    | Yes        | Yes        | No        |
+
+---
+
+Let me know if you want performance comparisons or cursor alternatives like **array fetching**, **window functions**, or **set-based approaches** in these databases.
+
