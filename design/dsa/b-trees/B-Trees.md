@@ -356,3 +356,76 @@ Several databases utilize B-trees for efficient data indexing and retrieval. Not
 For a practical example of B-tree implementation in a database system, you can refer to the PostgreSQL source code on GitHub. The B-tree index implementation is located in the `src/backend/access/nbtree` directory of the PostgreSQL repository.
 
 This directory contains the source files responsible for PostgreSQL's B-tree index operations, providing insight into how B-trees are implemented within the database system.
+
+
+### **B-Tree Data Structure**
+
+A **B-Tree** is a self-balancing **multi-way search tree** used extensively in databases and file systems. It maintains sorted data and allows searches, sequential access, insertions, and deletions in **logarithmic time**.
+
+---
+
+### **Key Characteristics of B-Tree**
+- Each node can have **multiple children** (more than 2, unlike binary trees).
+- Nodes contain **multiple keys**.
+- B-Trees are **balanced** — all leaf nodes are at the same level.
+- Designed for **minimizing disk I/O**, making them ideal for databases and file systems.
+
+---
+
+### **B-Tree Properties (Order `t`)**:
+- Every node has at most `2t - 1` keys.
+- Every node (except root) has at least `t - 1` keys.
+- The root has at least 1 key.
+- All leaves are at the same depth.
+
+---
+
+### **Operations**
+- **Search**: O(log n)
+- **Insert/Delete**: O(log n), though insertions/deletions may cause splits/merges.
+
+---
+
+### **B-Tree Example (order = 3)**
+
+```
+        [10, 20]
+       /   |   \
+    [5]  [15]  [25, 30]
+```
+
+---
+
+### **Red-Black Tree vs B-Tree**
+
+| Feature              | **B-Tree**                              | **Red-Black Tree**                     |
+|----------------------|------------------------------------------|----------------------------------------|
+| Type                 | Multi-way tree                          | Binary search tree                     |
+| Node Keys            | Multiple keys per node                  | One key per node                       |
+| Balancing            | Strictly balanced                       | Loosely balanced                       |
+| Height               | Shorter (due to more keys per node)     | Taller                                 |
+| Disk Access          | Optimized for **disk access**           | Not optimized for disk                 |
+| Use Case             | **Databases, file systems**             | **In-memory** data structures          |
+| Insertion/Deletion   | More complex (splits/merges)            | Simpler (rotations)                    |
+| Search Time          | O(log n)                                | O(log n)                               |
+| Cache Friendliness   | Higher (due to fewer disk reads)        | Lower                                  |
+
+---
+
+### **When to Use Which?**
+- **Use B-Trees** when:
+  - Data is stored on disk (e.g., DB indexes, file systems)
+  - Large block reads are preferred
+
+- **Use Red-Black Trees** when:
+  - Data is in-memory
+  - Fast insertions and deletions are required with simple logic
+
+---
+
+### **Conclusion**
+Both are balanced search trees, but they serve different purposes:
+- **B-Trees** are built for I/O efficiency, suited for **disk-based** systems like databases (MySQL, PostgreSQL, Oracle).
+- **Red-Black Trees** are ideal for **in-memory** operations, like in C++ STL `map` or Java `TreeMap`.
+
+Would you like a Python example of a simple B-Tree?
