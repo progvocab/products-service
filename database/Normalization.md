@@ -44,8 +44,11 @@ CREATE TABLE Students1NF (
 
 **Example (1NF with partial dependency)**
 
+
 | StudentID | CourseID | StudentName | CourseName |
 |-----------|----------|-------------|------------|
+| 1         | 1  | Alics      | Math|
+
 
 Here, `StudentName` depends only on `StudentID`, and `CourseName` only on `CourseID`.
 
@@ -87,6 +90,8 @@ CREATE TABLE Enrollment (
 
 | EmpID | EmpName | DeptID | DeptName |
 |-------|---------|--------|----------|
+| 1          | Alics |1     | IT|
+
 
 Here, `DeptName` depends on `DeptID`, which is not a primary key.
 
@@ -119,6 +124,7 @@ CREATE TABLE Departments (
 
 | StudentID | Course | Instructor |
 |-----------|--------|------------|
+| 1 | Math | Ray |
 
 Assume:  
 - Each course has only one instructor.  
