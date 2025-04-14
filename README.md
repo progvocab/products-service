@@ -3,6 +3,7 @@
 
 - [Design](design)
 - [Database](database)
+- [DevOps](devOps)
 - [Data Engineering](data-engineering)
 - [Architecture](architecture)
 
