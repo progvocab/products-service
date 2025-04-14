@@ -178,6 +178,7 @@ public class TeeingExample {
 ---
 
 ### **Key Differences Between Java 8 and Java 11**
+
 | Feature | Java 8 | Java 11 |
 |---------|--------|---------|
 | `var` for lambda parameters | ❌ | ✅ |

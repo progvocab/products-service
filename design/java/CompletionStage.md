@@ -7,6 +7,7 @@
 - Supports **chaining, combining, and error handling** for async tasks.  
 
 ## **Key Differences:**
+
 | Feature | `Future` | `CompletableFuture` (`CompletionStage`) |
 |---------|----------|------------------|
 | **Blocking** | `get()` blocks the thread | Supports **non-blocking async chaining** |
@@ -178,6 +179,7 @@ Task running on: pool-1-thread-1
 ---
 
 # **Summary of CompletionStage Methods**
+
 | Method | Description |
 |--------|-------------|
 | `supplyAsync()` | Runs an async task and returns a result. |

@@ -226,6 +226,7 @@ Task executed in: pool-1-thread-1
 ---
 
 ## **7. Summary of CompletableFuture Methods**
+
 | Method | Description |
 |--------|-------------|
 | `supplyAsync()` | Runs a task asynchronously and returns a result. |
