@@ -6,4 +6,5 @@
 - [Normalization](Normalization.md)
 - [Cursor](cursor)
 - [Indexes](index)
+- [Procedures](procedure)
 
