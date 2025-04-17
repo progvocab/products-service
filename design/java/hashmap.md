@@ -1,4 +1,6 @@
-### A HashMap stores key-value pairs using an array of buckets (bins) where each bucket can hold a linked list of nodes. When a key is added, its hashCode() method is used to calculate an index (bucket). If multiple keys hash to the same index (collision), they are stored in a linked list at that bucket. When retrieving a value, the process is reversed: the key's hashCode() is used to find the bucket, and then the equals() method is used to compare keys within that bucket. [1, 2, 3, 4, 5]  
+### Hashmap internal working 
+
+A HashMap stores key-value pairs using an array of buckets (bins) where each bucket can hold a linked list of nodes. When a key is added, its hashCode() method is used to calculate an index (bucket). If multiple keys hash to the same index (collision), they are stored in a linked list at that bucket. When retrieving a value, the process is reversed: the key's hashCode() is used to find the bucket, and then the equals() method is used to compare keys within that bucket. [1, 2, 3, 4, 5]  
 Elaboration: [1, 2]  
 
  - Buckets/Bins: A HashMap uses an array of buckets, also known as bins, to store data. Each bucket can potentially hold multiple key-value pairs. [1, 2, 3]  
