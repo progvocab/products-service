@@ -167,3 +167,70 @@ module com.example.myapp {
 ---
 
 Would you like a working example with multiple modules and service loading?
+
+
+### **`package-info.java` in Java**
+
+The `package-info.java` file is a **special Java source file** used to provide **package-level metadata**, such as documentation, annotations, and package-level visibility rules.
+
+---
+
+### **Primary Uses**
+
+1. **Package-Level Javadoc Documentation**
+   - Allows you to write Javadoc for an entire package, not just individual classes.
+   - Helps document package responsibilities, design, and usage.
+
+   ```java
+   /**
+    * This package contains service layer implementations for the application.
+    * It handles business logic and interacts with the data access layer.
+    */
+   package com.example.service;
+   ```
+
+2. **Package-Level Annotations**
+   - You can apply annotations at the package level (e.g., `@ParametersAreNonnullByDefault` for null-safety).
+
+   ```java
+   @ParametersAreNonnullByDefault
+   package com.example.util;
+
+   import javax.annotation.ParametersAreNonnullByDefault;
+   ```
+
+3. **Java Architecture and Module Compatibility**
+   - Helps tools and frameworks like JAXB, JPA, or Spring to process package-level configurations.
+
+---
+
+### **Where is it Located?**
+
+- It must be placed in the **same directory** as other `.java` files of the package.
+- The file name must be **`package-info.java`** (no class inside it).
+- Must contain only a **package declaration**, annotations, and comments (no classes or methods).
+
+---
+
+### **Example**
+
+```java
+/**
+ * Contains utility classes for string manipulation and validation.
+ * This package is used internally across various modules.
+ */
+@Deprecated
+package com.example.utils;
+```
+
+---
+
+### **Why Use It?**
+
+- **Better documentation** for maintainability and collaboration.
+- **Centralized annotations** reduce redundancy.
+- Improves **tooling support** (code generation, static analysis).
+
+---
+
+Would you like to see how `package-info.java` integrates with Javadoc generation or annotations like `@XmlSchema` in JAXB?
