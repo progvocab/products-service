@@ -144,3 +144,88 @@ CMD ["myapp"]
 - Use **multi-stage builds** and **efficient Dockerfile practices** to minimize the number of layers and reduce image size.
 
 Let me know if you need further clarification!
+
+
+Docker layers are the **building blocks** of Docker images. Understanding them is essential for creating efficient, cache-friendly Dockerfiles.
+
+---
+
+### **What Are Docker Layers?**
+
+Each command in a `Dockerfile` (like `RUN`, `COPY`, `ADD`) creates a **new image layer**. These layers are:
+
+- **Read-only** and **stacked** on top of each other.
+- **Cached** by Docker, which speeds up rebuilds.
+- **Reused** if the layer hasn’t changed.
+
+---
+
+### **Why Layers Matter**
+
+- Efficient rebuilds: Only changed layers are rebuilt.
+- Smaller images: Layers are shared across images.
+- Faster CI/CD pipelines: Use cache to skip redundant steps.
+
+---
+
+### **Example Dockerfile and Layers**
+
+```Dockerfile
+# Layer 1: Base image
+FROM openjdk:17-jdk-alpine
+
+# Layer 2: Set working directory
+WORKDIR /app
+
+# Layer 3: Copy dependency files
+COPY pom.xml ./
+COPY src ./src
+
+# Layer 4: Build the application
+RUN ./mvnw package
+
+# Layer 5: Copy and run app
+CMD ["java", "-jar", "target/app.jar"]
+```
+
+---
+
+### **Layer Caching Tips**
+
+| Best Practice                     | Why it Helps |
+|----------------------------------|--------------|
+| `COPY` only necessary files early | Avoid cache busting from code changes |
+| Separate `COPY` of `pom.xml` and `src/` | Build cache works for unchanged dependencies |
+| Minimize number of `RUN` steps  | Each `RUN` is a layer |
+| Use `.dockerignore`             | Avoid copying unnecessary files |
+
+---
+
+### **View Layers**
+
+Use the following command to inspect image layers:
+
+```bash
+docker history your-image-name
+```
+
+---
+
+### **Bonus: Multi-stage Builds**
+
+Use **multi-stage builds** to keep final images clean and optimized.
+
+```Dockerfile
+FROM maven:3.9-openjdk-17 AS builder
+WORKDIR /app
+COPY . .
+RUN mvn package -DskipTests
+
+FROM openjdk:17-jdk-slim
+COPY --from=builder /app/target/app.jar /app.jar
+CMD ["java", "-jar", "/app.jar"]
+```
+
+---
+
+Let me know if you’d like a visual breakdown of how caching works with example Docker builds.
