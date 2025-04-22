@@ -300,3 +300,143 @@ New document created with:
 ---
 
 Would you like a sample repository interface (`ProductRepository`) and REST controller too?
+
+
+Absolutely! Below are MongoDB **aggregation queries** for your employee-related use cases, followed by their **Spring Data MongoDB equivalents**, along with sample **input data** and **expected results**.
+
+---
+
+## **Sample Employee Document**
+
+```json
+{
+  "_id": ObjectId("..."),
+  "name": "Alice",
+  "department": "Engineering",
+  "salary": 70000
+}
+```
+
+---
+
+## **1. Total Number of Employees in Each Department**
+
+### **MongoDB Query**
+
+```js
+db.employees.aggregate([
+  { $group: { _id: "$department", total: { $sum: 1 } } }
+]);
+```
+
+### **Spring Data MongoDB**
+
+```java
+Aggregation agg = Aggregation.newAggregation(
+    Aggregation.group("department").count().as("total")
+);
+
+AggregationResults<Document> results = mongoTemplate.aggregate(agg, "employees", Document.class);
+```
+
+---
+
+## **2. Employee(s) with Highest Salary**
+
+### **MongoDB Query**
+
+```js
+db.employees.find().sort({ salary: -1 }).limit(1);
+```
+
+### **Spring Data MongoDB**
+
+```java
+Query query = new Query().with(Sort.by(Sort.Direction.DESC, "salary")).limit(1);
+Employee topPaid = mongoTemplate.findOne(query, Employee.class);
+```
+
+---
+
+## **3. Employee(s) with Second Highest Salary**
+
+### **MongoDB Aggregation**
+
+```js
+db.employees.aggregate([
+  { $sort: { salary: -1 } },
+  { $group: { _id: "$salary", employees: { $push: "$$ROOT" } } },
+  { $skip: 1 },
+  { $limit: 1 },
+  { $unwind: "$employees" },
+  { $replaceRoot: { newRoot: "$employees" } }
+]);
+```
+
+### **Spring Data MongoDB**
+
+Spring Data doesn't directly support `skip + group + unwind` in aggregation pipeline easily, but this is a close approximation using raw `Document` parsing:
+
+```java
+Aggregation agg = Aggregation.newAggregation(
+    Aggregation.sort(Sort.by(Sort.Direction.DESC, "salary")),
+    Aggregation.group("salary").push("$$ROOT").as("employees"),
+    Aggregation.skip(1),
+    Aggregation.limit(1),
+    Aggregation.unwind("employees"),
+    Aggregation.replaceRoot("employees")
+);
+
+AggregationResults<Employee> result = mongoTemplate.aggregate(agg, "employees", Employee.class);
+```
+
+---
+
+## **4. Maximum Salary for Each Department**
+
+### **MongoDB Aggregation**
+
+```js
+db.employees.aggregate([
+  { $group: { _id: "$department", maxSalary: { $max: "$salary" } } }
+]);
+```
+
+### **Spring Data MongoDB**
+
+```java
+Aggregation agg = Aggregation.newAggregation(
+    Aggregation.group("department").max("salary").as("maxSalary")
+);
+
+AggregationResults<Document> result = mongoTemplate.aggregate(agg, "employees", Document.class);
+```
+
+---
+
+## **Sample Input Data**
+
+```json
+[
+  { "name": "Alice", "department": "Engineering", "salary": 70000 },
+  { "name": "Bob", "department": "Engineering", "salary": 80000 },
+  { "name": "Charlie", "department": "HR", "salary": 60000 },
+  { "name": "Daisy", "department": "Engineering", "salary": 85000 },
+  { "name": "Eva", "department": "HR", "salary": 65000 }
+]
+```
+
+---
+
+## **Expected Results**
+
+| Use Case                       | Output (Example)                                                  |
+|--------------------------------|-------------------------------------------------------------------|
+| Employees per department       | `{ _id: "Engineering", total: 3 }`, `{ _id: "HR", total: 2 }`     |
+| Highest salary                 | `{ name: "Daisy", salary: 85000 }`                                |
+| Second highest salary          | `{ name: "Bob", salary: 80000 }`                                  |
+| Max salary per department      | `{ _id: "Engineering", maxSalary: 85000 }`, `{ _id: "HR", maxSalary: 65000 }` |
+
+---
+
+Would you also like versions of these as **Spring Data JPA (SQL)** queries for comparison?
