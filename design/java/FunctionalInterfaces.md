@@ -11,6 +11,7 @@ The **java.util.function** package provides a rich set of functional interfaces 
 - **Abstract Method**:
   - `boolean test(T t)`
 - **Example Use Case**: Filtering elements from a collection.
+- ** used in stream().filter()
 
 ```java
 import java.util.function.Predicate;
@@ -47,6 +48,8 @@ System.out.println(isPositiveAndEven.test(-4)); // Output: false
 - **Abstract Method**:
   - `void accept(T t)`
 - **Example Use Case**: Printing elements or performing an action on each element in a collection.
+
+- ** Used in stream().forEach 
 
 ```java
 import java.util.function.Consumer;
@@ -104,6 +107,7 @@ public class UnaryOperatorExample {
 - **Abstract Method**:
   - `R apply(T t)`
 - **Example**:
+- ** used in stream().map() **
 ```java
 import java.util.function.Function;
 
