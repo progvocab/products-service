@@ -90,6 +90,57 @@ db.users.aggregate([
 ]);
 ```
 
+To calculate the **sum of salary for all employees** in MongoDB, you can use the **aggregation framework**:
+
+---
+
+### **MongoDB Query**
+
+```javascript
+db.employees.aggregate([
+  {
+    $group: {
+      _id: null,
+      totalSalary: { $sum: "$salary" }
+    }
+  }
+]);
+```
+
+---
+
+### **Explanation**
+
+- `$group`: Groups all documents into one group (since `_id: null`).
+- `$sum: "$salary"`: Adds up all the values in the `salary` field.
+
+---
+
+### **Sample Data**
+
+```json
+[
+  { "name": "Alice", "salary": 5000 },
+  { "name": "Bob", "salary": 7000 },
+  { "name": "Charlie", "salary": 6000 }
+]
+```
+
+---
+
+### **Result**
+
+```json
+[
+  { "_id": null, "totalSalary": 18000 }
+]
+```
+
+---
+
+Would you like the same aggregation using **Spring Data MongoDB** or Java driver code?
+
+
 ---
 
 Would you like examples with Spring Data MongoDB as well?
