@@ -3,7 +3,7 @@
 # Oracle 
 - [Joins](joins.md)
 - [Cursor](cursor)
-- [Index](index)
+- [Indexes](indexes)
 - [Procedure](procedure)
 - [Objects](objects.md)
 - [ORA files](ora_files.md)
