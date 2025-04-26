@@ -56,6 +56,20 @@ Spring Security automatically configures a **basic authentication** system:
 - **Password** → Generated in logs (on startup)
 - **Default login page** → `/login`
 
+```log
+.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password:
+```
+By Default all requests return 401
+```bash
+curl -i http://localhost:8080/api/employees -H "content-type:application/json" -d '{"employeeName":"Rahul" , "salary": 2000}'
+```
+```log
+HTTP/1.1 401 
+
+```
+
 ---
 
 # **🔹 4. Custom Security Configuration**
@@ -75,8 +89,11 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+/**
+* for spring security setup using Configuration and EnableWebSecurity to create SecurityFilterChain bean for  
+*/
 public class SecurityConfig {
-
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
