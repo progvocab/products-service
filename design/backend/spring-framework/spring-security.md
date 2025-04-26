@@ -69,6 +69,69 @@ curl -i http://localhost:8080/api/employees -H "content-type:application/json" -
 HTTP/1.1 401 
 
 ```
+To make the GET APIs working you can use the password generated in console ,below is the curl command
+```bash
+curl -i   -u user:$pass http://localhost:8080/api/employees
+```
+The POST endpoints will still throw 401 , To fix the POST endpoints you need to make code changes 
+
+ 
+This happens because of **CSRF protection**!
+
+---
+- By default, **Spring Security enables CSRF protection** for **stateful sessions** (i.e., browser clients).
+- When you send a **POST/PUT/DELETE**, Spring Security **expects a CSRF token**.
+- Since your `curl` or API client is not sending any CSRF token, Spring rejects the request with 401 or 403.
+
+---
+
+###  Solution options:
+
+| Option | What to do | When to use |
+|:---|:---|:---|
+| 1. Disable CSRF protection (easy for APIs) | Add `http.csrf().disable()` in security config | For **pure APIs** (no browser form login) |
+| 2. Send CSRF token manually | Use Spring's CSRF endpoint to get token first | Needed if you are using browser + forms |
+
+**Since you are building an API, option 1 (disable CSRF) is perfectly fine!**
+
+---
+
+###  Quick Code to disable CSRF:
+
+Create a `SecurityConfig.java` if you don’t have it:
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable() //   Disable CSRF for APIs
+            .authorizeHttpRequests(authorize -> authorize
+                .anyRequest().authenticated()
+            )
+            .httpBasic(); // Use basic auth
+        return http.build();
+    }
+}
+```
+
+---
+
+### 🧪 After this, your POST cURL should work like:
+
+```bash
+curl -u user:$pass -H "Content-Type: application/json" -X POST -d '{"key":"value"}' http://localhost:8080/your-post-endpoint
+```
+
+✅ No CSRF token needed anymore!
+ 
 
 ---
 
@@ -298,3 +361,147 @@ http.oauth2Login(Customizer.withDefaults());
 | **OAuth2** | Enables login with Google, Facebook, etc. |
 
 Would you like a complete JWT-based authentication example? 🚀
+
+
+
+Got it — you're hitting the **default Spring Security behavior** after adding the `spring-boot-starter-security` dependency.
+
+Here’s exactly what's happening:
+
+---
+
+### 🔥 Why is a random password being printed?
+
+When you **add** `spring-boot-starter-security`, and you **don't configure** any custom security settings, Spring Boot **auto-configures** basic HTTP authentication:
+
+- It creates a **default user** with username `user`.
+- It generates a **random password** at startup (you can see it in logs — something like this):
+
+```text
+Using generated security password: 8f8c61dd-67a3-4b5f-80e2-75db8aaf3b55
+```
+
+This is **intended to secure** the application immediately.
+
+---
+
+### 🚨 Why are your API calls failing with 401 Unauthorized?
+
+Because now **every API** requires authentication (username/password) unless you explicitly configure it otherwise.
+
+Since your client (Postman, curl, frontend, etc.) isn't providing credentials, **Spring Security** blocks the request with **HTTP 401 Unauthorized**.
+
+---
+
+### 🛠 How to Fix It?
+
+You have 2 options:
+
+---
+
+#### 1. (Quick fix) **Allow all APIs without authentication** (for development)
+
+If you don't want security at all (during dev), create a `SecurityConfig` class like this:
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable() // (optional) disable CSRF for POST/PUT APIs in development
+            .authorizeHttpRequests(authorize -> authorize
+                .anyRequest().permitAll()
+            );
+        return http.build();
+    }
+}
+```
+
+✅ This will **allow all requests** without authentication.
+
+---
+
+#### 2. (Better) **Configure proper authentication**
+
+If you actually want to **secure APIs properly** (and not just turn it off), you should:
+
+- Define users, roles, permissions.
+- Configure login endpoints or token-based authentication (e.g., JWT).
+
+Example: In-memory username/password:
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable()
+            .authorizeHttpRequests(authz -> authz
+                .anyRequest().authenticated()
+            )
+            .httpBasic();
+        return http.build();
+    }
+
+    @Bean
+    public UserDetailsService users() {
+        return new InMemoryUserDetailsManager(
+            User.withUsername("admin")
+                .password(passwordEncoder().encode("admin123"))
+                .roles("USER")
+                .build()
+        );
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+
+Now you can call APIs by using:
+- Username: `admin`
+- Password: `admin123`
+
+---
+
+### ⚡️ Summary
+
+| Situation            | Action                            |
+|-----------------------|-----------------------------------|
+| Disable security (dev) | Use `.permitAll()` config |
+| Add simple auth       | Setup `InMemoryUserDetailsManager` |
+| Production app        | Setup JWT, OAuth2, etc. |
+
+---
+
+### 🔥 Quick Pro Tip
+If you don't want to manually create `SecurityConfig` for now (only disable),  
+**you can even remove the `spring-boot-starter-security` dependency** from your `pom.xml` until you really need it.  
+Then APIs won't be protected.
+
+---
+
+Would you like me to show how to add **JWT-based authentication** next?  
+(That's usually better than Basic Auth for real projects!) 🚀  
+Want me to?
