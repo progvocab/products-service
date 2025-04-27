@@ -405,3 +405,194 @@ Employee (EmployeeID)
 It will give a full practical feel!  
 Shall I continue? (it’ll be beautiful and very clear!)  
 Let me know!
+Perfect — let's do this carefully.
+
+You asked to **add** two columns to the existing table:  
+- **Project ID**  
+- **Project Role**
+
+And then **show the changes** for **all 6 normal forms** (1NF → 6NF).
+
+I'll **start from your previous table**:
+
+---
+
+# **Initial Table (Before Normalization)**
+
+| Employee Name | Salary | City     | Zip Code | Reportees      | Designation | Grade | Project ID | Project Role |
+|:--------------|:-------|:---------|:---------|:---------------|:------------|:------|:-----------|:-------------|
+| Bob           | 1000   | New York | 10001    | Alex \| Jenny | Manager     | A     | P101       | Lead         |
+| Alice         | 1200   | Boston   | 02101    | -              | Developer   | B     | P102       | Developer    |
+
+- **Problems:**  
+  - Reportees column is **multi-valued** ("Alex | Jenny").  
+  - **City** depends on **Zip Code** (not Employee Name).
+  - **Designation** depends on **Grade**.
+  - **Partial dependency** possible if `(Employee Name, Project ID)` is a composite key.
+
+---
+
+# **Normalization step-by-step**
+
+---
+
+## **1NF — Remove multi-valued columns, atomic values only**
+
+### Changes:
+- Split reportees into separate rows or a new table.
+- Keep each field atomic.
+
+| Employee Name | Salary | City     | Zip Code | Designation | Grade | Project ID | Project Role |
+|:--------------|:-------|:---------|:---------|:------------|:------|:-----------|:-------------|
+| Bob           | 1000   | New York | 10001    | Manager     | A     | P101       | Lead         |
+| Alice         | 1200   | Boston   | 02101    | Developer   | B     | P102       | Developer    |
+
+Separate **Reportees** into a new table:
+
+| Manager Name | Reportee Name |
+|:-------------|:--------------|
+| Bob          | Alex          |
+| Bob          | Jenny         |
+
+---
+
+## **2NF — Remove partial dependency**
+
+Assuming **composite key** `(Employee Name, Project ID)`:
+- Salary, City, Zip Code, Grade, Designation depend **only** on Employee Name → **Partial dependency**.
+
+### Changes:
+**Split into two tables**:
+
+**Employee Table:**
+
+| Employee Name | Salary | City     | Zip Code | Grade | Designation |
+|:--------------|:-------|:---------|:---------|:------|:------------|
+| Bob           | 1000   | New York | 10001    | A     | Manager     |
+| Alice         | 1200   | Boston   | 02101    | B     | Developer   |
+
+**Employee Project Table:**
+
+| Employee Name | Project ID | Project Role |
+|:--------------|:-----------|:-------------|
+| Bob           | P101       | Lead         |
+| Alice         | P102       | Developer    |
+
+---
+
+## **3NF — Remove transitive dependency**
+
+- City depends on Zip Code → Transitive dependency via Zip Code.
+- Designation depends on Grade → Transitive dependency via Grade.
+
+### Changes:
+Create lookup tables.
+
+**ZipCode Table:**
+
+| Zip Code | City     |
+|:---------|:---------|
+| 10001    | New York |
+| 02101    | Boston   |
+
+**Grade Table:**
+
+| Grade | Designation |
+|:------|:------------|
+| A     | Manager     |
+| B     | Developer   |
+
+**Now Employee Table becomes:**
+
+| Employee Name | Salary | Zip Code | Grade |
+|:--------------|:-------|:---------|:------|
+| Bob           | 1000   | 10001    | A     |
+| Alice         | 1200   | 02101    | B     |
+
+(Notice: no direct City or Designation here — only references!)
+
+---
+
+## **BCNF (Boyce-Codd Normal Form)**
+
+- Every determinant must be a candidate key.
+-  
+**Already achieved** because:
+  - Employee Name is primary key for Employee.
+  - Zip Code is primary key for ZipCode Table.
+  - Grade is primary key for Grade Table.
+
+---
+
+## **4NF — Remove multi-valued dependencies**
+
+- No independent multi-valued facts in same table.
+-  
+**Already achieved**, because:
+  - Reportees are separated into a different table.
+
+---
+
+## **5NF — Remove join dependencies**
+
+- Decompose tables further if needed, to avoid lossless joins.
+-  
+In this simple case, **5NF is achieved**.  
+(Real cases arise when one fact depends on multiple joins.)
+
+---
+
+## **6NF — Table decomposed to irreducible form (theoretical)**
+
+- Fully decomposed into smallest meaningful parts.
+- Useful mainly in Temporal Databases (versioned records).
+-  
+**Not necessary** here unless you introduce **time-based changes** to salaries, projects, etc.
+
+---
+
+# **Summary of New Tables**
+
+### 1. Employee Table
+
+| Employee Name | Salary | Zip Code | Grade |
+|:--------------|:-------|:---------|:------|
+| Bob           | 1000   | 10001    | A     |
+| Alice         | 1200   | 02101    | B     |
+
+### 2. ZipCode Table
+
+| Zip Code | City     |
+|:---------|:---------|
+| 10001    | New York |
+| 02101    | Boston   |
+
+### 3. Grade Table
+
+| Grade | Designation |
+|:------|:------------|
+| A     | Manager     |
+| B     | Developer   |
+
+### 4. Employee Project Table
+
+| Employee Name | Project ID | Project Role |
+|:--------------|:-----------|:-------------|
+| Bob           | P101       | Lead         |
+| Alice         | P102       | Developer    |
+
+### 5. Manager-Reportees Table
+
+| Manager Name | Reportee Name |
+|:-------------|:--------------|
+| Bob          | Alex          |
+| Bob          | Jenny         |
+
+---
+
+# **Visual Diagram**
+
+If you'd like, I can also draw a **simple ERD (Entity Relationship Diagram)** showing the relations (like One-to-Many, Foreign Keys) —  
+Would you like me to do that too?  
+It'll be very easy to understand at a glance!  
+**(Should I draw it?)**
