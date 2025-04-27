@@ -1,29 +1,31 @@
 In Spring Framework, there are three main ways to implement dependency injection using autowiring: field-based, constructor-based, and setter-based autowiring. Field-based uses reflection to inject dependencies into class fields, while constructor-based injects them through the constructor, and setter-based uses setter methods. 
-- 1. Field-based Autowiring:
-Mechanism: Spring uses Java reflection to inject dependencies directly into the fields of a class. 
+### 1. Field-based Autowiring:
+- **Mechanism**: Spring uses Java reflection to inject dependencies directly into the fields of a class. 
 Example: @Autowired private MyService service;. 
-Benefits: Simple to use and can be useful for small projects. 
+- **Benefits**: Simple to use and can be useful for small projects. 
 Drawbacks: Can make unit testing harder and may not be suitable for larger projects. 
-- 2. Constructor-based Autowiring:
-Mechanism: Dependencies are injected through the constructor of a class.
+### 2. Constructor-based Autowiring:
+- **Mechanism**: Dependencies are injected through the constructor of a class.
 Example: class MyClass { public MyClass(MyDependency dep) { this.dep = dep; } }.
-Benefits: Makes dependencies explicit and immutable, simplifies unit testing, and is generally preferred for larger projects.
-Drawbacks: Requires dependencies to be passed in the constructor, which might not always be feasible. 
-- 3. Setter-based Autowiring:
-Mechanism:
+- **Benefits**: Makes dependencies explicit and immutable, simplifies unit testing, and is generally preferred for larger projects.
+- **Drawbacks**: Requires dependencies to be passed in the constructor, which might not always be feasible. 
+### 3. Setter-based Autowiring:
+- **Mechanism**:
 Dependencies are injected through setter methods of a class.
 Example:
-@Autowired public void setService(MyService service) { this.service = service; }.
-Benefits:
+```java
+@Autowired public void setService(MyService service) { this.service = service; }
+```
+- **Benefits**:
 Suitable for optional dependencies and can be used in conjunction with other injection methods.
-Drawbacks:
+- **Drawbacks**:
 Can be less explicit than constructor injection and might not be suitable for mandatory dependencies. 
 Which one to choose?
-Constructor-based
+- Constructor-based
 is generally recommended as the preferred approach, especially for mandatory dependencies, as it promotes immutability, simplifies testing, and makes dependencies explicit. 
-Setter-based
+- Setter-based
 is suitable for optional dependencies and can be used in conjunction with constructor-based injection. 
-Field-based
+- Field-based
 is the simplest but should be used with caution, as it can make testing more complex and is not as recommended for larger projects. 
 
  Let’s dive deep into **Autowiring**, **Dependency Management**, and **Inversion of Control (IoC)** in **Spring Boot**, along with the **design patterns** and **annotations** involved.
