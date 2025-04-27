@@ -1042,3 +1042,139 @@ Would you like me to also show:
 
 It’ll give you full mastery!  
 **(Type: "Yes show batch/savepoint/XA")**
+
+
+
+In Spring (including both Spring Data JPA and JDBC Template), **transaction propagation** defines how transactions behave when one transactional method calls another. The propagation type tells Spring how to manage the transaction context in such scenarios.
+
+Here's a breakdown of the main **transaction propagation types** and how they behave when set at the **method level**:
+
+---
+
+### 1. **REQUIRED (default)**
+
+- **Behavior**: Uses the existing transaction if one exists; otherwise, starts a new one.
+- **Typical Result**: Both methods participate in the same transaction. If the outer method rolls back, so does the inner one.
+
+```java
+@Transactional(propagation = Propagation.REQUIRED)
+public void outerMethod() {
+    innerMethod(); // also REQUIRED
+}
+```
+
+**Result**: Single transaction.
+
+---
+
+### 2. **REQUIRES_NEW**
+
+- **Behavior**: Suspends the current transaction and starts a new one.
+- **Typical Result**: Inner method runs in its own transaction. Rollback in outer method does not affect inner one and vice versa.
+
+```java
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+public void innerMethod() {
+    // runs in a new transaction
+}
+```
+
+**Result**: Two separate transactions.
+
+---
+
+### 3. **NESTED**
+
+- **Behavior**: Starts a nested transaction within the existing one (only supported with JDBC, not JPA out of the box).
+- **Typical Result**: Inner method can roll back independently (via savepoints), but the outer method’s rollback will undo everything.
+
+```java
+@Transactional(propagation = Propagation.NESTED)
+public void innerMethod() {
+    // runs within a nested transaction
+}
+```
+
+**Result**: Sub-transaction inside the main one (works best with JDBC Template, not always effective with JPA).
+
+---
+
+### 4. **SUPPORTS**
+
+- **Behavior**: Joins existing transaction if available; otherwise, runs non-transactionally.
+- **Typical Result**: The method can participate in a transaction or run without one.
+
+```java
+@Transactional(propagation = Propagation.SUPPORTS)
+public void innerMethod() {
+    // behavior depends on caller
+}
+```
+
+**Result**: Flexible; behavior varies depending on context.
+
+---
+
+### 5. **NOT_SUPPORTED**
+
+- **Behavior**: Suspends any existing transaction; runs non-transactionally.
+- **Typical Result**: Inner method won't be affected by transactional context.
+
+```java
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
+public void innerMethod() {
+    // no transaction
+}
+```
+
+**Result**: No transaction; useful for operations like logging or auditing.
+
+---
+
+### 6. **NEVER**
+
+- **Behavior**: Throws an exception if there's an active transaction.
+- **Typical Result**: Used to enforce non-transactional behavior.
+
+```java
+@Transactional(propagation = Propagation.NEVER)
+public void innerMethod() {
+    // error if transaction exists
+}
+```
+
+**Result**: Ensures strict non-transactional execution.
+
+---
+
+### 7. **MANDATORY**
+
+- **Behavior**: Must be called within a transaction; throws an exception if none exists.
+- **Typical Result**: Enforces that a transaction must already exist.
+
+```java
+@Transactional(propagation = Propagation.MANDATORY)
+public void innerMethod() {
+    // requires a transaction
+}
+```
+
+**Result**: Enforces that caller must start the transaction.
+
+---
+
+### Summary Table:
+
+| Propagation Type | Joins Existing Tx | Starts New Tx | Throws if None | Rolls Back Independently |
+|--------------------|------------------|---------------|----------------|--------------------------|
+| REQUIRED | Yes | Yes | No | No |
+| REQUIRES_NEW | No | Yes | No | Yes |
+| NESTED | Yes | No (nested) | No | Partially (via savepoint)|
+| SUPPORTS | Yes | No | No | N/A |
+| NOT_SUPPORTED | No | No | No | N/A |
+| NEVER | No | No | Yes | N/A |
+| MANDATORY | Yes | No | Yes | N/A |
+
+---
+
+Would you like an example scenario with actual method calls to see how propagation affects the final database state?
