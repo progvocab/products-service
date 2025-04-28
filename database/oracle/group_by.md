@@ -91,3 +91,85 @@ Would you also like me to show:
 
 Let me know!  
 I can prepare examples too.
+
+
+# 2. **Find the Highest Salary for Each Department**
+
+```sql
+SELECT department_name, MAX(salary) AS highest_salary
+FROM employees
+GROUP BY department_name
+ORDER BY department_name;
+```
+
+- **`MAX(salary)`** groups the highest salary **per department**.
+
+---
+
+# 3. **Grand Total Example**
+
+Suppose you want **department-wise total salaries** + **grand total** at the bottom.
+
+```sql
+SELECT 
+    department_name, 
+    SUM(salary) AS total_salary
+FROM employees
+GROUP BY ROLLUP (department_name);
+```
+
+- `ROLLUP(department_name)` will automatically add one extra row:
+  - For each department: department_name + sum
+  - Last row: `NULL` department_name + grand total salary.
+
+---
+
+# **Sample Data**
+
+| emp_id | emp_name | department_name | salary |
+|:------:|:--------:|:---------------:|:------:|
+| 1      | Bob      | IT               | 5000   |
+| 2      | Alice    | IT               | 6000   |
+| 3      | Carol    | HR               | 4000   |
+| 4      | Dave     | SALES            | 5500   |
+| 5      | Eve      | SALES            | 6500   |
+
+---
+
+# **Query Outputs**
+
+**Second Highest Salary**
+- Salary: `6000`
+
+**Highest Salary for Each Department**
+
+| department_name | highest_salary |
+|:---------------:|:--------------:|
+| HR              | 4000           |
+| IT              | 6000           |
+| SALES           | 6500           |
+
+**Grand Total of Salaries**
+
+| department_name | total_salary |
+|:---------------:|:------------:|
+| HR              | 4000         |
+| IT              | 11000        |
+| SALES           | 12000        |
+| (NULL)          | 27000        |
+
+- NULL department name means **grand total**.
+
+---
+
+# **Bonus**
+If you want to find **second highest salary per department**, let me know — I can show that too (a slightly more advanced query).
+
+---
+
+Would you also want:
+- **Spring Data JPA custom @Query** examples for these?
+- **JdbcTemplate** version?
+- **Optimized versions** for **very large data** (using analytic functions like `DENSE_RANK()`)?
+
+I can quickly add!
