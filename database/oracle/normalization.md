@@ -596,3 +596,136 @@ If you'd like, I can also draw a **simple ERD (Entity Relationship Diagram)** sh
 Would you like me to do that too?  
 It'll be very easy to understand at a glance!  
 **(Should I draw it?)**
+
+Alright — let’s **deliberately add new columns** to the **Employee table** that will cause **Boyce-Codd Normal Form (BCNF)** violations.  
+Then, I'll show you **what needs to be fixed**.
+
+---
+
+# **Current Clean Employee Table (after 3NF)**
+
+| Employee Name | Salary | Zip Code | Grade |
+|:--------------|:-------|:---------|:------|
+| Bob           | 1000   | 10001    | A     |
+| Alice         | 1200   | 02101    | B     |
+
+---
+
+# **Now, let's add some problematic columns**
+
+Let's add these two columns:
+
+- **Manager Name** → (who the employee reports to)  
+- **Office Location** → (depends on Zip Code)
+
+Updated table:
+
+| Employee Name | Salary | Zip Code | Grade | Manager Name | Office Location |
+|:--------------|:-------|:---------|:------|:-------------|:----------------|
+| Bob           | 1000   | 10001    | A     | John         | New York, 5th Ave |
+| Alice         | 1200   | 02101    | B     | Steve        | Boston, Main St  |
+
+---
+
+# **Where is the problem now?**
+
+- **Manager Name** may not uniquely depend on Employee Name (in some orgs, multiple employees have same manager).  
+- **Office Location** depends **only on Zip Code**, not on Employee Name directly.
+
+**Thus, not all determinants are candidate keys!**  
+This **violates BCNF**.
+
+---
+
+# **BCNF requires:**
+> "For every functional dependency X → Y, X must be a superkey."
+
+Currently:
+- `Zip Code → Office Location`  
+- `Employee Name → Salary, Zip Code, Grade, Manager Name`
+
+Here, **Zip Code** is **not a superkey** in Employee Table.  
+(So we violate BCNF.)
+
+---
+
+# **How to Fix This? (BCNF solution)**
+
+### 1. Move Office Location to a new table:
+
+**Zip Code Table:**
+
+| Zip Code | Office Location  |
+|:---------|:-----------------|
+| 10001    | New York, 5th Ave |
+| 02101    | Boston, Main St   |
+
+Employee table keeps only Zip Code (as Foreign Key).
+
+---
+
+### 2. Fix Manager Relationship
+
+Manager relationship could be moved to **Manager Table**:
+
+| Manager Name | Department (or ID) |
+|:-------------|:-------------------|
+| John         | Sales               |
+| Steve        | Tech                |
+
+And link employees via Manager ID, **NOT** store Manager Name directly (otherwise redundancy if manager info changes).
+
+(Or a self-referencing FK if employees themselves are managers.)
+
+---
+
+# **Final Clean Tables after BCNF Fixes**
+
+### **Employee Table**
+
+| Employee Name | Salary | Zip Code | Grade | Manager Name |
+|:--------------|:-------|:---------|:------|:-------------|
+| Bob           | 1000   | 10001    | A     | John         |
+| Alice         | 1200   | 02101    | B     | Steve        |
+
+(Manager Name could still be normalized further if needed.)
+
+---
+
+### **Zip Code Table**
+
+| Zip Code | Office Location  |
+|:---------|:-----------------|
+| 10001    | New York, 5th Ave |
+| 02101    | Boston, Main St   |
+
+---
+
+### **Optional: Manager Table**
+
+| Manager Name | Department |
+|:-------------|:-----------|
+| John         | Sales      |
+| Steve        | Tech       |
+
+---
+
+# **In short:**
+
+| What We Added         | What Happened          | How To Fix            |
+|:----------------------|:-----------------------|:----------------------|
+| Office Location        | Depends only on Zip Code, not Employee Name | Move to separate ZipCode table |
+| Manager Name           | Might cause redundancy, not normalized | Optionally create Manager table |
+
+---
+
+# **Summary**
+Adding "Manager Name" and "Office Location" introduced functional dependencies where a non-candidate attribute determined another non-prime attribute — exactly what BCNF forbids!
+
+We **fixed it** by **splitting the tables** based on those dependencies.
+
+---
+
+Would you like me to also show a **small ER diagram** after these changes?  
+(Visual makes this much clearer!)  
+**Shall I draw it?**
