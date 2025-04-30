@@ -76,3 +76,175 @@ When the number of entries exceeds the `load factor * capacity`, the map resizes
 - Java’s internal treeification in HashMap reduces the impact of worst-case collisions.
 
 Would you like to see how `equals()` and `hashCode()` affect these operations?
+
+
+
+Implementing a **Red-Black Tree (RBT)** from scratch can be complex due to rebalancing logic, but you can use simplified approaches to understand how it works—especially how it's used in Java's `HashMap`.
+
+---
+
+### **What is a Red-Black Tree?**
+
+A **Red-Black Tree** is a self-balancing binary search tree with the following properties:
+
+1. Each node is red or black.
+2. The root is always black.
+3. Red nodes cannot have red children (no two reds in a row).
+4. Every path from a node to its descendant `null` nodes has the same number of black nodes.
+5. New insertions are red by default and may trigger rebalancing (rotations + recoloring).
+
+---
+
+### **Use in Java HashMap**
+
+Since Java 8, when a hash bucket exceeds a threshold (default 8), it's converted into a Red-Black Tree to maintain **O(log n)** lookup and insert time.
+
+---
+
+### **Simple Red-Black Tree Implementation in Java (Simplified)**
+
+Here's a basic sketch to insert nodes into a Red-Black Tree (for learning, not production use):
+
+```java
+enum Color { RED, BLACK }
+
+class Node {
+    int key;
+    Color color;
+    Node left, right, parent;
+
+    Node(int key) {
+        this.key = key;
+        this.color = Color.RED; // New nodes are red by default
+    }
+}
+
+public class RedBlackTree {
+    private Node root;
+
+    public void insert(int key) {
+        Node node = new Node(key);
+        root = bstInsert(root, node);
+        fixViolation(node);
+    }
+
+    private Node bstInsert(Node root, Node node) {
+        if (root == null) return node;
+        if (node.key < root.key) {
+            root.left = bstInsert(root.left, node);
+            root.left.parent = root;
+        } else {
+            root.right = bstInsert(root.right, node);
+            root.right.parent = root;
+        }
+        return root;
+    }
+
+    private void rotateLeft(Node node) {
+        Node r = node.right;
+        node.right = r.left;
+        if (r.left != null) r.left.parent = node;
+        r.parent = node.parent;
+        if (node.parent == null) root = r;
+        else if (node == node.parent.left) node.parent.left = r;
+        else node.parent.right = r;
+        r.left = node;
+        node.parent = r;
+    }
+
+    private void rotateRight(Node node) {
+        Node l = node.left;
+        node.left = l.right;
+        if (l.right != null) l.right.parent = node;
+        l.parent = node.parent;
+        if (node.parent == null) root = l;
+        else if (node == node.parent.left) node.parent.left = l;
+        else node.parent.right = l;
+        l.right = node;
+        node.parent = l;
+    }
+
+    private void fixViolation(Node node) {
+        while (node != root && node.parent.color == Color.RED) {
+            Node parent = node.parent;
+            Node grandparent = parent.parent;
+            if (parent == grandparent.left) {
+                Node uncle = grandparent.right;
+                if (uncle != null && uncle.color == Color.RED) {
+                    // Case 1: Uncle is red
+                    parent.color = Color.BLACK;
+                    uncle.color = Color.BLACK;
+                    grandparent.color = Color.RED;
+                    node = grandparent;
+                } else {
+                    // Case 2 & 3: Uncle is black
+                    if (node == parent.right) {
+                        node = parent;
+                        rotateLeft(node);
+                    }
+                    parent.color = Color.BLACK;
+                    grandparent.color = Color.RED;
+                    rotateRight(grandparent);
+                }
+            } else {
+                // Mirror image of above
+                Node uncle = grandparent.left;
+                if (uncle != null && uncle.color == Color.RED) {
+                    parent.color = Color.BLACK;
+                    uncle.color = Color.BLACK;
+                    grandparent.color = Color.RED;
+                    node = grandparent;
+                } else {
+                    if (node == parent.left) {
+                        node = parent;
+                        rotateRight(node);
+                    }
+                    parent.color = Color.BLACK;
+                    grandparent.color = Color.RED;
+                    rotateLeft(grandparent);
+                }
+            }
+        }
+        root.color = Color.BLACK;
+    }
+
+    // Add inorder traversal to verify structure
+    public void inorder(Node node) {
+        if (node != null) {
+            inorder(node.left);
+            System.out.println(node.key + " (" + node.color + ")");
+            inorder(node.right);
+        }
+    }
+
+    public Node getRoot() {
+        return root;
+    }
+}
+```
+
+---
+
+### **How to Use**
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        RedBlackTree tree = new RedBlackTree();
+        int[] keys = {10, 20, 30, 15, 25, 5};
+        for (int key : keys) tree.insert(key);
+        tree.inorder(tree.getRoot());
+    }
+}
+```
+
+---
+
+### **Use Cases in Practice**
+
+- Java `TreeMap` and `TreeSet` are full implementations of Red-Black Trees.
+- Java `HashMap` converts a bucket to Red-Black Tree for performance when needed.
+
+---
+
+Would you like a comparison between RBT and AVL Tree or more examples on `TreeMap`/`HashMap` internals?
