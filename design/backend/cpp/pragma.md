@@ -84,23 +84,14 @@ Let me know if you want a comparison between `#pragma once` and include guards i
 
 | `#pragma` Directive         | Description / Use Case                                                      | Compiler Support       |
 |----------------------------|------------------------------------------------------------------------------|------------------------|
-
 | `#pragma once`             | Include a header file only once during compilation                           | GCC, Clang, MSVC       |
-
 | `#pragma warning`          | Enable/disable specific compiler warnings                                     | MSVC                   |
-
 | `#pragma GCC optimize`     | Specify optimization options                                                  | GCC                    |
-
 | `#pragma pack(n)`          | Control data structure alignment (e.g., for memory layout)                    | All major compilers    |
-
 | `#pragma region` / `#pragma endregion` | Create collapsible code blocks in IDEs (mostly for readability)                  | MSVC, some IDEs        |
-
 | `#pragma message("text")`  | Print a custom message during compilation                                     | GCC, MSVC              |
-
 | `#pragma omp`              | Used for OpenMP to enable parallelism                                         | With OpenMP support    |
-
 | `#pragma ivdep`            | Vectorization hint to the compiler                                            | Intel, some GCC        |
-
 | `#pragma deprecated`       | Mark functions/types as deprecated                                            | MSVC                   |
 
 ---
