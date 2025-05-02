@@ -252,3 +252,206 @@ func main() {
 - Used in **databases (MongoDB, PostgreSQL)** and **memory allocators** for efficient management.  
 
 Would you like additional details on **deletion in Red-Black Trees**?
+
+
+
+Absolutely! Let's walk through the **step-by-step insertion of values 1 to 10** into a Red-Black Tree. Red-Black Tree properties:
+
+1. Every node is red or black.
+2. Root is always black.
+3. Red nodes cannot have red children (no two reds in a row).
+4. Every path from a node to its descendant NULL nodes must have the same number of black nodes.
+5. New insertions are red by default.
+
+We’ll show each step as `(value, color)`, and balance if needed.
+
+---
+
+### **Step 1: Insert 1**
+```
+(1, Black)     ← root is always black
+```
+
+---
+
+### **Step 2: Insert 2**
+```
+   (1, Black)
+        \
+       (2, Red)
+```
+No fix needed — Red child of Black.
+
+---
+
+### **Step 3: Insert 3**
+```
+   (1, Black)
+        \
+       (2, Red)
+             \
+           (3, Red)
+```
+**Violation:** Red-Red between 2 and 3  
+**Fix:** Rotate Left at 1, recolor
+
+```
+   (2, Black)
+   /       \
+(1, Red)  (3, Red)
+```
+
+---
+
+### **Step 4: Insert 4**
+```
+   (2, Black)
+   /       \
+(1, Red)  (3, Red)
+               \
+              (4, Red)
+```
+**Violation:** Red-Red between 3 and 4  
+**Fix:** Recolor 3 and 4 to black, 2 to red. But 2 is root — recolor back.
+
+```
+   (2, Black)
+   /       \
+(1, Red)  (3, Black)
+               \
+              (4, Red)
+```
+
+---
+
+### **Step 5: Insert 5**
+Insert 5 under 4, now 4 has red child.
+```
+   (2, Black)
+   /       \
+(1, Red)  (3, Black)
+               \
+              (4, Red)
+                    \
+                   (5, Red)
+```
+**Violation:** Red-Red between 4 and 5  
+**Fix:** Rotate Left at 3, then Right at 2, recolor.
+
+After fix:
+```
+       (2, Black)
+      /         \
+(1, Red)     (4, Red)
+            /     \
+       (3, Black) (5, Black)
+```
+
+---
+
+### **Step 6: Insert 6**
+Insert under 5:
+```
+       (2, Black)
+      /         \
+(1, Red)     (4, Red)
+            /     \
+       (3, Black) (5, Black)
+                         \
+                        (6, Red)
+```
+No violation.
+
+---
+
+### **Step 7: Insert 7**
+```
+       (2, Black)
+      /         \
+(1, Red)     (4, Red)
+            /     \
+       (3, Black) (5, Black)
+                         \
+                        (6, Red)
+                               \
+                              (7, Red)
+```
+**Violation:** Red-Red between 6 and 7  
+**Fix:** Rotate Left at 5
+
+Then fix the Red-Red between 4 and new subtree.
+
+After fix:
+```
+       (2, Black)
+      /         \
+(1, Red)     (4, Red)
+            /     \
+       (3, Black) (6, Black)
+                      /    \
+                 (5, Red) (7, Red)
+```
+
+---
+
+### **Step 8: Insert 8**
+Insert under 7
+```
+       (2, Black)
+      /         \
+(1, Red)     (4, Red)
+            /     \
+       (3, Black) (6, Black)
+                      /    \
+                 (5, Red) (7, Red)
+                                     \
+                                    (8, Red)
+```
+**Violation:** Red-Red between 7 and 8  
+**Fix:** Recolor 7 and 8 to black, 6 to red — Red-Red between 4 and 6  
+Then rotate and recolor:
+
+After fix:
+```
+        (2, Black)
+       /         \
+  (1, Red)      (6, Red)
+              /         \
+        (4, Black)     (7, Black)
+       /      \               \
+  (3, Red) (5, Red)        (8, Red)
+```
+
+---
+
+### **Step 9: Insert 9**
+Insert under 8 → red-red violation again, fix similarly:
+
+After fix:
+```
+        (2, Black)
+       /         \
+  (1, Red)      (6, Red)
+              /         \
+        (4, Black)     (8, Black)
+       /      \       /      \
+  (3, Red) (5, Red)(7, Red) (9, Red)
+```
+
+---
+
+### **Step 10: Insert 10**
+Insert under 9 → red-red again, fix with recolor and rotate.
+
+Final (balanced and color-corrected) tree:
+```
+        (6, Black)
+       /           \
+  (2, Red)       (8, Red)
+  /      \        /      \
+(1,B)  (4,B)   (7,B)   (9,B)
+       / \                  \
+   (3,R)(5,R)            (10,R)
+```
+
+Let me know if you want this rendered visually or explored as code!
