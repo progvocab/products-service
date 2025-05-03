@@ -248,3 +248,276 @@ public class Main {
 ---
 
 Would you like a comparison between RBT and AVL Tree or more examples on `TreeMap`/`HashMap` internals?
+
+
+Let's visualize **how Java's `HashMap` stores the following entries** step-by-step:
+
+```java
+map.put(1, "one");
+map.put(2, "two");
+map.put(3, "three");
+map.put(4, "four");
+map.put(5, "five");
+```
+
+We’ll explain:
+
+- **Bucket array** (table)
+- **Index calculation**
+- **LinkedList** or **TreeNode** in bins
+- **No resizing assumed** (default capacity = 16, load factor = 0.75)
+- Assume **Java 8+**, where chains longer than 8 may become Red-Black trees (not triggered here).
+
+---
+
+### **1. HashMap Initialization**
+
+- Default capacity = 16
+- Internal structure: `Node<K,V>[] table = new Node[16];`
+- Index = `hash(key) & (n - 1)` where `n` is table length
+
+---
+
+### **2. Step-by-step Insertion**
+
+#### **Put(1, "one")**
+
+- `hash(1) → e.g., 1`
+- `index = 1 & (16 - 1) = 1`
+- `table[1] = new Node(1, "one")`
+
+**Table now:**
+```
+[0] 
+[1] -> (1, "one")
+[2] 
+...
+[15]
+```
+
+---
+
+#### **Put(2, "two")**
+
+- `hash(2) → 2`
+- `index = 2 & 15 = 2`
+- `table[2] = new Node(2, "two")`
+
+**Table:**
+```
+[1] -> (1, "one")
+[2] -> (2, "two")
+```
+
+---
+
+#### **Put(3, "three")**
+
+- `hash(3) → 3`
+- `index = 3 & 15 = 3`
+- `table[3] = new Node(3, "three")`
+
+**Table:**
+```
+[1] -> (1, "one")
+[2] -> (2, "two")
+[3] -> (3, "three")
+```
+
+---
+
+#### **Put(4, "four")**
+
+- `hash(4) → 4`
+- `index = 4 & 15 = 4`
+- `table[4] = new Node(4, "four")`
+
+---
+
+#### **Put(5, "five")**
+
+- `hash(5) → 5`
+- `index = 5 & 15 = 5`
+- `table[5] = new Node(5, "five")`
+
+---
+
+### **Resulting Table**
+Each key lands in a separate bucket:
+```
+[0] 
+[1] -> (1, "one")
+[2] -> (2, "two")
+[3] -> (3, "three")
+[4] -> (4, "four")
+[5] -> (5, "five")
+[6..15] -> null
+```
+
+### **What if Collision Occurs?**
+
+Suppose keys `17` and `1` both hash to index 1:
+
+```java
+map.put(17, "seventeen");  // hash(17) = 17, 17 & 15 = 1
+```
+
+**Bucket[1] becomes:**
+```
+[1] -> (1, "one") -> (17, "seventeen")
+```
+
+This forms a **linked list**.
+
+---
+
+### **What about Red-Black Tree?**
+
+If more than 8 entries collide into the same bucket **and table size is >= 64**, the linked list is converted into a **red-black tree** for faster lookup.
+
+Not triggered in our case (only 2 entries per bucket max).
+
+---
+
+### **Summary**
+
+| Concept            | Current Status                   |
+|--------------------|----------------------------------|
+| Buckets (array)    | 16 total                         |
+| Entries stored     | 1–5 in distinct buckets          |
+| Collision          | None so far                      |
+| Collision handling | Via linked list                  |
+| Treeify threshold  | >8 in one bucket triggers RBT    |
+
+Would you like a simulated version with custom hash to demonstrate treeification?
+
+In **Java's `HashMap`**, the terms **bucket** and **bin** are closely related and often used interchangeably, but they do have subtle distinctions:
+
+---
+
+### **1. Bucket**
+
+- A **bucket** is a **slot or index** in the internal array (`Node<K,V>[] table`) of a `HashMap`.
+- It is determined using the formula: `hash(key) & (n - 1)`
+- Think of a **bucket as a location** in the array where entries might be placed.
+
+> **Analogy**: If the `HashMap` is a shelf with 16 slots, each slot is a **bucket**.
+
+---
+
+### **2. Bin**
+
+- A **bin** refers to the **data structure** that holds entries **within a bucket**.
+- A bin can be:
+  - `null` (empty)
+  - A **single node** (when only one key maps to that hash)
+  - A **linked list** (for collisions)
+  - A **red-black tree** (when collisions exceed a threshold)
+
+> **Analogy**: A **bin is what’s inside the bucket** — it could be a single item, a chain of items, or a tree.
+
+---
+
+### **Quick Comparison Table**
+
+| Term     | Meaning                         | Represents            | Example                      |
+|----------|----------------------------------|------------------------|------------------------------|
+| Bucket   | Slot/index in array              | A position             | `table[5]`                   |
+| Bin      | Structure holding entries in bucket | Node, LinkedList, Tree | `Node(5, "five")` or Tree    |
+
+---
+
+### **In Summary**
+
+- **Bucket = location** in the array.
+- **Bin = contents** of that bucket (can be empty, list, or tree).
+- In practice, **"bucket" is more common**, but in Java 8 source code, you'll see **"bin"** to describe the data structure in a bucket.
+
+Would you like to explore how bins are treeified step-by-step?
+
+
+Let’s walk step by step through how **Java 8+ HashMap** converts **bins (linked lists)** into **red-black trees** — a process called **treeification** — to maintain performance in cases of **hash collisions**.
+
+---
+
+## **When Treeification Happens**
+
+Java's `HashMap` **treeifies a bin** (converts from linked list to red-black tree) when:
+
+- The **number of entries in a bucket exceeds 8** (i.e., `TREEIFY_THRESHOLD = 8`)
+- And the **overall capacity of the HashMap is >= 64** (i.e., `MIN_TREEIFY_CAPACITY = 64`)
+
+Otherwise, Java resizes the map instead of treeifying to avoid the overhead of trees for small maps.
+
+---
+
+## **Step-by-Step Example**
+
+Let’s assume:
+- HashMap capacity is `>= 64`
+- All inserted keys **collide into the same bucket** (for simplicity), meaning they all have the same hash modulo capacity.
+
+### **1. Inserting First 8 Keys (Same Bucket)**
+
+```java
+map.put("k1", "v1");
+map.put("k2", "v2");
+...
+map.put("k8", "v8");
+```
+
+- These 8 entries are added to the **same bucket**.
+- The bin is a **linked list**:
+  
+```
+Bucket[n]: Node(k1) -> Node(k2) -> ... -> Node(k8)
+```
+
+### **2. Inserting the 9th Entry**
+
+```java
+map.put("k9", "v9");
+```
+
+- Now, the **threshold (8)** is crossed.
+- Since the map's capacity is **>= 64**, Java **converts the bin into a red-black tree**.
+
+#### **Before: Linked List**
+
+```
+Node(k1) -> Node(k2) -> ... -> Node(k9)
+```
+
+#### **After: Red-Black Tree Rooted**
+
+```
+           [k5]
+         /      \
+      [k3]      [k7]
+     /   \      /   \
+   [k2] [k4] [k6] [k8]
+  /
+[k1]
+```
+
+> Tree is **balanced** with red-black tree rules: colors assigned, rotations performed as needed.
+
+Now any operation on this bucket — get, put, remove — has **O(log n)** performance.
+
+---
+
+## **When Tree Converts Back to List**
+
+When the number of nodes in the tree falls **below 6**, it is **converted back to a linked list** (`UNTREEIFY_THRESHOLD = 6`).
+
+---
+
+## **Design Pattern**
+
+- Treeification follows the **Strategy** and **State** patterns.
+  - Based on size and capacity, the bin **changes structure** dynamically from **LinkedList to Tree**.
+  - Internally uses **`TreeNode<K,V>`** instead of `Node<K,V>`.
+
+---
+
+Would you like a code example to simulate this behavior or visualize treeification with actual hash collisions?
