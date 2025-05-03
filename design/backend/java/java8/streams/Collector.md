@@ -1,6 +1,21 @@
 In Java, the `Collector` interface from the `java.util.stream` package is used to accumulate elements from a stream into a final result, typically used in the `Stream.collect()` terminal operation.
 
 ---
+### As per Javadoc 
+A Collector is specified by four functions that work together to accumulate entries into a mutable result container, and optionally perform a final transform on the result. They are:
+```text
+
+```
+
+
+- creation of a new result container (supplier())
+- incorporating a new data element into a result container (accumulator())
+- combining two result containers into one (combiner())
+- performing an optional final transform on the container (finisher())
+- Collectors also have a set of characteristics, such as Collector.Characteristics.CONCURRENT, that provide hints that can be used by a reduction implementation to provide better performance.
+```text
+```
+---
 
 ### **When to implement a custom Collector?**
 You might need a custom `Collector` when:
