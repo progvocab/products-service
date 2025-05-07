@@ -207,4 +207,59 @@ This is why we say binary search has a time complexity of:
 
 ---
 
-Would you like to see how this compares to geometric **sums** for something like merge sort or exponential growth?
+Would you like to see how this compares to geometric **sums** for something like merge sort or exponential growth? 
+Let’s compare a **Binary Search Tree (BST)** vs a **sorted list** in terms of operations like **search, insert, and delete**, to understand how a BST can improve performance — or not — depending on the context.
+
+---
+
+### **1. Sorted List**
+
+Assume it's an `ArrayList` (contiguous memory):
+
+| Operation     | Time Complexity                     |
+| ------------- | ----------------------------------- |
+| Search        | **O(log n)** (binary search)        |
+| Insert/Delete | **O(n)** (due to shifting elements) |
+
+Even though binary search gives fast lookup, inserting or deleting in a sorted list requires **shifting elements**, which takes **linear time**.
+
+---
+
+### **2. Binary Search Tree (BST)**
+
+In a **balanced BST** (like AVL or Red-Black Tree):
+
+| Operation     | Time Complexity |
+| ------------- | --------------- |
+| Search        | **O(log n)**    |
+| Insert/Delete | **O(log n)**    |
+
+So, all key operations are logarithmic. The BST avoids element shifting, as it modifies pointers instead of moving contiguous elements.
+
+---
+
+### **3. When BST is Better**
+
+* **Frequent inserts/deletes**: BSTs are better because they avoid shifting overhead.
+* **Dynamic dataset**: If your dataset grows and shrinks a lot, BSTs offer better performance than keeping a sorted list updated.
+* **In-memory range queries**: BSTs allow fast range scans due to their structure.
+
+---
+
+### **4. Caveat**
+
+* A **naive/unbalanced BST** can degrade to **O(n)** if you insert sorted data (becomes a linked list).
+* That’s why we prefer **balanced BSTs** like **AVL Trees or Red-Black Trees** in practice.
+
+---
+
+### **Summary Comparison**
+
+| Structure    | Search   | Insert   | Delete   | Notes                                  |
+| ------------ | -------- | -------- | -------- | -------------------------------------- |
+| Sorted List  | O(log n) | O(n)     | O(n)     | Fast search, poor mutation performance |
+| Balanced BST | O(log n) | O(log n) | O(log n) | Balanced operations for dynamic data   |
+
+---
+
+Would you like a visual comparison of tree vs list operations or an implementation example?
