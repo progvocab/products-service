@@ -128,3 +128,74 @@ print(maze_solver(maze))
 | Design Pattern | Often uses **DFS + Backtracking**               |
 
 Would you like optimized versions of any example using pruning or memoization?
+
+ Let's look at one of the **simplest and classic problems** solved using **backtracking**:
+
+---
+
+## 🎯 Problem: Find All Subsets of a Set
+
+**Given** a set of distinct integers, find all possible subsets (the power set).
+
+---
+
+### 🔍 Why Backtracking?
+
+Backtracking is a good fit here because:
+
+* We explore each element by deciding **include** or **exclude**.
+* If we reach a dead end (all elements processed), we backtrack to explore other paths.
+
+---
+
+### 📌 Example
+
+Input: `[1, 2]`
+Output: `[[], [1], [2], [1, 2]]`
+
+---
+
+## 🧠 Backtracking Approach
+
+We build subsets incrementally and backtrack when all decisions for an element are made.
+
+---
+
+### ✅ Python Code
+
+```python
+def subsets(nums):
+    result = []
+
+    def backtrack(start, path):
+        result.append(path[:])  # Add a copy of the current subset
+        for i in range(start, len(nums)):
+            path.append(nums[i])           # Choose
+            backtrack(i + 1, path)         # Explore
+            path.pop()                     # Un-choose (backtrack)
+
+    backtrack(0, [])
+    return result
+
+# Example usage
+print(subsets([1, 2]))
+```
+
+---
+
+### 🧮 Output
+
+```
+[[], [1], [1, 2], [2]]
+```
+
+---
+
+### 🧩 Time Complexity
+
+* `O(2^n)` where `n` is the number of elements.
+* There are `2^n` possible subsets.
+
+---
+
+Would you like to see the same logic applied to combinations or permutations as a next step?
