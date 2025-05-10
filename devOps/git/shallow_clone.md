@@ -32,3 +32,43 @@ git clone --depth=1 https://github.com/user/repo.git
 ---
 
 Would you like to know how to later convert a shallow clone into a full clone?
+
+
+To convert a **shallow clone** (made with `--depth=1`) into a **full clone**, you need to **fetch the remaining commit history** from the remote.
+
+---
+
+### **Step-by-step to convert shallow to full clone**
+
+1. **Navigate to your cloned repo**:
+
+   ```bash
+   cd repo
+   ```
+
+2. **Fetch the full history**:
+
+   ```bash
+   git fetch --unshallow
+   ```
+
+   This will fetch all previous commits and turn your shallow clone into a full clone.
+
+   * Alternatively, if `--unshallow` is not supported (older versions):
+
+     ```bash
+     git fetch --depth=1000000
+     ```
+
+3. **Verify**:
+
+   ```bash
+   git log
+   ```
+
+   You should now see the complete commit history.
+
+---
+
+Would you like to automate this as part of a script or CI workflow?
+
