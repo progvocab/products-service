@@ -28,3 +28,23 @@ def longest_common_substring(str1, str2):
 #substr, length = #longest_common_substring(s1, s2)
 #print("Longest Common Substring:", substr)
 #print("Length:", length)
+
+
+def coin_change(coins, amount):
+    # Initialize the DP table with amount+1 (impossible high value)
+    dp = [amount + 1] * (amount + 1)
+    dp[0] = 0  # Base case: 0 coins to make amount 0
+
+    for a in range(1, amount + 1):
+        for coin in coins:
+            if coin <= a:
+                dp[a] = min(dp[a], dp[a - coin] + 1)
+
+    return dp[amount] if dp[amount] != amount + 1 else -1
+
+# Example usage
+coins = [1, 2, 5]
+amount = 11
+result = coin_change(coins, amount)
+print("Minimum coins required:", result)
+
