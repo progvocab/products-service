@@ -48,3 +48,19 @@ amount = 11
 result = coin_change(coins, amount)
 print("Minimum coins required:", result)
 
+
+def climb_stairs(n):
+    if n <= 2:
+        return n
+
+    a, b = 1, 2  # base cases: 1 way to reach step 1, 2 ways to reach step 2
+    for i in range(3, n + 1):
+        a, b = b, a + b  # update the number of ways dynamically
+
+    return b
+
+# Example usage
+n = 5
+print(f"Number of distinct ways to climb {n} steps:", climb_stairs(n))
+
+
