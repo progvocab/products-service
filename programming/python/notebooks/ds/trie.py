@@ -37,3 +37,33 @@ class Trie:
         ch = word[index]
         if ch not in node.children:
             return False  # Word not found
+def autocomplete(self, prefix: str) -> list[str]:
+    node = self._find_node(prefix)
+    results = []
+
+    def dfs(curr_node, path):
+        if curr_node.end_of_word:
+            results.append(prefix + path)
+        for ch, next_node in curr_node.children.items():
+            dfs(next_node, path + ch)
+
+    if node:
+        dfs(node, "")
+    return results
+
+def all_words(self) -> list[str]:
+    results = []
+
+    def dfs(node, path):
+        if node.end_of_word:
+            results.append(path)
+        for ch, child in node.children.items():
+            dfs(child, path + ch)
+
+    dfs(self.root, "")
+    return results
+
+
+def spellcheck(self, word: str, max_distance: int = 1) -> list[str]:
+    from difflib import get_close_matches
+    return get_close_matches(word, self.all_words(), n=5, cutoff=1 - max_distance * 0.2)
