@@ -87,3 +87,65 @@ print(heapq.nsmallest(2, nums))  # [1, 2]
 ---
 
 Would you like a **custom priority queue class** using `heapq` or to simulate a **max-priority queue with objects**?
+
+
+Let's visualize a **min-heap** created from the list `[1, 2, 3, ..., 10]` using `heapq`.
+
+---
+
+### 🔧 Python Code
+
+```python
+import heapq
+
+nums = list(range(1, 11))  # [1, 2, ..., 10]
+heapq.heapify(nums)
+print(nums)
+```
+
+Since `heapq` uses a list-based binary heap, the structure isn’t sorted linearly but maintains the **heap invariant**:
+
+> For every index `i`, `heap[i] <= heap[2*i + 1]` and `heap[i] <= heap[2*i + 2]` (if those indices exist).
+
+---
+
+### 📈 Visual Representation (Min-Heap)
+
+Let's show the structure as a binary tree:
+
+```
+               1
+           /       \
+         2           3
+       /   \       /   \
+     4       5   6       7
+    / \
+   8   9
+  /
+10
+```
+
+Each level satisfies the min-heap property:
+
+* Parent ≤ Children
+
+---
+
+### 📦 Internal List Storage (after `heapify`)
+
+The internal array will be:
+
+```
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
+Although the list appears sorted here, this is **not always true** for arbitrary inputs. The structure is designed for **log-time insertion and removal of the smallest element**, not for sorting.
+
+---
+
+Would you like to visualize:
+
+* **Heapify process step-by-step?**
+* **Max-heap version?**
+* **Animation or plot with `matplotlib` or `graphviz`?**
+
