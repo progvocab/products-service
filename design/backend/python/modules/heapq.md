@@ -515,3 +515,94 @@ Would you like:
 * To build a **max-heap** version?
 
 Let me know!
+
+
+The **heap invariant** is a rule that defines the **structural and ordering property** of a heap.
+
+---
+
+## 🔹 Heap Invariant (Definition)
+
+> In a **min-heap**, for every node `i`, the value at `i` is **less than or equal to** the values of its children.
+
+Mathematically:
+
+* For index `i` in the list:
+
+  ```
+  heap[i] <= heap[2*i + 1]   (left child, if exists)
+  heap[i] <= heap[2*i + 2]   (right child, if exists)
+  ```
+
+> In a **max-heap**, the value at each node is **greater than or equal to** its children:
+
+```
+heap[i] >= heap[2*i + 1]
+heap[i] >= heap[2*i + 2]
+```
+
+---
+
+## ✅ Why It Matters
+
+The heap invariant ensures:
+
+* The **minimum (or maximum)** element is always at the **root**.
+* Efficient operations like:
+
+  * `heapq.heappop()` → always pops the smallest element in `O(log n)`
+  * `heapq.heappush()` → inserts while maintaining order in `O(log n)`
+  * `heapq.heapify()` → builds a heap from a list in `O(n)`
+
+---
+
+## 📦 Example (Min-Heap)
+
+Given list:
+
+```python
+heap = [1, 3, 5, 7, 9, 8]
+```
+
+Visual tree:
+
+```
+       1
+     /   \
+    3     5
+   / \   /
+  7   9 8
+```
+
+Each parent is ≤ children — ✅ **heap invariant is maintained**
+
+---
+
+## ❌ Violating the Invariant
+
+```python
+heap = [5, 3, 4]  # Not a valid min-heap
+```
+
+Here:
+
+* `heap[0] = 5` is **not ≤ 3**
+
+→ **Invariant is broken** → `heapq` operations will not behave correctly.
+
+---
+
+## 🛠 Ensuring the Invariant in Python
+
+Python’s `heapq` module uses this invariant and maintains it through:
+
+* `heapq.heappush()`
+* `heapq.heappop()`
+* `heapq.heapify()`
+
+You must **not modify the heap list directly**, or the invariant may break.
+
+---
+
+Would you like to see how this invariant is maintained during push/pop operations?
+
