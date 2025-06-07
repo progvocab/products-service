@@ -94,3 +94,66 @@ print(permute([1, 2, 3]))
 ---
 
 Would you like to explore these with constraints (like duplicate handling, sum limits, etc.) next?
+
+
+To generate **all permutations** for a 3-digit **suitcase lock** using digits from `0` to `9`, where **each digit can be reused**, you're essentially solving a **permutation with repetition** problem.
+
+### ✅ Problem:
+
+* Lock has 3 digits.
+* Each digit can be from `0` to `9`.
+* Total combinations: $10^3 = 1000$
+* Use **backtracking** to generate all.
+
+---
+
+### 🧠 Backtracking Strategy:
+
+Each "decision" is placing a digit (0–9) at a position in the lock.
+Backtrack when the current combination has 3 digits.
+
+---
+
+### 🔢 Python Code (Backtracking):
+
+```python
+def generate_lock_combinations():
+    digits = [str(i) for i in range(10)]
+    result = []
+
+    def backtrack(path):
+        if len(path) == 3:
+            result.append("".join(path))
+            return
+        for d in digits:
+            path.append(d)
+            backtrack(path)
+            path.pop()  # undo last choice
+
+    backtrack([])
+    return result
+
+# Example usage:
+combinations = generate_lock_combinations()
+print("Total combinations:", len(combinations))
+print("First 10 combinations:", combinations[:10])
+```
+
+---
+
+### 🧾 Output Example:
+
+```
+Total combinations: 1000
+First 10 combinations: ['000', '001', '002', '003', '004', '005', '006', '007', '008', '009']
+```
+
+---
+
+### 🧠 Notes:
+
+* This is not a permutation of **distinct digits**, so repetition is allowed.
+* If **no repetition** was allowed, we’d use a different approach (`itertools.permutations` or visited flags).
+* Backtracking is overkill here since it's just base-10 enumeration, but it's a good exercise.
+
+Would you like a version where **digits must be unique (no repeats)** or support for **n-digit locks**?
