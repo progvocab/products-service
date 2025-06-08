@@ -366,3 +366,90 @@ You can use `previous` to reconstruct the shortest path.
 ---
 
 Let me know if you’d like a **graphical visualization** or **step tracer** in code!
+
+
+In a **complete graph**, every pair of distinct vertices (cities) is directly connected by a unique edge.
+
+---
+
+## 🧠 Key Properties of a Complete Graph:
+
+* For `n` nodes (cities), there are `n * (n - 1) / 2` edges.
+* In terms of shortest paths:
+
+  > **The shortest distance between any two distinct nodes is the direct edge weight between them.**
+
+---
+
+## ✅ Example
+
+Assume 4 cities:
+
+* `A`, `B`, `C`, `D`
+
+Let’s assign arbitrary edge weights:
+
+| From | To | Distance |
+| ---- | -- | -------- |
+| A    | B  | 5        |
+| A    | C  | 10       |
+| A    | D  | 8        |
+| B    | C  | 3        |
+| B    | D  | 7        |
+| C    | D  | 2        |
+
+Represented as:
+
+```python
+graph = {
+    'A': [('B', 5), ('C', 10), ('D', 8)],
+    'B': [('A', 5), ('C', 3), ('D', 7)],
+    'C': [('A', 10), ('B', 3), ('D', 2)],
+    'D': [('A', 8), ('B', 7), ('C', 2)]
+}
+```
+
+---
+
+## 🚀 Dijkstra’s on Complete Graph
+
+Let’s find shortest distances from city `A`.
+
+Because all cities are directly connected:
+
+* `A -> B = 5` (direct)
+* `A -> C = 8` (via `B` since `A->B->C = 5+3 = 8`, better than direct 10)
+* `A -> D = 10` (via `C`: `A->B->C->D = 5+3+2 = 10`, matches direct path)
+
+So even in a complete graph, **shortest path isn’t always direct** — it depends on edge weights.
+
+---
+
+## 🔄 General Steps
+
+To compute shortest paths in a complete graph:
+
+1. **Represent the graph** as an adjacency list or matrix.
+2. **Apply Dijkstra’s algorithm** from each node if you want **all-pairs shortest paths**.
+
+   * Or use **Floyd-Warshall algorithm** for `O(n³)` time.
+3. Use the direct edge if it's the **shortest**, or go via intermediaries.
+
+---
+
+## 🧾 Code Snippet (Just Using Edge Weights)
+
+If edge weights are consistent and no shorter indirect paths exist:
+
+```python
+shortest = min(edge_weights[(u, v)], edge_weights[(u, w)] + edge_weights[(w, v)])
+```
+
+But if you want **guaranteed shortest paths**, run:
+
+```python
+for each node u:
+    run dijkstra(graph, u)
+```
+
+Would you like a full code sample for **complete graph shortest paths using Dijkstra or Floyd-Warshall**?
