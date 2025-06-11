@@ -88,3 +88,84 @@ print(sorted_words)  # Output: ['is', 'python', 'awesome']
 These are some of the most commonly used tools in `functools`. The module also includes other utilities like `singledispatch` for single-dispatch generic functions and `total_ordering` for auto-generating comparison methods.
 
 Each of these tools helps make your Python code more functional, efficient, or maintainable depending on your use case. Let me know if you'd like deeper examples of any specific function!
+
+In Python, `functools.cmp_to_key` is a utility that helps you use old-style comparison functions (i.e., `cmp` functions) with newer sorting mechanisms like `sorted()` or `list.sort()`, which expect a **key function**, not a **comparison function**.
+
+---
+
+### 🔄 Why `cmp_to_key`?
+
+In **Python 2**, you could use a `cmp` function like this:
+
+```python
+sorted(data, cmp=my_cmp_function)
+```
+
+But in **Python 3**, the `cmp` parameter was **removed** from `sorted()` and `list.sort()`. Instead, you're expected to use a **key function**:
+
+```python
+sorted(data, key=my_key_function)
+```
+
+If you still have a `cmp`-style function, you can convert it using `functools.cmp_to_key`.
+
+---
+
+### 📘 Syntax
+
+```python
+from functools import cmp_to_key
+key_function = cmp_to_key(cmp_function)
+```
+
+---
+
+### 🧪 Example
+
+Suppose you want to sort a list of strings by their length, and if lengths are equal, sort reverse-alphabetically.
+
+#### 1. Define a `cmp` function
+
+```python
+def custom_cmp(a, b):
+    if len(a) != len(b):
+        return len(a) - len(b)  # shorter comes first
+    return -1 if a > b else (1 if a < b else 0)  # reverse alphabetical
+```
+
+#### 2. Use `cmp_to_key`
+
+```python
+from functools import cmp_to_key
+
+words = ['apple', 'banana', 'pear', 'grape', 'fig', 'kiwi']
+sorted_words = sorted(words, key=cmp_to_key(custom_cmp))
+print(sorted_words)
+```
+
+#### ✅ Output
+
+```
+['fig', 'pear', 'kiwi', 'grape', 'apple', 'banana']
+```
+
+* Sorted by length: fig (3), pear/kiwi/grape (4–5), apple/banana (5–6)
+* Ties broken by reverse alphabet: 'pear' before 'kiwi'
+
+---
+
+### 🧠 How it works internally
+
+`cmp_to_key` creates a **wrapper class** with rich comparison methods (`__lt__`, `__gt__`, etc.) that use your `cmp` function under the hood. So you can use your comparison logic even when Python requires key-based sorting.
+
+---
+
+### ✅ Use Cases
+
+* Migrating legacy Python 2 code to Python 3.
+* Sorting with complex comparison logic that doesn’t easily map to a key function.
+* Custom multi-level sorts where a single key is insufficient.
+
+---
+
+Would you like to see how to write the same sort using a `key` function instead of `cmp_to_key`, for comparison?
