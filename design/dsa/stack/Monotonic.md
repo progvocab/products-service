@@ -297,3 +297,140 @@ Let me know if you want:
 * Performance tips or visual explanation?
 
 I'm happy to go deeper!
+
+
+A **monotonic stack** is a type of stack data structure that maintains its elements in either **increasing** or **decreasing** order. It is widely used to solve problems involving **next greater**, **next smaller**, **previous greater**, and **previous smaller** elements, often in arrays or grids.
+
+---
+
+### 🔹 What is a Monotonic Stack?
+
+* A **monotonic increasing stack** keeps elements in increasing order (i.e., from bottom to top, each element is **smaller or equal** to the one above).
+* A **monotonic decreasing stack** keeps elements in decreasing order.
+
+The main idea is to use the stack to **remove unnecessary elements** and **track the useful candidates** for the next/previous greater/smaller element.
+
+---
+
+### 🔹 Common Use-Cases
+
+| Problem                                       | Stack Type               |
+| --------------------------------------------- | ------------------------ |
+| Next Greater Element                          | Monotonic **decreasing** |
+| Next Smaller Element                          | Monotonic **increasing** |
+| Largest Rectangle in Histogram                | Monotonic **increasing** |
+| Trapping Rain Water                           | Monotonic **decreasing** |
+| 132 Pattern / Stock Span / Daily Temperatures | Varies                   |
+
+---
+
+### 🔹 Core Algorithm Pattern
+
+```python
+stack = []  # stores indexes or values
+
+for i, num in enumerate(arr):
+    while stack and condition(stack[-1], num):
+        stack.pop()
+    stack.append(i or num)
+```
+
+---
+
+### 🔹 Example 1: Next Greater Element
+
+```python
+def next_greater_elements(nums):
+    res = [-1] * len(nums)
+    stack = []  # stack holds indices
+
+    for i in range(len(nums)):
+        while stack and nums[i] > nums[stack[-1]]:
+            idx = stack.pop()
+            res[idx] = nums[i]
+        stack.append(i)
+
+    return res
+
+# Example
+print(next_greater_elements([2, 1, 2, 4, 3]))  # [4, 2, 4, -1, -1]
+```
+
+---
+
+### 🔹 Example 2: Previous Smaller Element
+
+```python
+def previous_smaller_elements(nums):
+    res = [-1] * len(nums)
+    stack = []
+
+    for i in range(len(nums)):
+        while stack and nums[stack[-1]] >= nums[i]:
+            stack.pop()
+        if stack:
+            res[i] = nums[stack[-1]]
+        stack.append(i)
+
+    return res
+
+# Example
+print(previous_smaller_elements([3, 7, 1, 7, 8, 4]))  # [-1, 3, -1, 1, 7, 1]
+```
+
+---
+
+### 🔹 Example 3: Largest Rectangle in Histogram
+
+```python
+def largest_rectangle_area(heights):
+    stack = []
+    max_area = 0
+    heights.append(0)  # Sentinel value
+
+    for i, h in enumerate(heights):
+        while stack and heights[stack[-1]] > h:
+            height = heights[stack.pop()]
+            width = i if not stack else i - stack[-1] - 1
+            max_area = max(max_area, height * width)
+        stack.append(i)
+
+    return max_area
+
+# Example
+print(largest_rectangle_area([2,1,5,6,2,3]))  # 10
+```
+
+---
+
+### 🔹 Example 4: Daily Temperatures (Next Warmer Day)
+
+```python
+def daily_temperatures(T):
+    res = [0] * len(T)
+    stack = []
+
+    for i in range(len(T)):
+        while stack and T[i] > T[stack[-1]]:
+            idx = stack.pop()
+            res[idx] = i - idx
+        stack.append(i)
+
+    return res
+
+# Example
+print(daily_temperatures([73, 74, 75, 71, 69, 72, 76, 73]))
+# Output: [1, 1, 4, 2, 1, 1, 0, 0]
+```
+
+---
+
+### Summary
+
+Monotonic stacks:
+
+* Efficiently solve many **range-based** or **comparison** problems in linear time.
+* Help **avoid brute force** nested loops (from O(n²) to O(n)).
+
+Let me know if you want to explore 2D grid problems (like in Leetcode 84 or 85), or **circular arrays**, which are other interesting applications!
+
