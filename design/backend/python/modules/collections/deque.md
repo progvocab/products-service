@@ -121,3 +121,119 @@ Let me know if you want examples of:
 * **Sliding window max/min**
 * **Palindrome checker**
 * **BFS using deque**
+
+
+Great question!
+
+### ✅ What happens when you create a `deque` from a list of dictionaries?
+
+It works exactly like creating a deque from any list — each **dictionary becomes an element** of the deque.
+
+---
+
+### 🔸 Example
+
+```python
+from collections import deque
+
+data = [
+    {"id": 1, "name": "Alice"},
+    {"id": 2, "name": "Bob"}
+]
+
+dq = deque(data)
+print(dq)
+```
+
+**Output:**
+
+```
+deque([{'id': 1, 'name': 'Alice'}, {'id': 2, 'name': 'Bob'}])
+```
+
+* Now `dq[0]` is `{'id': 1, 'name': 'Alice'}`.
+* `dq.popleft()` would remove the first dictionary.
+
+---
+
+## 🧠 Use Cases of `deque` with List of Dicts
+
+### 1. **Queue of Tasks or Events**
+
+Each dictionary can represent a task or event.
+
+```python
+tasks = deque([
+    {"id": 101, "task": "send_email"},
+    {"id": 102, "task": "backup_db"}
+])
+
+tasks.append({"id": 103, "task": "generate_report"})
+current = tasks.popleft()
+print(current)  # {'id': 101, 'task': 'send_email'}
+```
+
+---
+
+### 2. **Sliding Window over Structured Data**
+
+You can maintain a fixed-size `deque` of data points (e.g., for analytics).
+
+```python
+from collections import deque
+
+window = deque(maxlen=3)
+window.append({"user": "Alice", "action": "click"})
+window.append({"user": "Bob", "action": "scroll"})
+window.append({"user": "Charlie", "action": "click"})
+window.append({"user": "Diana", "action": "hover"})
+
+print(window)
+# deque([{'user': 'Bob', ...}, {'user': 'Charlie'...}, {'user': 'Diana'...}])
+```
+
+---
+
+### 3. **Caching (LRU, FIFO)**
+
+Each dict can represent a cached item with metadata (timestamp, ID, etc.).
+
+```python
+cache = deque(maxlen=2)
+cache.append({"key": "A", "value": 1})
+cache.append({"key": "B", "value": 2})
+cache.append({"key": "C", "value": 3})  # "A" is removed (FIFO)
+
+print(cache)  # [{'key': 'B', ...}, {'key': 'C', ...}]
+```
+
+---
+
+### 4. **Stream Processing / Messaging**
+
+Process events from the front, and keep adding new ones to the back.
+
+```python
+messages = deque()
+messages.append({"msg": "Hello", "sender": "User1"})
+messages.append({"msg": "Bye", "sender": "User2"})
+
+while messages:
+    msg = messages.popleft()
+    print(f"Processing message from {msg['sender']}")
+```
+
+---
+
+### ✅ Summary
+
+| Purpose          | How deque of dicts helps                      |
+| ---------------- | --------------------------------------------- |
+| Task queues      | Easy FIFO processing of structured tasks      |
+| Sliding window   | Track recent structured entries               |
+| Cache management | Maintain LRU/FIFO cache of objects            |
+| Stream handling  | Append and pop structured records efficiently |
+
+---
+
+Let me know if you want a real project-like example (e.g., implementing a task scheduler or LRU cache with `deque` of dicts).
