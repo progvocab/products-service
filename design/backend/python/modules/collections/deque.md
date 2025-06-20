@@ -1,0 +1,123 @@
+### 🌀 `deque` in Python (from `collections` module)
+
+A **`deque`** (pronounced *deck*, short for **double-ended queue**) is a **flexible list-like container** that allows **fast appends and pops from both ends**.
+
+It's part of Python’s `collections` module and is implemented as a **doubly linked list**, unlike lists which are dynamic arrays.
+
+---
+
+## 🔧 Why use `deque`?
+
+* `O(1)` time complexity for:
+
+  * `append()` and `pop()` (right end)
+  * `appendleft()` and `popleft()` (left end)
+* `list.insert(0, x)` and `list.pop(0)` are **O(n)** — much slower!
+
+---
+
+## ✅ Import Statement
+
+```python
+from collections import deque
+```
+
+---
+
+## 📘 Creating a deque
+
+```python
+from collections import deque
+
+d = deque()                  # empty deque
+d = deque([1, 2, 3])         # deque with initial elements
+print(d)  # deque([1, 2, 3])
+```
+
+---
+
+## 🔹 Common Methods with Examples
+
+| Method             | Description                              | Example                |
+| ------------------ | ---------------------------------------- | ---------------------- |
+| `append(x)`        | Add element to **right end**             | `d.append(4)`          |
+| `appendleft(x)`    | Add element to **left end**              | `d.appendleft(0)`      |
+| `pop()`            | Remove and return **rightmost**          | `d.pop()`              |
+| `popleft()`        | Remove and return **leftmost**           | `d.popleft()`          |
+| `extend(iter)`     | Extend deque at right with iterable      | `d.extend([4,5])`      |
+| `extendleft(iter)` | Extend at left (reversed order!)         | `d.extendleft([0,-1])` |
+| `remove(x)`        | Remove first occurrence of value         | `d.remove(2)`          |
+| `rotate(n)`        | Rotate n steps to right (or left if n<0) | `d.rotate(1)`          |
+| `reverse()`        | Reverse the deque in-place               | `d.reverse()`          |
+| `clear()`          | Remove all elements                      | `d.clear()`            |
+| `copy()` (3.5+)    | Shallow copy                             | `d2 = d.copy()`        |
+
+---
+
+## 🧪 Code Examples
+
+```python
+from collections import deque
+
+d = deque([1, 2, 3])
+print("Initial:", d)
+
+d.append(4)
+print("append(4):", d)
+
+d.appendleft(0)
+print("appendleft(0):", d)
+
+d.pop()
+print("pop():", d)
+
+d.popleft()
+print("popleft():", d)
+
+d.extend([4, 5])
+print("extend([4,5]):", d)
+
+d.extendleft([-1, -2])
+print("extendleft([-1, -2]):", d)  # Note: reversed order
+
+d.remove(2)
+print("remove(2):", d)
+
+d.rotate(1)
+print("rotate(1):", d)
+
+d.rotate(-2)
+print("rotate(-2):", d)
+
+d.reverse()
+print("reverse():", d)
+
+d.clear()
+print("clear():", d)
+```
+
+---
+
+## 🧠 Deque vs List
+
+| Feature                         | `deque`                 | `list`                 |
+| ------------------------------- | ----------------------- | ---------------------- |
+| Fast insert/remove at both ends | ✅                       | ❌ (slow at front)      |
+| Random access (`d[2]`)          | ❌ (O(n))                | ✅ (O(1))               |
+| Ideal use cases                 | Queues, Sliding Windows | Index-based operations |
+
+---
+
+## 🔄 Queue / Stack / Sliding Window
+
+* **Queue (FIFO)**: Use `append()` + `popleft()`
+* **Stack (LIFO)**: Use `append()` + `pop()`
+* **Sliding Window**: Efficient left/right pop for window shifts
+
+---
+
+Let me know if you want examples of:
+
+* **Sliding window max/min**
+* **Palindrome checker**
+* **BFS using deque**
