@@ -1,4 +1,5 @@
-Yes, you can absolutely use **Keycloak** with Spring Boot for token-based authentication, and yes — it will result in **significantly less code** compared to writing your own JWT issuing and validating logic.
+- use **Keycloak** with Spring Boot for token-based authentication, 
+ it will result in **significantly less code** compared to writing your own JWT issuing and validating logic.
 
 ---
 
@@ -291,6 +292,284 @@ Once configured, Spring automatically:
 * Be sure the **audience** (`aud`) in the token matches your client.
 * If using client credentials, enable “Service Accounts” in Keycloak client settings.
 
+
+### 🔐 What Are **Keycloak Public Keys**?
+
+Keycloak uses **asymmetric cryptography** (usually **RSA**) to sign the **JWT tokens** it issues. These tokens are signed with a **private key** that only Keycloak holds, and can be **verified by clients** (like your Spring Boot app) using a **public key**.
+
 ---
 
-Would you like an example using **Keycloak roles** for authorization or integrating Keycloak in a **Spring Boot + Angular** app?
+### 🔑 Key Concepts
+
+| Key Type        | Description                                                           |
+| --------------- | --------------------------------------------------------------------- |
+| **Private Key** | Used by Keycloak to sign JWT tokens                                   |
+| **Public Key**  | Used by applications to verify the token's authenticity and integrity |
+
+---
+
+### 📍 Where to Find Keycloak’s Public Key?
+
+There are 2 ways to get the public key:
+
+#### ✅ 1. Via OpenID Connect Discovery URL (Recommended)
+
+```http
+GET http://<keycloak-host>/realms/<realm-name>/.well-known/openid-configuration
+```
+
+Example:
+
+```
+http://localhost:8080/realms/myrealm/.well-known/openid-configuration
+```
+
+From the JSON, look for:
+
+```json
+"jwks_uri": "http://localhost:8080/realms/myrealm/protocol/openid-connect/certs"
+```
+
+This `jwks_uri` contains the **JSON Web Key Set (JWKS)** — the public keys in JWK format.
+
+#### ✅ 2. Admin Console (Manual)
+
+1. Go to **Realm Settings > Keys**
+2. Click on the **Active RSA key**
+3. Copy the **Public Key**
+
+Example:
+
+```text
+MIIBIjANBgkqhkiG9w0BAQEFAA...
+```
+
+You can embed this in your Spring config (not recommended if you rotate keys).
+
+---
+
+### 📦 How Spring Boot Uses the Public Key
+
+When you set:
+
+```properties
+spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8080/realms/myrealm
+```
+
+Spring Boot automatically:
+
+* Reads the discovery document
+* Fetches the JWKS (`jwks_uri`)
+* Caches the public key
+* Validates every incoming token's signature with that public key
+
+---
+
+### 🔍 Example: Public Key in JWKS Format
+
+```json
+{
+  "keys": [
+    {
+      "kid": "abc123",
+      "kty": "RSA",
+      "alg": "RS256",
+      "use": "sig",
+      "n": "0vx7agoebGc... (modulus)",
+      "e": "AQAB"
+    }
+  ]
+}
+```
+
+Spring Boot automatically uses this to verify tokens signed with `RS256`.
+
+---
+
+### ✅ Summary
+
+| Feature            | Value                                            |
+| ------------------ | ------------------------------------------------ |
+| Public key purpose | Verify JWTs signed by Keycloak                   |
+| Where to find it   | `/.well-known/openid-configuration` → `jwks_uri` |
+| Used by            | Spring Boot, API Gateways, any JWT validator     |
+| Key format         | JWK (JSON Web Key)                               |
+| Key algorithm      | RS256 (default), EC supported                    |
+
+---
+
+Would you like help decoding your Keycloak JWT and verifying the signature using the public key?
+
+
+When using Keycloak in a Spring Boot project (especially with Spring Security and the OAuth2 Resource Server), **Keycloak sets up the `SecurityContext` automatically** using the JWT token provided by the client.
+
+Let’s break this down step-by-step to understand how the **SecurityContext is built** and how your application can use it.
+
+---
+
+## 🔐 Keycloak + Spring Boot Security Context Setup
+
+### 🔁 Flow Overview
+
+1. **Client** sends a request with a `Bearer` token (JWT) from Keycloak.
+2. **Spring Security's OAuth2ResourceServer**:
+
+   * Validates the token (signature, expiration, issuer).
+   * Converts token claims to a `JwtAuthenticationToken`.
+   * Stores this in the **`SecurityContextHolder`**.
+3. You can access the **current authenticated user** using:
+
+   * `@AuthenticationPrincipal Jwt`
+   * `SecurityContextHolder.getContext().getAuthentication()`
+
+---
+
+## ⚙️ Spring Boot Configuration
+
+### 1. `application.properties`
+
+```properties
+spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8080/realms/myrealm
+```
+
+This:
+
+* Automatically fetches Keycloak's public key (from the JWKS URI)
+* Enables JWT signature validation
+* Builds `JwtAuthenticationToken`
+
+---
+
+### 2. Security Config (`SecurityFilterChain`)
+
+```java
+package com.example.security;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/public/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth -> oauth
+                .jwt() // enables SecurityContext setup
+            );
+
+        return http.build();
+    }
+}
+```
+
+---
+
+## ✅ SecurityContext Contents
+
+After a token is successfully validated, Spring Security creates:
+
+```java
+JwtAuthenticationToken token = new JwtAuthenticationToken(jwt);
+SecurityContextHolder.getContext().setAuthentication(token);
+```
+
+### Example Claims in Token:
+
+```json
+{
+  "sub": "user-id-123",
+  "preferred_username": "alice",
+  "email": "alice@example.com",
+  "realm_access": {
+    "roles": ["USER", "ADMIN"]
+  }
+}
+```
+
+---
+
+## 🧠 How to Access the SecurityContext in Code
+
+### Method 1: Use `@AuthenticationPrincipal`
+
+```java
+@RestController
+public class UserController {
+
+    @GetMapping("/me")
+    public String getMe(@AuthenticationPrincipal Jwt jwt) {
+        return "Logged in as: " + jwt.getClaimAsString("preferred_username");
+    }
+}
+```
+
+### Method 2: Use `SecurityContextHolder`
+
+```java
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+
+public String getCurrentUser() {
+    AbstractAuthenticationToken auth = (AbstractAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+    Jwt jwt = (Jwt) auth.getPrincipal();
+    return jwt.getClaimAsString("preferred_username");
+}
+```
+
+---
+
+## 🎯 Optional: Map Keycloak Roles to Spring Authorities
+
+Spring won’t use Keycloak roles (`realm_access.roles`) as authorities by default.
+
+### Add this to map them:
+
+```java
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+
+@Bean
+public JwtAuthenticationConverter jwtAuthenticationConverter() {
+    JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+    converter.setAuthoritiesClaimName("realm_access.roles");
+    converter.setAuthorityPrefix("ROLE_");
+
+    JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+    jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
+    return jwtConverter;
+}
+```
+
+Then add it in config:
+
+```java
+.oauth2ResourceServer(oauth -> oauth
+    .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+)
+```
+
+---
+
+## ✅ Summary
+
+| Step | Description                                                                   |
+| ---- | ----------------------------------------------------------------------------- |
+| 1.   | Spring reads `Authorization: Bearer <token>`                                  |
+| 2.   | Token validated using public key from Keycloak                                |
+| 3.   | Spring builds `JwtAuthenticationToken` and sets it in `SecurityContextHolder` |
+| 4.   | You can access JWT claims in controllers/services                             |
+
+---
+
+Would you like:
+
+* To map Keycloak **client roles or resource roles** too?
+* Help integrating **Keycloak Spring Boot Starter** instead of manual setup?
