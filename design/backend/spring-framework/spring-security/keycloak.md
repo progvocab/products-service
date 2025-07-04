@@ -156,3 +156,141 @@ You can also use:
 
 Would you like a complete working **Spring Boot + Keycloak example project** (starter template)?
 
+To **validate a Keycloak JWT token** in a Spring Boot application, you'll typically do this using:
+
+* Spring Security + OAuth2 Resource Server
+* Keycloak public keys to verify the token signature
+* Roles/claims to authorize requests
+
+---
+
+## ✅ 1. Basic Setup
+
+### 📦 `pom.xml` dependencies
+
+```xml
+<dependencies>
+    <!-- Spring Boot Security -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+
+    <!-- Resource server to decode and validate JWT -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+    </dependency>
+
+    <!-- JWT decoder -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-oauth2-jose</artifactId>
+    </dependency>
+</dependencies>
+```
+
+---
+
+## ⚙️ 2. `application.properties`
+
+```properties
+# Replace with your Keycloak realm URL
+spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8080/realms/myrealm
+
+# Optional (auto-discovered from issuer-uri): 
+# spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost:8080/realms/myrealm/protocol/openid-connect/certs
+```
+
+This will:
+
+* Fetch the **public key (JWK)** from Keycloak
+* Use it to **validate signature** of the JWT
+* Validate token **expiration**, **issuer**, and **audience** (if configured)
+
+---
+
+## 🔐 3. Enable Resource Server
+
+```java
+package com.example.security;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.context.annotation.Bean;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/public/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt()  // Enable JWT token validation
+            );
+        return http.build();
+    }
+}
+```
+
+---
+
+## 📥 4. Use Bearer Token in Requests
+
+When calling your secured endpoints:
+
+```
+GET /api/employees
+Authorization: Bearer <access_token>
+```
+
+---
+
+## 🧠 5. Decode JWT Manually (Optional)
+
+If you want to read token claims in code:
+
+```java
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api")
+public class MyController {
+
+    @GetMapping("/userinfo")
+    public String userInfo(@AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaim("preferred_username");
+        return "Hello " + username;
+    }
+}
+```
+
+---
+
+## ✅ Validated By Spring
+
+Once configured, Spring automatically:
+
+* Validates JWT structure and signature
+* Validates expiration and issuer
+* Injects token claims into `AuthenticationPrincipal` or `SecurityContextHolder`
+
+---
+
+## 🔧 Keycloak Notes
+
+* Be sure the **audience** (`aud`) in the token matches your client.
+* If using client credentials, enable “Service Accounts” in Keycloak client settings.
+
+---
+
+Would you like an example using **Keycloak roles** for authorization or integrating Keycloak in a **Spring Boot + Angular** app?
