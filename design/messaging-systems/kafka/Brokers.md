@@ -49,3 +49,136 @@ In Kafka, **brokers** and **partitions** are fundamental concepts that work toge
 
 ### **Conclusion**
 Kafka brokers and partitions are integral to Kafka's architecture, working together to provide a scalable, distributed messaging system. Brokers store and manage data, while partitions enable data distribution and parallel processing. Understanding their roles and interactions is crucial for designing and maintaining an efficient Kafka deployment.
+
+
+---
+
+## 📌 Part 1: **How is a Kafka Broker related to a Topic?**
+
+### 🔄 Relationship:
+
+* A **Kafka broker** is a **server** that stores and serves **topic partitions**.
+* A **topic** is split into **partitions**, and each **partition is hosted on one or more brokers** (depending on replication factor).
+
+### ⚙️ Example:
+
+Say you have:
+
+* Topic `orders` with 3 partitions
+* 3 Kafka brokers: `broker-1`, `broker-2`, `broker-3`
+* Replication factor: 2
+
+Then:
+
+* Partition 0 might be on broker-1 (leader), replicated to broker-2
+* Partition 1 might be on broker-2 (leader), replicated to broker-3
+* Partition 2 might be on broker-3 (leader), replicated to broker-1
+
+Each broker handles a subset of topic partitions, either as **leader** or **follower**.
+
+---
+
+## 📌 Part 2: **Managing Kafka Brokers using Zookeeper CLI**
+
+> ⚠️ This only applies if you're using **Zookeeper-based Kafka** (i.e., NOT KRaft mode).
+
+### 🛠️ What Zookeeper CLI Can Do (in context of brokers):
+
+Zookeeper itself doesn’t directly manage brokers, but you can **view** broker info and cluster metadata using the `zookeeper-shell.sh` CLI tool.
+
+---
+
+### 🔍 Useful Zookeeper CLI Commands
+
+#### 🔗 Connect to Zookeeper:
+
+```bash
+$ zookeeper-shell.sh localhost:2181
+```
+
+---
+
+### 📜 List all Kafka Brokers
+
+```bash
+ls /brokers/ids
+```
+
+> Returns broker IDs (e.g., `[0, 1, 2]`)
+
+---
+
+### 📄 Get broker info (host, port, rack, etc.)
+
+```bash
+get /brokers/ids/0
+```
+
+Output:
+
+```json
+{"listener_security_protocol_map":{"PLAINTEXT":"PLAINTEXT"},"endpoints":["PLAINTEXT://localhost:9092"],"jmx_port":-1,"host":"localhost","timestamp":"...","port":9092,"version":4}
+```
+
+---
+
+### 📂 List all topics:
+
+```bash
+ls /brokers/topics
+```
+
+---
+
+### 📄 See which broker is leader for a partition
+
+```bash
+get /brokers/topics/<topic-name>/partitions/<partition-number>/state
+```
+
+Example:
+
+```bash
+get /brokers/topics/orders/partitions/0/state
+```
+
+Output:
+
+```json
+{"controller_epoch":1,"leader":1,"leader_epoch":2,"isr":[1,2]}
+```
+
+* `leader`: broker ID
+* `isr`: in-sync replicas
+
+---
+
+### ⚠️ Limitations:
+
+You **cannot use Zookeeper CLI to add/remove brokers or create topics** directly. These actions are done via:
+
+* Kafka Broker config + restart (for adding/removing brokers)
+* `kafka-topics.sh` CLI tool (for creating/modifying topics)
+
+---
+
+## ✅ Summary Table
+
+| Task                              | Zookeeper CLI | Kafka CLI | Kafdrop |
+| --------------------------------- | ------------- | --------- | ------- |
+| View registered brokers           | ✅             | ❌         | ✅       |
+| Get broker details (host/port)    | ✅             | ❌         | ✅       |
+| Create/delete topics              | ❌             | ✅         | ❌       |
+| View topic partitions/leader info | ✅             | ✅         | ✅       |
+| Add/remove broker                 | ❌ (manual)    | ❌         | ❌       |
+
+---
+
+### 💡 Bonus Tip:
+
+If you want to see topic-to-broker assignment visually, you can use:
+
+* **Kafdrop** for basic inspection
+* **Kafka Manager** or **AKHQ** for more advanced UI
+
+Let me know if you'd like broker reassignment examples or how to balance load across brokers.
