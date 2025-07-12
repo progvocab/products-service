@@ -24,7 +24,7 @@
   3. Behavioural
 - J2EE Design Patterns 
 - Microservices Design Patterns 
-  2. API Gateway 
+  1. API Gateway 
   3. Service Mesh 
   4. Lookup Service - Eureka
   5. Interservice Communication - Fien Client
