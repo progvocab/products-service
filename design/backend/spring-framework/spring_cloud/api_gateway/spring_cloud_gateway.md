@@ -66,6 +66,211 @@ spring:
 
 ---
 
+In **Spring Cloud Gateway**, **filters** are powerful components that allow you to **manipulate, control, and monitor** traffic going through the gateway. Filters can be **global** (applied to all routes) or **route-specific**, and they implement many key **system design patterns** like **rate limiting**, **circuit breaking**, **authentication**, and more.
+
+---
+
+## ✅ Categories of Filters in Spring Cloud Gateway
+
+1. **Pre-filters** – run **before** the request is routed
+2. **Post-filters** – run **after** the response is received
+
+---
+
+## 🚀 Common Route Filters (Declarative in `application.yml`)
+
+| Filter Name                 | Purpose                                                |
+| --------------------------- | ------------------------------------------------------ |
+| `AddRequestHeader`          | Add a header before forwarding request                 |
+| `AddResponseHeader`         | Add a header to the response                           |
+| `StripPrefix`               | Remove path prefix before routing to downstream        |
+| `RewritePath`               | Rewrite the path using regex                           |
+| `RequestRateLimiter`        | Apply rate limiting (usually with Redis)               |
+| `CircuitBreaker`            | Circuit breaker pattern (uses Resilience4j or Hystrix) |
+| `Retry`                     | Retry failed requests automatically                    |
+| `SetStatus`                 | Set the response status code directly                  |
+| `RedirectTo`                | Redirect request to a new URL                          |
+| `RequestHeaderToRequestUri` | Rewrite URI based on header                            |
+
+---
+
+## 🔒 1. `RequestRateLimiter` Filter
+
+Implements **API rate limiting** using a token-bucket algorithm.
+
+> Requires Redis.
+
+### Example:
+
+```yaml
+filters:
+  - name: RequestRateLimiter
+    args:
+      redis-rate-limiter.replenishRate: 5
+      redis-rate-limiter.burstCapacity: 10
+```
+
+* `replenishRate`: tokens per second
+* `burstCapacity`: max tokens in bucket
+
+⛓️ Pattern: **Rate Limiting**
+
+---
+
+## 💥 2. `CircuitBreaker` Filter
+
+Stops sending requests to a failing service temporarily to prevent cascading failures.
+
+> Uses **Resilience4j** under the hood (default).
+
+### Example:
+
+```yaml
+filters:
+  - name: CircuitBreaker
+    args:
+      name: myCircuitBreaker
+      fallbackUri: forward:/fallback
+```
+
+* `fallbackUri`: route used when circuit is open
+
+⛓️ Pattern: **Circuit Breaker**, **Fail-Fast**
+
+---
+
+## 🔁 3. `Retry` Filter
+
+Automatically retries failed requests.
+
+### Example:
+
+```yaml
+filters:
+  - name: Retry
+    args:
+      retries: 3
+      statuses: BAD_GATEWAY
+      methods: GET,POST
+```
+
+⛓️ Pattern: **Retry Pattern**
+
+---
+
+## ✂️ 4. `StripPrefix` Filter
+
+Removes prefix from URL path before forwarding.
+
+```yaml
+filters:
+  - StripPrefix=1
+```
+
+* `/api/employees` → `/employees`
+
+⛓️ Pattern: **Path Rewriting**
+
+---
+
+## 🔃 5. `RewritePath` Filter
+
+Uses regex to change the path.
+
+```yaml
+filters:
+  - RewritePath=/api/(?<segment>.*), /$\{segment}
+```
+
+* `/api/employee` → `/employee`
+
+⛓️ Pattern: **URL Rewrite**
+
+---
+
+## 🔧 6. `AddRequestHeader`, `AddResponseHeader`
+
+Adds headers to request/response.
+
+```yaml
+filters:
+  - AddRequestHeader=X-Gateway, GatewayService
+  - AddResponseHeader=X-Processed-Time, ${date}
+```
+
+⛓️ Pattern: **Request Decoration**, **Observability**
+
+---
+
+## 🧪 7. `SetStatus`, `RedirectTo`, `RemoveRequestHeader`
+
+Various control filters:
+
+```yaml
+- SetStatus=401
+- RedirectTo=302, https://new-domain.com
+- RemoveRequestHeader=Authorization
+```
+
+---
+
+## 🧠 Global Filters
+
+Custom or built-in filters applied to **all requests**, e.g.:
+
+```java
+@Bean
+public GlobalFilter loggingFilter() {
+    return (exchange, chain) -> {
+        System.out.println("Incoming request: " + exchange.getRequest().getPath());
+        return chain.filter(exchange);
+    };
+}
+```
+
+---
+
+## 📦 Dependencies Required
+
+To use `RequestRateLimiter` and `CircuitBreaker`, include:
+
+```xml
+<dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-gateway</artifactId>
+</dependency>
+
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+</dependency>
+
+<dependency>
+  <groupId>io.github.resilience4j</groupId>
+  <artifactId>resilience4j-spring-boot2</artifactId>
+</dependency>
+```
+
+---
+
+## ✅ Summary Table
+
+| Filter               | Purpose                     | Design Pattern         |
+| -------------------- | --------------------------- | ---------------------- |
+| `RequestRateLimiter` | Throttle requests           | Rate Limiting          |
+| `CircuitBreaker`     | Fallback on service failure | Circuit Breaker        |
+| `Retry`              | Auto retry failed calls     | Retry                  |
+| `StripPrefix`        | Adjust request path         | URL Path Normalization |
+| `RewritePath`        | Regex rewrite path          | URL Rewrite            |
+| `AddRequestHeader`   | Add request metadata        | Request Decoration     |
+| `AddResponseHeader`  | Enrich response headers     | Observability          |
+| `SetStatus`          | Custom error code           | Response Control       |
+
+---
+
+Would you like a working Spring Boot API Gateway project with these filters configured for an employee microservice?
+
+
 ## 🧠 Major System Design Patterns it Implements
 
 | System Design Pattern            | Role in Spring Cloud Gateway                                                |
