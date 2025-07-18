@@ -1,4 +1,4 @@
-1. Convolutional Neural Networks (CNNs)
+### Convolutional Neural Networks (CNNs)
  * Core Concept: CNNs are the most prominent technique in modern image recognition. They excel at identifying patterns and features within images through layers of:
    * Convolutional Layers: Extract features like edges, corners, and textures.
    * Pooling Layers: Down-sample the feature maps, reducing dimensionality and computational cost.
