@@ -289,3 +289,98 @@ Let me know if you want that sample code.
 ---
 
 Would you like to go deeper into **planarity testing algorithms** or **Kuratoswki’s Theorem**?
+
+At first glance, **K₄** (complete graph with 4 vertices) may **appear** non-planar if you draw it in a certain way (e.g., with edges (1,4) and (2,3) crossing). But **planarity** is not about whether *a specific drawing* has crossings — it's about whether the graph **can be drawn** without *any crossings* at all.
+
+---
+
+## ✅ Key Concept: What Does "Planar" Mean?
+
+A graph is **planar** if **there exists at least one way** to draw it in the plane **without any edges crossing** — regardless of your first or naive drawing.
+
+---
+
+## 🔄 K₄ Can Be Redrawn Planar
+
+Let’s take **K₄**, the complete graph with 4 nodes. It has:
+
+* **4 vertices**
+* **6 edges** (every vertex connects to every other)
+
+Naive drawing with crossings:
+
+```
+   1
+  / \
+ 2---3
+  \ /
+   4
+```
+
+Here, edges (1,4) and (2,3) cross. **But** you can rearrange it:
+
+---
+
+## ✅ Planar Drawing of K₄ (No Crossings)
+
+```
+   1
+  / \
+ 2---3
+  \ /
+   4
+```
+
+Rotate node 4 **outside the triangle**:
+
+```
+     1
+    / \
+   2---3
+    \ /
+     4
+```
+
+* (1,4) goes around the outside
+* No edges cross!
+
+---
+
+## 🧠 Why Is K₄ Planar?
+
+There is **no subgraph homeomorphic to K₅ or K₃,₃** in K₄ (which are minimal non-planar graphs).
+
+* Euler’s formula for planar graphs:
+
+  $$
+  V - E + F = 2
+  $$
+
+  For K₄:
+
+  * Vertices (V) = 4
+  * Edges (E) = 6
+  * Faces (F) = 4 (including outer face)
+  * ✅ Satisfies Euler’s formula
+
+---
+
+## ⚠️ Important: Drawing ≠ Structure
+
+| Statement                           | True? | Why                         |
+| ----------------------------------- | ----- | --------------------------- |
+| "K₄ has crossings"                  | ❌ No  | Only in some drawings       |
+| "K₄ is non-planar"                  | ❌ No  | K₄ is planar                |
+| "K₄ can be drawn without crossings" | ✅ Yes | That's what makes it planar |
+
+---
+
+## 📌 Summary
+
+* **K₄ is planar**, even if your drawing initially shows edge crossings.
+* **Planarity depends on existence** of at least one **non-crossing embedding**, not on every drawing.
+* Tools like `networkx.check_planarity()` confirm this.
+
+---
+
+Would you like a Python code snippet to visualize both the crossing and non-crossing versions of K₄?
