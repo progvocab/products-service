@@ -296,5 +296,141 @@ Tarjan’s algorithm for **Strongly Connected Components (SCCs)** is widely used
 
 ---
 
-Would you like a Python example showing SCCs applied to real data, like package dependencies or function calls?
+ **real-world use case** where **Tarjan’s algorithm** is used to:
 
+1. Find **strongly connected components** (SCCs) in a **dependency graph**.
+2. **Partition** the graph into **subgraphs** (SCCs).
+3. **Perform operations** (e.g. topological sort, parallel execution, cycle detection) on each **SCC independently**.
+
+---
+
+## 🧠 Real-World Use Case: **Build System / Task Scheduling**
+
+Imagine you are building a **CI/CD pipeline** or **Makefile dependency analyzer**. Tasks have dependencies (a graph). Some dependencies are cyclic (bad), and you want to:
+
+* Detect and report cycles (using Tarjan's SCC)
+* Break the graph into **SCCs**
+* Sort/execute them safely
+
+---
+
+## ✅ Example Graph
+
+Let’s say we have 7 build tasks:
+
+```
+A → B → C → A
+D → E → F
+F → D
+G
+```
+
+* `A-B-C` form a cycle → SCC1
+* `D-E-F` form another cycle → SCC2
+* `G` is a single node → SCC3
+
+---
+
+## 🔧 Code (Python)
+
+```python
+from collections import defaultdict
+
+class TarjanSCC:
+    def __init__(self, graph):
+        self.graph = graph
+        self.index = 0
+        self.stack = []
+        self.indices = {}
+        self.lowlink = {}
+        self.on_stack = set()
+        self.sccs = []
+
+    def run(self):
+        for node in self.graph:
+            if node not in self.indices:
+                self._strongconnect(node)
+        return self.sccs
+
+    def _strongconnect(self, node):
+        self.indices[node] = self.lowlink[node] = self.index
+        self.index += 1
+        self.stack.append(node)
+        self.on_stack.add(node)
+
+        for neighbor in self.graph[node]:
+            if neighbor not in self.indices:
+                self._strongconnect(neighbor)
+                self.lowlink[node] = min(self.lowlink[node], self.lowlink[neighbor])
+            elif neighbor in self.on_stack:
+                self.lowlink[node] = min(self.lowlink[node], self.indices[neighbor])
+
+        if self.lowlink[node] == self.indices[node]:
+            scc = []
+            while True:
+                w = self.stack.pop()
+                self.on_stack.remove(w)
+                scc.append(w)
+                if w == node:
+                    break
+            self.sccs.append(scc)
+
+# Define the graph
+graph = {
+    'A': ['B'],
+    'B': ['C'],
+    'C': ['A'],
+    'D': ['E'],
+    'E': ['F'],
+    'F': ['D'],
+    'G': []
+}
+
+tarjan = TarjanSCC(graph)
+sccs = tarjan.run()
+
+# Print SCCs and perform operations
+for i, scc in enumerate(sccs):
+    print(f"SCC {i+1}: {scc}")
+    if len(scc) > 1:
+        print("⚠️  Cycle detected: Cannot proceed with parallel build!")
+    else:
+        print("✅ Safe to execute independently.")
+```
+
+---
+
+## 🧩 Output
+
+```
+SCC 1: ['C', 'B', 'A']
+⚠️  Cycle detected: Cannot proceed with parallel build!
+SCC 2: ['F', 'E', 'D']
+⚠️  Cycle detected: Cannot proceed with parallel build!
+SCC 3: ['G']
+✅ Safe to execute independently.
+```
+
+---
+
+## 💡 Applications
+
+| Domain                          | Use Case                                    |
+| ------------------------------- | ------------------------------------------- |
+| **CI/CD pipelines**             | Detect and isolate cyclic task dependencies |
+| **Database schema migration**   | Detect cycles in foreign key constraints    |
+| **Package managers (npm, pip)** | Detect cyclic dependencies                  |
+| **Social networks**             | Detect strongly bonded communities          |
+| **Compiler build order**        | Analyze import/include cycles               |
+
+---
+
+## 🔗 Real-World Code References
+
+* [Bazel](https://bazel.build) and [Buck](https://buck.build) use SCC-based analysis to optimize dependency graphs.
+* [`madge`](https://github.com/pahen/madge): analyzes JavaScript/TypeScript project graphs and detects cycles using Tarjan.
+* [Apache Maven dependency graph](https://github.com/apache/maven-dependency-plugin) — indirectly resolves cycles during build lifecycles.
+
+---
+
+Would you like me to show how to parallelize execution of non-cyclic SCCs or visualize this as a DAG of components?
