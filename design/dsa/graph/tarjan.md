@@ -115,4 +115,80 @@ Strongly Connected Components: [[4], [3], [1, 2, 0]]
 
 ---
 
-Would you like a visualization or example on a real-world use case like package dependency resolution?
+In graph theory, **cycles** and **connected components** refer to different structural properties of a graph. Here’s a clear breakdown:
+
+---
+
+## 🔁 **Cycle in a Graph**
+
+### ✅ Definition:
+
+A **cycle** is a path that starts and ends at the same vertex, with no repeated edges or vertices (except the start/end).
+
+### 🧠 Key Points:
+
+| Property    | Explanation                                        |
+| ----------- | -------------------------------------------------- |
+| Type        | Can occur in **directed** or **undirected** graphs |
+| Requirement | Must have at least 3 nodes (in undirected)         |
+| Check       | Use DFS or Union-Find to detect cycles             |
+| Usage       | Detect deadlocks, feedback loops, etc.             |
+
+### ➕ Example (Undirected):
+
+```
+1 -- 2
+|    |
+4 -- 3
+```
+
+This graph has a cycle: `1-2-3-4-1`
+
+---
+
+## 🔗 **Connected Components**
+
+### ✅ Definition:
+
+A **connected component** is a subgraph in which there is a path between **every pair of vertices**, and which is **disconnected** from the rest of the graph.
+
+### 🧠 Key Points:
+
+| Property   | Explanation                                                                       |
+| ---------- | --------------------------------------------------------------------------------- |
+| Type       | Applies to **undirected** or **strongly connected** components in directed graphs |
+| Components | A graph may have multiple connected components                                    |
+| Check      | Use DFS or BFS to find all nodes reachable from a node                            |
+| Usage      | Cluster detection, network reliability, etc.                                      |
+
+### ➕ Example:
+
+```
+Component 1:  1 -- 2 -- 3
+Component 2:  4 -- 5
+```
+
+---
+
+## 🔄 Difference Table
+
+| Feature    | **Cycle**                                              | **Connected Component**                                              |
+| ---------- | ------------------------------------------------------ | -------------------------------------------------------------------- |
+| Definition | Path that loops back to starting node                  | Subgraph where all nodes are reachable from one another              |
+| Graph Type | Directed or Undirected                                 | Typically undirected; directed has **strongly connected components** |
+| Count      | A graph may have zero or many cycles                   | A graph has ≥1 connected components                                  |
+| Detection  | Cycle detection algorithms (DFS back edge, Union-Find) | BFS/DFS starting from unvisited nodes                                |
+| Use Case   | Detect loops/deadlocks                                 | Grouping connected regions, partitioning graph                       |
+
+---
+
+## 📌 Summary:
+
+* A **cycle** shows **looping structure**.
+* A **connected component** shows **reachability grouping**.
+* A graph **can have connected components with or without cycles**.
+
+---
+
+Would you like code examples for detecting both in Python?
+
