@@ -42,6 +42,110 @@ A popular method to compute **maximum flow** using **repeated DFS/BFS** to find 
 
 🔸 With **Edmonds-Karp** (BFS instead of DFS), the complexity becomes `O(VE²)`.
 
+
+The **Ford-Fulkerson algorithm** is used to find the **maximum flow** in a flow network. It repeatedly finds augmenting paths from the **source to the sink** using **DFS** (or BFS), and updates the residual capacities of the edges.
+
+---
+
+### 💡 Key Concepts:
+
+1. **Residual Graph**: For every edge `(u → v)`, if there's flow `f`, the residual capacity is `capacity - f`. Also, a reverse edge `(v → u)` is added with capacity `f`.
+
+2. **Augmenting Path**: A path from source to sink in the residual graph where all edges have positive capacity.
+
+3. **DFS for finding path**: We use DFS to search for augmenting paths.
+
+---
+
+### 🧠 Time Complexity:
+
+Depends on the number of augmenting paths and the method used:
+
+* Ford-Fulkerson with DFS: `O(max_flow × E)` where `E` is number of edges.
+
+---
+
+### ✅ Python Implementation using DFS:
+
+```python
+from collections import defaultdict
+
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = defaultdict(dict)
+
+    def add_edge(self, u, v, capacity):
+        self.graph[u][v] = capacity
+        if v not in self.graph or u not in self.graph[v]:
+            self.graph[v][u] = 0  # Add reverse edge with 0 capacity
+
+    def _dfs(self, s, t, visited, flow):
+        visited.add(s)
+        if s == t:
+            return flow
+        for neighbor in self.graph[s]:
+            cap = self.graph[s][neighbor]
+            if cap > 0 and neighbor not in visited:
+                min_cap = min(flow, cap)
+                result = self._dfs(neighbor, t, visited, min_cap)
+                if result > 0:
+                    self.graph[s][neighbor] -= result
+                    self.graph[neighbor][s] += result
+                    return result
+        return 0
+
+    def ford_fulkerson(self, source, sink):
+        max_flow = 0
+        while True:
+            visited = set()
+            flow = self._dfs(source, sink, visited, float('inf'))
+            if flow == 0:
+                break
+            max_flow += flow
+        return max_flow
+```
+
+---
+
+### 🔍 Example:
+
+```python
+g = Graph(6)
+g.add_edge(0, 1, 16)
+g.add_edge(0, 2, 13)
+g.add_edge(1, 2, 10)
+g.add_edge(1, 3, 12)
+g.add_edge(2, 1, 4)
+g.add_edge(2, 4, 14)
+g.add_edge(3, 2, 9)
+g.add_edge(3, 5, 20)
+g.add_edge(4, 3, 7)
+g.add_edge(4, 5, 4)
+
+source = 0
+sink = 5
+print("Max Flow:", g.ford_fulkerson(source, sink))
+```
+
+### Output:
+
+```
+Max Flow: 23
+```
+
+---
+
+### 🛠️ Real-World Applications:
+
+* Network bandwidth allocation
+* Bipartite matching
+* Job assignment problems
+* Circulation with demands
+
+Would you like a visualization or BFS-based Edmonds-Karp version?
+
+
 ---
 
 ## ✅ Python Example using Edmonds-Karp (BFS-based)
