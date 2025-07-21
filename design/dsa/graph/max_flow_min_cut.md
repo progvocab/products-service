@@ -246,3 +246,211 @@ Let me know if you want:
 * Dinic’s algorithm (faster for large graphs)
 * Visualization tools
 * Minimum cut from max flow (Max-Flow Min-Cut Theorem)
+
+
+The **Ford-Fulkerson algorithm** (or its BFS variant, **Edmonds-Karp**) is not directly applicable to **weighted graphs like the one you've given** unless we interpret the weights as **capacities** in a **flow network**.
+
+Let’s assume this matrix represents a **flow network**, and we want to calculate the **maximum flow from node 0 (source) to node 3 (sink)** using **Ford-Fulkerson**.
+
+---
+
+### 🔢 Step 1: Interpret the Adjacency Matrix
+
+Given adjacency matrix:
+
+```
+       0     1     2     3
+0   [ 0 ,   3 ,   4 ,  inf ]
+1   [inf,   0 , inf ,   5  ]
+2   [inf, inf,  0 ,   6  ]
+3   [inf, inf, inf,   0  ]
+```
+
+Interpret as:
+
+* Edge 0 → 1 with capacity 3
+* Edge 0 → 2 with capacity 4
+* Edge 1 → 3 with capacity 5
+* Edge 2 → 3 with capacity 6
+
+### 🧠 Step 2: Construct Residual Graph
+
+We’ll use the Ford-Fulkerson method with DFS to find augmenting paths.
+
+---
+
+### 🔁 Step 3: Run Algorithm
+
+**Residual Capacities**:
+
+```
+0 → 1: 3
+0 → 2: 4
+1 → 3: 5
+2 → 3: 6
+```
+
+#### 🔍 First DFS Path:
+
+* 0 → 1 → 3
+* Min capacity along path = min(3, 5) = **3**
+* Update residual graph:
+
+  * 0→1 becomes 0 (3-3)
+  * 1→3 becomes 2 (5-3)
+  * Add reverse edges:
+
+    * 1→0 += 3
+    * 3→1 += 3
+* **Flow added: 3**
+
+#### 🔍 Second DFS Path:
+
+* 0 → 2 → 3
+* Min capacity = min(4, 6) = **4**
+* Update residual graph:
+
+  * 0→2 becomes 0 (4-4)
+  * 2→3 becomes 2 (6-4)
+  * Add reverse edges:
+
+    * 2→0 += 4
+    * 3→2 += 4
+* **Flow added: 4**
+
+#### 🚫 No more augmenting paths from 0 to 3:
+
+* 0→1 = 0
+* 0→2 = 0
+
+---
+
+### ✅ Final Max Flow:
+
+Total flow = 3 (first path) + 4 (second path) = **7**
+
+---
+
+### 🧮 Summary Table of Residual Capacities:
+
+| Edge  | Initial Capacity | Residual Capacity |
+| ----- | ---------------- | ----------------- |
+| 0 → 1 | 3                | 0                 |
+| 0 → 2 | 4                | 0                 |
+| 1 → 3 | 5                | 2                 |
+| 2 → 3 | 6                | 2                 |
+| 1 ← 0 | 0                | 3                 |
+| 2 ← 0 | 0                | 4                 |
+| 3 ← 1 | 0                | 3                 |
+| 3 ← 2 | 0                | 4                 |
+
+---
+
+### 🟢 Final Answer: **Max Flow = 7**
+
+Would you like the Python code for this exact matrix example?
+
+
+To represent a **graph with capacities** (as needed for max-flow problems like Ford-Fulkerson), the most common representations are:
+
+---
+
+### ✅ 1. **Adjacency List with Capacity Dictionary**
+
+Each node has a dictionary of connected nodes with their corresponding **capacity**.
+
+Example from your matrix:
+
+```python
+graph = {
+    0: {1: 3, 2: 4},
+    1: {3: 5},
+    2: {3: 6},
+    3: {}
+}
+```
+
+This means:
+
+* Node `0` has an edge to `1` with capacity `3` and to `2` with capacity `4`.
+* Node `1` has an edge to `3` with capacity `5`.
+* Node `2` has an edge to `3` with capacity `6`.
+
+---
+
+### ✅ 2. **Adjacency Matrix (2D Array)**
+
+You can also represent capacities using a 2D list (matrix). Replace `inf` with 0 to indicate "no edge" (as capacities cannot be infinite in max-flow problems).
+
+#### Given matrix (original):
+
+```
+[ [ 0, 3, 4, inf ],
+  [ inf, 0, inf, 5 ],
+  [ inf, inf, 0, 6 ],
+  [ inf, inf, inf, 0 ] ]
+```
+
+#### As a capacity matrix (converted to 0):
+
+```python
+capacity = [
+    [0, 3, 4, 0],  # node 0
+    [0, 0, 0, 5],  # node 1
+    [0, 0, 0, 6],  # node 2
+    [0, 0, 0, 0]   # node 3
+]
+```
+
+This can be used in Ford-Fulkerson implementations.
+
+---
+
+### ✅ 3. **Edge List with Capacity**
+
+You can also represent the graph as a list of `(from, to, capacity)` tuples:
+
+```python
+edges = [
+    (0, 1, 3),
+    (0, 2, 4),
+    (1, 3, 5),
+    (2, 3, 6)
+]
+```
+
+---
+
+### 🔄 Conversion from Adjacency Matrix to Adjacency List:
+
+```python
+import math
+
+matrix = [
+    [0, 3, 4, math.inf],
+    [math.inf, 0, math.inf, 5],
+    [math.inf, math.inf, 0, 6],
+    [math.inf, math.inf, math.inf, 0]
+]
+
+n = len(matrix)
+graph = {}
+
+for i in range(n):
+    graph[i] = {}
+    for j in range(n):
+        if matrix[i][j] != math.inf and matrix[i][j] != 0:
+            graph[i][j] = matrix[i][j]
+
+print(graph)
+```
+
+**Output:**
+
+```python
+{0: {1: 3, 2: 4}, 1: {3: 5}, 2: {3: 6}, 3: {}}
+```
+
+---
+
+Would you like me to use this representation in the full max-flow Python code using Ford-Fulkerson?
