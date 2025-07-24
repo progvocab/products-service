@@ -1,3 +1,100 @@
+Detecting cycles in a graph depends on whether the graph is **directed** or **undirected**. Here's how you can detect cycles in both types using Python.
+
+---
+
+## 📌 Cycle Detection in **Directed Graph** using DFS
+
+### ✅ Idea:
+
+Maintain a `visited` set and a `recursion stack` (call stack) to track nodes in the current path. If we visit a node that's already in the recursion stack, we have a cycle.
+
+### 🔧 Code:
+
+```python
+def has_cycle_directed(graph):
+    visited = set()
+    rec_stack = set()
+
+    def dfs(v):
+        visited.add(v)
+        rec_stack.add(v)
+        for neighbor in graph.get(v, []):
+            if neighbor not in visited:
+                if dfs(neighbor):
+                    return True
+            elif neighbor in rec_stack:
+                return True
+        rec_stack.remove(v)
+        return False
+
+    for node in graph:
+        if node not in visited:
+            if dfs(node):
+                return True
+    return False
+
+# 🔍 Example:
+graph = {
+    'A': ['B'],
+    'B': ['C'],
+    'C': ['A'],  # cycle: A -> B -> C -> A
+    'D': ['E'],
+    'E': []
+}
+print(has_cycle_directed(graph))  # Output: True
+```
+
+---
+
+## 📌 Cycle Detection in **Undirected Graph** using DFS
+
+### ✅ Idea:
+
+Use DFS and keep track of the parent node. If a visited neighbor is not the parent, we found a cycle.
+
+### 🔧 Code:
+
+```python
+def has_cycle_undirected(graph):
+    visited = set()
+
+    def dfs(v, parent):
+        visited.add(v)
+        for neighbor in graph.get(v, []):
+            if neighbor not in visited:
+                if dfs(neighbor, v):
+                    return True
+            elif neighbor != parent:
+                return True
+        return False
+
+    for node in graph:
+        if node not in visited:
+            if dfs(node, None):
+                return True
+    return False
+
+# 🔍 Example:
+graph = {
+    0: [1],
+    1: [0, 2],
+    2: [1, 3],
+    3: [2, 0]  # cycle: 0-1-2-3-0
+}
+print(has_cycle_undirected(graph))  # Output: True
+```
+
+---
+
+## 🧠 Notes:
+
+* For **undirected graphs**, you can also use **Union-Find (Disjoint Set)** for cycle detection.
+* For **directed graphs**, you can also use **Kahn’s Algorithm** (Topological Sort), which will fail if a cycle exists.
+
+Would you like the Union-Find version too?
+
+
+
 ### **Detecting Cycles in a Graph Using DFS**  
 
 A **cycle** in a graph occurs when there is a path from a node back to itself through different edges.  
