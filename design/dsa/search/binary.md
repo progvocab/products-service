@@ -1,3 +1,63 @@
+Here is a Python implementation of **Binary Search** on a **sorted array** using both **iterative** and **recursive** approaches:
+
+---
+
+### ✅ Iterative Binary Search in Python
+
+```python
+def binary_search_iterative(arr, target):
+    left, right = 0, len(arr) - 1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if arr[mid] == target:
+            return mid  # Found
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return -1  # Not found
+```
+
+---
+
+### ✅ Recursive Binary Search in Python
+
+```python
+def binary_search_recursive(arr, target, left, right):
+    if left > right:
+        return -1  # Not found
+
+    mid = (left + right) // 2
+
+    if arr[mid] == target:
+        return mid
+    elif arr[mid] < target:
+        return binary_search_recursive(arr, target, mid + 1, right)
+    else:
+        return binary_search_recursive(arr, target, left, mid - 1)
+```
+
+---
+
+### 🔍 Example Usage
+
+```python
+arr = [1, 3, 5, 7, 9, 11, 13]
+target = 9
+
+print("Iterative:", binary_search_iterative(arr, target))
+print("Recursive:", binary_search_recursive(arr, target, 0, len(arr) - 1))
+```
+
+---
+
+Would you like a one-liner lambda version or explanation step-by-step?
+
+
+
 To **find the time complexity of Linear Search**, let's walk through it step-by-step, using both **conceptual reasoning** and **Big-O notation**.
 
 ---
