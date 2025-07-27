@@ -175,6 +175,263 @@ print(dijkstra(graph, 1))
 
 ---
 
+### ✅ 4. **Cycle Detection (Directed Graph, DFS-based)**
+
+```python
+def has_cycle(graph):
+    visited, rec = set(), set()
+    def dfs(v):
+        if v in rec: return True
+        if v in visited: return False
+        visited.add(v); rec.add(v)
+        if any(dfs(nei) for nei in graph.get(v, [])): return True
+        rec.remove(v); return False
+    return any(dfs(v) for v in graph)
+```
+
+---
+
+### ✅ 5. **Topological Sort (Kahn’s Algorithm)**
+
+```python
+from collections import deque, defaultdict
+def topo_sort(graph):
+    indegree = defaultdict(int)
+    for u in graph: 
+        for v in graph[u]: indegree[v] += 1
+    q = deque([u for u in graph if indegree[u]==0])
+    res = []
+    while q:
+        u = q.popleft(); res.append(u)
+        for v in graph[u]:
+            indegree[v] -= 1
+            if indegree[v] == 0: q.append(v)
+    return res
+```
+
+---
+
+### ✅ 7. **Detect Strongly Connected Components (Tarjan’s Algorithm)**
+
+```python
+def tarjans_scc(graph):
+    idx, stack, indices, lowlink, on_stack, sccs = 0, [], {}, {}, set(), []
+    def strongconnect(v):
+        nonlocal idx
+        indices[v] = lowlink[v] = idx; idx += 1
+        stack.append(v); on_stack.add(v)
+        for w in graph.get(v, []):
+            if w not in indices:
+                strongconnect(w); lowlink[v] = min(lowlink[v], lowlink[w])
+            elif w in on_stack:
+                lowlink[v] = min(lowlink[v], indices[w])
+        if lowlink[v] == indices[v]:
+            scc, w = [], None
+            while w != v:
+                w = stack.pop(); on_stack.remove(w); scc.append(w)
+            sccs.append(scc)
+    for v in graph:
+        if v not in indices: strongconnect(v)
+    return sccs
+```
+
+---
+
+### ✅ 8. **Check if Graph is Bipartite**
+
+```python
+def is_bipartite(graph):
+    color = {}
+    def dfs(u, c):
+        color[u] = c
+        return all(color.get(v, c^1) == c^1 and dfs(v, c^1) for v in graph[u] if v not in color or color[v] == c^1)
+    return all(v in color or dfs(v, 0) for v in graph)
+```
+
+---
+
+Here's a **concise set of Python implementations** for advanced graph problems:
+
+---
+
+### ✅ 1. **Maximum Flow (Ford-Fulkerson using DFS)**
+
+```python
+def ford_fulkerson(capacity, source, sink):
+    n = len(capacity)
+    flow = [[0]*n for _ in range(n)]
+
+    def dfs(u, t, f, visited):
+        if u == t: return f
+        visited[u] = True
+        for v in range(n):
+            if not visited[v] and capacity[u][v] - flow[u][v] > 0:
+                df = dfs(v, t, min(f, capacity[u][v] - flow[u][v]), visited)
+                if df > 0:
+                    flow[u][v] += df
+                    flow[v][u] -= df
+                    return df
+        return 0
+
+    max_flow = 0
+    while True:
+        visited = [False]*n
+        pushed = dfs(source, sink, float('inf'), visited)
+        if not pushed: break
+        max_flow += pushed
+    return max_flow
+```
+
+> **Usage:**
+
+```python
+# Node 0 -> 1(10), 0 -> 2(5), etc.
+capacity = [
+    [0, 10, 5, 0],
+    [0, 0, 15, 10],
+    [0, 0, 0, 10],
+    [0, 0, 0, 0]
+]
+print(ford_fulkerson(capacity, 0, 3))  # Output: 15
+```
+
+---
+
+### ✅ 2. **Planarity Test (Using `networkx`)**
+
+```python
+import networkx as nx
+
+def is_planar(graph_edges):
+    G = nx.Graph()
+    G.add_edges_from(graph_edges)
+    return nx.check_planarity(G)[0]
+```
+
+> **Usage:**
+
+```python
+edges = [(0,1),(1,2),(2,3),(3,4),(4,0),(0,2)]  # K5 is not planar
+print(is_planar(edges))  # False
+```
+
+---
+
+### ✅ 3. **Maximum Bipartite Matching (Hungarian Algorithm via `networkx`)**
+
+```python
+import networkx as nx
+
+def max_bipartite_matching(edges, U, V):
+    G = nx.Graph()
+    G.add_nodes_from(U, bipartite=0)
+    G.add_nodes_from(V, bipartite=1)
+    G.add_edges_from(edges)
+    return nx.bipartite.maximum_matching(G)
+```
+
+> **Usage:**
+
+```python
+U, V = [1,2], ['a','b']
+edges = [(1, 'a'), (2, 'a'), (2, 'b')]
+print(max_bipartite_matching(edges, U, V))  # {1: 'a', 'a': 1, 2: 'b', 'b': 2}
+```
+
+---
+
+### ✅ 4. **Travelling Salesman Problem (TSP, brute force)**
+
+```python
+from itertools import permutations
+
+def tsp_brute_force(dist):
+    n, min_cost = len(dist), float('inf')
+    for perm in permutations(range(1, n)):
+        cost = dist[0][perm[0]] + sum(dist[perm[i]][perm[i+1]] for i in range(n-2)) + dist[perm[-1]][0]
+        min_cost = min(min_cost, cost)
+    return min_cost
+```
+
+> **Usage:**
+
+```python
+dist = [
+    [0, 10, 15, 20],
+    [10, 0, 35, 25],
+    [15, 35, 0, 30],
+    [20, 25, 30, 0]
+]
+print(tsp_brute_force(dist))  # 80
+```
+
+---
+
+The **Union-Find** data structure (also called **Disjoint Set Union (DSU)**) is widely used in graph algorithms and systems where you need to efficiently manage **groupings of elements** and **check if two elements are in the same group**.
+
+---
+
+## ✅ **Real-World and Algorithmic Use Cases of Union-Find**
+
+| Use Case                                        | Description                                                                                           |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **1. Kruskal’s Algorithm**                      | To build a Minimum Spanning Tree (MST), we use Union-Find to check if adding an edge creates a cycle. |
+| **2. Connected Components**                     | Efficiently group nodes in a graph into components.                                                   |
+| **3. Cycle Detection in Undirected Graph**      | Detect if adding an edge connects nodes already in the same set (cycle).                              |
+| **4. Network Connectivity**                     | Check whether two users/computers/devices are connected.                                              |
+| **5. Image Processing**                         | Identify connected pixel regions (blob detection, flood fill).                                        |
+| **6. Social Network Friend Circles**            | Merge users into "friend groups" if they are connected.                                               |
+| **7. Dynamic Connectivity**                     | Maintain changing network connectivity (e.g., adding/removing edges in real-time).                    |
+| **8. Percolation Theory / Physics Simulations** | Determine when systems become "connected" from top to bottom.                                         |
+| **9. Compiler Design (Type Inference)**         | To merge equivalent types.                                                                            |
+| **10. Version Control Internals**               | Merging file histories or branches.                                                                   |
+
+---
+
+## 🔧 Python Example: Cycle Detection in Undirected Graph using Union-Find
+
+```python
+def find(parent, x):
+    if parent[x] != x:
+        parent[x] = find(parent, parent[x])  # Path compression
+    return parent[x]
+
+def union(parent, rank, x, y):
+    rootX, rootY = find(parent, x), find(parent, y)
+    if rootX == rootY:
+        return False  # Cycle detected
+    if rank[rootX] < rank[rootY]:
+        parent[rootX] = rootY
+    else:
+        parent[rootY] = rootX
+        if rank[rootX] == rank[rootY]:
+            rank[rootX] += 1
+    return True
+
+def has_cycle(edges, n):
+    parent = list(range(n))
+    rank = [0]*n
+    for u, v in edges:
+        if not union(parent, rank, u, v):
+            return True
+    return False
+```
+
+> **Usage:**
+
+```python
+edges = [(0,1),(1,2),(2,0)]
+print(has_cycle(edges, 3))  # True
+```
+
+---
+
+Would you like an advanced implementation with **union by size**, or **parallel DSU** for huge datasets?
+
+
+
+
+
 ## **📌 Use Cases of Graphs**
 | **Application** | **Graph Type** |
 |---------------|---------------|
