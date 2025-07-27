@@ -14,7 +14,11 @@ A **graph** is a non-linear data structure consisting of **nodes (vertices)** co
 7. **Adjacency Matrix** - A 2D array representing connections between nodes.
 8. **Connected Graph** - A graph where every vertex is reachable.
 9. **Cyclic & Acyclic Graph** - A cyclic graph contains cycles; an acyclic one does not.
+10. **Complete Graph** - A complete graph is a simple undirected graph in which every pair of distinct vertices is connected by a unique edge,  a complete graph with n vertices has n(n - 1)/2 edges.
+11. A bipartite graph divides its vertices into two disjoint sets such that every edge connects a vertex from one set to the other.
 
+12.A complete bipartite graph connects every vertex in set A (size m) to every vertex in set B (size n).
+13. Planar graphs 
 ---
 
 ## **📌 Time & Space Complexity**
