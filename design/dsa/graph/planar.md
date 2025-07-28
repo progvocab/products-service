@@ -1,3 +1,126 @@
+Let’s start with **Kuratowski’s Theorem** and then move on to other **fundamental theorems in graph theory** that are related to **planarity**, **graph embeddings**, and **graph minors**.
+
+---
+
+## 📘 **Kuratowski’s Theorem**
+
+### 🔷 Statement:
+
+> A **finite graph** is **non-planar** if and only if it contains a **subdivision** of either:
+
+* **K₅** (complete graph on 5 vertices), or
+* **K₃,₃** (complete bipartite graph on 3 + 3 vertices).
+
+### 🔷 Key Terms:
+
+* **Planar Graph**: A graph that can be drawn on a plane without any edges crossing.
+* **Subdivision**: A graph formed by replacing edges with paths (i.e., inserting degree-2 vertices on edges).
+
+### 🧠 Intuition:
+
+If you can find K₅ or K₃,₃ hidden (possibly stretched or subdivided) inside a graph, it **cannot** be planar.
+
+### 🖼️ Example:
+
+* K₅ → every vertex connected to every other vertex (5 choose 2 = 10 edges)
+* K₃,₃ → bipartite: 3 on each side, all-to-all connections (3×3 = 9 edges)
+
+---
+
+## ✅ **Wagner’s Theorem** (Closely Related)
+
+> A graph is planar **if and only if** it does **not contain K₅ or K₃,₃ as a minor**.
+
+### Difference from Kuratowski:
+
+* **Wagner** uses **graph minors** (contracting edges)
+* **Kuratowski** uses **subdivisions** (expanding edges into paths)
+
+### 🔄 Minor vs Subdivision:
+
+| Term        | Operation         |
+| ----------- | ----------------- |
+| Subdivision | Stretching edges  |
+| Minor       | Contracting edges |
+
+---
+
+## ✅ **Fáry's Theorem**
+
+> Every simple planar graph can be drawn in the plane **with straight-line edges** (no bends), and **no crossings**.
+
+This means planarity doesn't require curved edges to avoid overlaps.
+
+---
+
+## ✅ **Euler's Formula (for Planar Graphs)**
+
+> For a connected planar graph:
+
+$$
+V - E + F = 2
+$$
+
+Where:
+
+* **V** = number of vertices
+* **E** = number of edges
+* **F** = number of faces (including the outer face)
+
+Used to prove upper bounds on edges in planar graphs:
+
+* For simple connected planar graphs:
+
+  $$
+  E \leq 3V - 6
+  $$
+* For bipartite planar graphs:
+
+  $$
+  E \leq 2V - 4
+  $$
+
+---
+
+## ✅ **Hanani–Tutte Theorem**
+
+> A graph is planar **if it can be drawn** in the plane such that **every pair of non-adjacent edges cross an even number of times**.
+
+This is more theoretical but leads to **algebraic tests of planarity**.
+
+---
+
+## ✅ **Whitney's Planarity Criterion (for 3-connected graphs)**
+
+> A 3-connected graph is planar **iff** it can be embedded on the sphere without crossings.
+
+---
+
+## ✅ **Robertson–Seymour Theorem**
+
+> For any **infinite set** of graphs, one graph is a **minor** of another.
+
+Used in modern graph minor theory and planarity algorithms.
+
+---
+
+## 🧠 Summary Table
+
+| Theorem               | Focus               | Key Idea                                                                   |
+| --------------------- | ------------------- | -------------------------------------------------------------------------- |
+| **Kuratowski**        | Planarity           | Forbidden **subdivisions** of K₅ or K₃,₃                                   |
+| **Wagner**            | Planarity           | Forbidden **minors** of K₅ or K₃,₃                                         |
+| **Fáry**              | Drawing             | Planar graphs → straight-line drawings                                     |
+| **Euler's**           | Geometry            | $V - E + F = 2$ for planar graphs                                          |
+| **Hanani–Tutte**      | Algebraic planarity | Even crossings imply planarity                                             |
+| **Whitney's**         | Topology            | 3-connected planar graphs embed on sphere                                  |
+| **Robertson–Seymour** | Minors              | Every graph class closed under minors has a finite set of forbidden minors |
+
+---
+
+Would you like code to test planarity (e.g., using NetworkX or Boost)?
+heorem 
+
 To determine whether a graph is **planar** in Python, you can use the **`networkx`** library, which provides a built-in function to check for **planarity** using the **Kuratowski’s theorem**-based algorithm.
 
 ---
