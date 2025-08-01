@@ -1,3 +1,162 @@
+
+The terms **Connected Components** and **Strongly Connected Components (SCCs)** refer to subsets of vertices in a graph, but their definitions depend on whether the graph is **undirected** or **directed**.
+
+---
+
+## 📘 1. Connected Components (for **Undirected Graphs**)
+
+A **connected component** is a **maximal set of nodes** such that **there exists a path between any pair of nodes** in the set.
+
+### 🔸 Example:
+
+Undirected Graph:
+
+```
+A - B   D
+    |   |
+    C   E
+```
+
+* Two connected components:
+
+  * `{A, B, C}`
+  * `{D, E}`
+
+### ✅ Key Properties:
+
+* Applicable only to **undirected graphs**
+* Every node in a component can reach every other node in that component
+* Can be found using DFS or BFS
+
+---
+
+## 📘 2. Strongly Connected Components (for **Directed Graphs**)
+
+A **strongly connected component (SCC)** is a **maximal subset of nodes** such that for every pair of nodes `u` and `v` in the component:
+
+> There is a **directed path from `u` to `v`** and **a directed path from `v` to `u`**.
+
+### 🔸 Example:
+
+Directed Graph:
+
+```
+A → B → C
+↑   ↓   ↓
+E ← D ← F
+```
+
+* SCCs could be:
+
+  * `{A, B, D, E}` (they form a cycle with mutual reachability)
+  * `{C}`, `{F}` (no cycles)
+
+### ✅ Key Properties:
+
+* Applicable only to **directed graphs**
+* SCCs can be found using **Kosaraju’s**, **Tarjan’s**, or **Gabow’s** algorithm
+* Each SCC is a **strongly connected subgraph**
+
+---
+
+## 🔍 Comparison Table
+
+| Property               | Connected Components        | Strongly Connected Components               |
+| ---------------------- | --------------------------- | ------------------------------------------- |
+| Graph type             | Undirected                  | Directed                                    |
+| Definition             | Path between all node pairs | Bidirectional paths between nodes           |
+| Path requirement       | Single path needed          | Both `u → v` and `v → u` required           |
+| Algorithms used        | DFS, BFS                    | Kosaraju’s, Tarjan’s                        |
+| Use case example       | Social groups               | Cycles in control flow, dependency analysis |
+| Count in acyclic graph | ≥1                          | Often many                                  |
+
+---
+
+## 🧠 Intuition
+
+* **Connected Component**: “Can I get from A to B ignoring direction?”
+* **Strongly Connected Component**: “Can I get from A to B *and back* following direction?”
+
+---
+
+Let me know if you want **Python code** to find either of these.
+Great! Let's analyze the **directed graph** you've described:
+
+```
+A → B → C  
+↑   ↓    ↓  
+E ← D ← F
+```
+
+Let me reconstruct the full list of **directed edges** based on your diagram:
+
+### 🧭 Edge List:
+
+* A → B
+* B → C
+* B → D
+* C → F
+* F → D
+* D → E
+* E → A
+
+---
+
+## 🎯 Goal: Find Strongly Connected Components (SCCs)
+
+### ✅ Step 1: Represent the graph
+
+We'll write the adjacency list to understand the graph better:
+
+```plaintext
+A → B  
+B → C, D  
+C → F  
+F → D  
+D → E  
+E → A
+```
+
+### ✅ Step 2: Traverse SCCs using mutual reachability
+
+We'll now look for **strongly connected components**, i.e., **maximal sets of nodes** where each node can reach every other node and vice versa.
+
+---
+
+### 🔍 Start from A
+
+Let’s try to follow the path from `A` and check if we can come back to `A`:
+
+* A → B → C → F → D → E → A
+
+This forms a **cycle**:
+**A → ... → E → A**
+
+So all nodes `{A, B, C, D, E, F}` are **in a loop** — each one can **reach the next** and eventually **loop back to the original**.
+
+Therefore, all nodes are **mutually reachable**.
+
+---
+
+## ✅ Final Answer:
+
+> The graph has **1 strongly connected component**, containing all the nodes:
+
+```
+SCC = {A, B, C, D, E, F}
+```
+
+---
+
+### 🧠 Intuition:
+
+Even though the edges are not symmetrical, the structure forms a directed cycle (via `E → A`) that ensures all nodes are **reachable from one another** in both directions (directly or indirectly), satisfying the **SCC condition**.
+
+Let me know if you'd like Python code to compute this or convert the graph into a DOT/visual format.
+
+
+
+
 **Tarjan’s Algorithm** is used to find all **Strongly Connected Components (SCCs)** in a **directed graph** in **O(V + E)** time. A **strongly connected component** is a maximal group of vertices where each vertex is reachable from every other vertex in the group.
 
 ---
