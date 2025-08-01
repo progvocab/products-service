@@ -506,3 +506,118 @@ Let me know if you need a real-world example! 🚀
 
 
 [search](search.md)
+
+
+Here are **key algorithms related to bridges and articulation points** in graph theory, along with **related concepts and algorithms** that solve similar or interconnected problems:
+
+---
+
+### 🔹 1. **Tarjan’s Algorithm**
+
+* **Purpose:** Finds **articulation points**, **bridges**, and **strongly connected components (SCC)**.
+* **Approach:** DFS-based, tracks `discovery time` and `low time` for each node.
+* **Time Complexity:** `O(V + E)`
+* **Variants:**
+
+  * **Tarjan for articulation points and bridges**
+  * **Tarjan for strongly connected components (SCCs)** (used in directed graphs)
+
+---
+
+### 🔹 2. **Kosaraju’s Algorithm**
+
+* **Purpose:** Finds **strongly connected components** (SCC) in a **directed graph**.
+* **Approach:**
+
+  1. Do DFS and push nodes onto a stack by finish time.
+  2. Reverse the graph.
+  3. Do DFS in order of stack to find SCCs.
+* **Time Complexity:** `O(V + E)`
+
+---
+
+### 🔹 3. **Gabow’s Algorithm**
+
+* **Purpose:** Also used for finding **strongly connected components**.
+* **Improved stack-based version** of Tarjan’s for SCCs.
+* **Time Complexity:** `O(V + E)`
+
+---
+
+### 🔹 4. **Union-Find / Disjoint Set Union (DSU)**
+
+* **Purpose:** Detect **connected components**, especially useful in **offline bridge-finding algorithms** or **Kruskal’s MST**.
+* **Time Complexity:** Almost `O(1)` per operation with path compression.
+
+---
+
+### 🔹 5. **Low-Link Values Algorithm (DFS-based)**
+
+* **Purpose:** Foundational concept used in **Tarjan’s** and **bridge-finding algorithms**.
+* Maintains:
+
+  * `disc[v]`: discovery time
+  * `low[v]`: lowest reachable ancestor
+* Helps detect:
+
+  * **Back edges** (which indicate cycles)
+  * **Bridges** and **articulation points**
+
+---
+
+### 🔹 6. **Depth-First Search (DFS) Tree Concepts**
+
+Used to derive:
+
+* **DFS tree edges**
+* **Back edges**
+* **Forward edges**
+* **Cross edges**
+
+Important for identifying **cycles**, **bridges**, and **cut-vertices**.
+
+---
+
+### 🔹 7. **Biconnected Components**
+
+* **Definition:** Maximal subgraphs where the removal of any single vertex does **not disconnect** the graph.
+* **Related to articulation points**.
+* Can be found using DFS + stack.
+
+---
+
+### 🔹 8. **Bridge Tree / Block Tree**
+
+* **Tree formed by collapsing biconnected components** into single nodes.
+* Used in network reliability, optimization of routes, and fault tolerance.
+
+---
+
+## 🔸 Related Concepts / Problems
+
+| Concept                    | Related Algorithms                      |
+| -------------------------- | --------------------------------------- |
+| **Cycle Detection**        | DFS, Union-Find (for undirected graphs) |
+| **Connected Components**   | BFS/DFS, Union-Find                     |
+| **Articulation Points**    | Tarjan’s, DFS low-link                  |
+| **Bridges (Cut-edges)**    | Tarjan’s, DFS low-link                  |
+| **SCCs (Directed Graph)**  | Kosaraju’s, Tarjan’s, Gabow’s           |
+| **Biconnected Components** | DFS + stack                             |
+| **Minimum Spanning Tree**  | Kruskal’s (can help detect bridges)     |
+
+---
+
+### 📌 Visual Summary
+
+```
+       Graph Problem
+          ├── Cycle Detection (DFS / Union-Find)
+          ├── Bridges ←────┐
+          ├── Articulation Points ←─── Tarjan’s Algorithm
+          ├── Strongly Connected Components ←── Kosaraju / Tarjan
+          └── Biconnected Components ←── DFS + Stack
+```
+
+---
+
+Would you like a visual diagram, code for these related algorithms, or comparisons between them in a table?
