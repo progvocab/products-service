@@ -160,3 +160,107 @@ Alice -> Carol
 ---
 
 If you want, I can also draw a **hierarchy diagram** showing how Oracle navigates using `CONNECT BY` and `PRIOR` for top-down vs bottom-up traversal — it makes the direction switch crystal clear.
+
+
+Got it — we’ll extend the **Employee** and **Employee Hierarchy** example to include a **Sales** table, then show how to retrieve **sales for a given employee and their direct reportees** using `CONNECT BY` in Oracle.
+
+---
+
+## 1. Sample Tables
+
+**`EMPLOYEE`**
+
+| EMP\_ID | EMP\_NAME |
+| ------- | --------- |
+| 1       | Alice     |
+| 2       | Bob       |
+| 3       | Carol     |
+| 4       | David     |
+| 5       | Eve       |
+
+**`EMPLOYEE_HIERARCHY`**
+
+| EMP\_ID | MANAGER\_ID |
+| ------- | ----------- |
+| 2       | 1           |
+| 3       | 1           |
+| 4       | 2           |
+| 5       | 2           |
+
+**`SALES`**
+
+| SALE\_ID | EMP\_ID | SALE\_AMOUNT |
+| -------- | ------- | ------------ |
+| 101      | 1       | 5000         |
+| 102      | 2       | 3000         |
+| 103      | 3       | 2000         |
+| 104      | 4       | 1000         |
+| 105      | 5       | 1500         |
+
+---
+
+## 2. Requirement
+
+* **Input:** Employee name (e.g., `'Bob'`)
+* **Output:** Sales of that employee **and** all their **direct reportees** (only one level down, not full hierarchy).
+
+---
+
+## 3. Query – Direct Reportees Only
+
+In Oracle, to get only **direct children**, you can:
+
+* Start from the given employee as root.
+* Use `CONNECT BY` with `LEVEL <= 2` to restrict to **root and one level below**.
+
+```sql
+SELECT e.emp_id,
+       e.emp_name,
+       s.sale_amount
+FROM employee e
+JOIN sales s
+    ON e.emp_id = s.emp_id
+START WITH e.emp_name = 'Bob'
+CONNECT BY PRIOR e.emp_id = e.emp_id  -- we'll fix this join below
+```
+
+Wait, the join in `CONNECT BY` must reflect **manager-employee** relation. Here’s the fixed, full working query:
+
+```sql
+SELECT e.emp_id,
+       e.emp_name,
+       s.sale_amount
+FROM employee e
+JOIN sales s
+    ON e.emp_id = s.emp_id
+JOIN employee_hierarchy eh
+    ON e.emp_id = eh.emp_id
+START WITH e.emp_name = 'Bob'
+CONNECT BY PRIOR e.emp_id = eh.manager_id
+   AND LEVEL <= 2;
+```
+
+---
+
+## 4. How This Works
+
+* `START WITH e.emp_name = 'Bob'` → Bob is root.
+* `CONNECT BY PRIOR e.emp_id = eh.manager_id` →
+  Parent’s emp\_id matches child’s manager\_id.
+* `LEVEL <= 2` → only root (level 1) and direct children (level 2).
+
+---
+
+## 5. Output Example for `'Bob'`
+
+| EMP\_ID | EMP\_NAME | SALE\_AMOUNT |
+| ------- | --------- | ------------ |
+| 2       | Bob       | 3000         |
+| 4       | David     | 1000         |
+| 5       | Eve       | 1500         |
+
+---
+
+If you instead wanted **Bob + all subordinates recursively**, you would just **remove** the `LEVEL <= 2` condition.
+
+If you want, I can also give you **one query without `employee_hierarchy` join** by embedding the hierarchy inside the `CONNECT BY` directly — useful if you want it compact. Would you like me to show that?
