@@ -621,3 +621,56 @@ Important for identifying **cycles**, **bridges**, and **cut-vertices**.
 ---
 
 Would you like a visual diagram, code for these related algorithms, or comparisons between them in a table?
+
+Here’s the clean comparison — short, clear, but deep enough so you won’t mix them up again.
+
+---
+
+## 1. **Basic Idea**
+
+| Feature                  | **Tree**                                                           | **Acyclic Graph** (DAG)                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| **Type**                 | Special kind of acyclic graph                                      | More general — can include trees as a subset                                                                             |
+| **Cycles**               | No cycles                                                          | No cycles                                                                                                                |
+| **Connectedness**        | Always connected                                                   | May be disconnected                                                                                                      |
+| **Edges**                | Exactly `n - 1` edges for `n` vertices                             | Can have fewer or more (up to `n(n-1)/2` in undirected case without cycles)                                              |
+| **Parent-child concept** | Always has one root, every node except root has exactly one parent | No strict parent-child rule — a node can have multiple incoming edges                                                    |
+| **Direction**            | Can be undirected or rooted (directed edges from parent to child)  | Typically discussed as **directed** (Directed Acyclic Graph = DAG), but undirected acyclic graphs are called **forests** |
+| **Hierarchy**            | Strict hierarchy                                                   | Not necessarily hierarchical, can be a partial order                                                                     |
+
+---
+
+## 2. **Visual Difference**
+
+**Tree** (connected, n-1 edges)
+
+```
+    A
+   / \
+  B   C
+     / \
+    D   E
+```
+
+**DAG** (acyclic but can have multiple parents and cross-links)
+
+```
+A → B
+A → C
+B → D
+C → D
+```
+
+Here `D` has two parents (`B` and `C`), so it’s **not** a tree.
+
+---
+
+## 3. **Key Rules to Remember**
+
+* **Every tree is an acyclic graph, but not every acyclic graph is a tree.**
+* If an **acyclic graph** is **connected** and has exactly **n − 1 edges**, it’s a **tree**.
+* If an acyclic graph is disconnected, it’s called a **forest** (a collection of trees).
+
+---
+
+If you want, I can also give you **a quick table of formulas** for edges, degrees, and properties so you can identify in O(1) whether a given acyclic graph is a tree. That’s a neat trick for interviews.
