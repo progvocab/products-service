@@ -1,3 +1,26 @@
+# Topics
+- Undirected Graph 
+- Depth First Search 
+- Stack Data structure 
+- Recursion 
+- Breadth-First Search 
+- Queue
+- Shortest Part from a Vertex 
+- Dijkstra 
+- Priority Queue 
+- Tuples 
+- Travelling Salesman Problem 
+- Dynamic Programming 
+- Bit Manipulation 
+- LRU Cache
+- Detecting Cycles 
+- Disjoint Set
+- Union-Find Datastructures 
+- Negative Edge
+
+
+
+
 ## **Graph in Data Structures & Algorithms (DSA)**  
 
 A **graph** is a non-linear data structure consisting of **nodes (vertices)** connected by **edges**. Graphs are widely used in real-world applications such as **social networks, shortest path algorithms (Google Maps), recommendation systems, and network topology**.
