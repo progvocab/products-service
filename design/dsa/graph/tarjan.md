@@ -603,3 +603,18 @@ Here’s the side-by-side comparison:
   * **Weak connectivity** (Union–Find ignoring direction) still gives `{1, 2}` and `{3, 4}`.
   * **Strong connectivity** splits them into `{1}`, `{2}`, `{3}`, `{4}` because there’s no path back in each pair.
 
+Right — **strongly connected components (SCCs)** are only defined for **directed graphs**.
+
+Here’s why:
+
+* In a **directed graph**, you can have cases where you can go from A → B but not from B → A, so you need the concept of “strong” connectivity (both ways).
+* In an **undirected graph**, every edge is automatically two-way, so “strong” and “weak” connectivity are the same thing.
+
+  * If the graph is connected, it’s already “strongly connected” in the directed sense.
+  * If it’s not connected, you just talk about **connected components**, not SCCs.
+
+So SCC algorithms like **Tarjan** or **Kosaraju** are meaningless for undirected graphs — for undirected, you just run a simple DFS/BFS to find connected components.
+
+---
+
+If you want, I can show **what happens if you run Tarjan’s SCC algorithm on an undirected graph** — it’ll just give you the same connected components. Would you like me to?
