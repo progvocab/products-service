@@ -333,3 +333,163 @@ If you want, I can:
 * Or generate tests / visualizations for a specific example you care about.
 
 Which follow-up would be most useful?
+
+
+Got it — let’s go step-by-step with **examples of graphs** and their **disjoint sets** (using the Union–Find data structure).
+
+---
+
+## **1. Key Idea**
+
+A **disjoint set** (also called Union–Find) tracks **which vertices belong to the same connected component** in a graph.
+If a graph has multiple disconnected components, each is its own disjoint set.
+
+We’ll go through **different graph examples** and show:
+
+* Graph edges
+* How Union–Find groups vertices
+* The final disjoint sets
+
+---
+
+## **Example 1 — Connected Graph**
+
+Graph:
+
+```
+1 -- 2
+|    |
+4 -- 3
+```
+
+Edges:
+
+```
+(1, 2), (2, 3), (3, 4), (4, 1)
+```
+
+**Disjoint Sets:**
+
+* Start: `{1}, {2}, {3}, {4}`
+* After union(1, 2) → `{1, 2}, {3}, {4}`
+* After union(2, 3) → `{1, 2, 3}, {4}`
+* After union(3, 4) → `{1, 2, 3, 4}`
+* After union(4, 1) → no change
+
+✅ **Final:** `{1, 2, 3, 4}` — **one set** (fully connected).
+
+---
+
+## **Example 2 — Two Disconnected Components**
+
+Graph:
+
+```
+1 -- 2      3 -- 4
+```
+
+Edges:
+
+```
+(1, 2), (3, 4)
+```
+
+**Disjoint Sets:**
+
+* Start: `{1}, {2}, {3}, {4}`
+* union(1, 2) → `{1, 2}, {3}, {4}`
+* union(3, 4) → `{1, 2}, {3, 4}`
+
+✅ **Final:** `{1, 2}`, `{3, 4}` — **two components**.
+
+---
+
+## **Example 3 — Graph with Isolated Vertex**
+
+Graph:
+
+```
+1 -- 2    3    4 -- 5
+```
+
+Edges:
+
+```
+(1, 2), (4, 5)
+```
+
+**Disjoint Sets:**
+
+* Start: `{1}, {2}, {3}, {4}, {5}`
+* union(1, 2) → `{1, 2}, {3}, {4}, {5}`
+* union(4, 5) → `{1, 2}, {3}, {4, 5}`
+
+✅ **Final:** `{1, 2}`, `{3}`, `{4, 5}` — vertex 3 is alone.
+
+---
+
+## **Example 4 — Cycle Graph**
+
+Graph:
+
+```
+1 -- 2
+|    |
+4 -- 3
+```
+
+Edges:
+
+```
+(1, 2), (2, 3), (3, 4), (4, 1)
+```
+
+This is the same as Example 1 — cycles don’t change **connected components**; all are still in **one set**.
+
+---
+
+## **Python Implementation**
+
+```python
+class DisjointSet:
+    def __init__(self, n):
+        self.parent = list(range(n+1))
+    
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])  # path compression
+        return self.parent[x]
+    
+    def union(self, x, y):
+        px, py = self.find(x), self.find(y)
+        if px != py:
+            self.parent[py] = px
+
+def graph_to_disjoint_sets(n, edges):
+    ds = DisjointSet(n)
+    for u, v in edges:
+        ds.union(u, v)
+    # Group nodes by parent
+    sets = {}
+    for node in range(1, n+1):
+        root = ds.find(node)
+        sets.setdefault(root, []).append(node)
+    return list(sets.values())
+
+# Examples
+print(graph_to_disjoint_sets(4, [(1, 2), (2, 3), (3, 4)]))
+# [[1, 2, 3, 4]]
+
+print(graph_to_disjoint_sets(4, [(1, 2), (3, 4)]))
+# [[1, 2], [3, 4]]
+
+print(graph_to_disjoint_sets(5, [(1, 2), (4, 5)]))
+# [[1, 2], [3], [4, 5]]
+```
+
+---
+
+If you like, I can **draw visual diagrams** for these graphs **side-by-side with their disjoint set output**, so you can instantly see the mapping between connected components and union–find results.
+
+Do you want me to create those diagrams?
+
