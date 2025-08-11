@@ -593,3 +593,13 @@ SCC 3: ['G']
 ---
 
 Would you like me to show how to parallelize execution of non-cyclic SCCs or visualize this as a DAG of components?
+
+
+Here’s the side-by-side comparison:
+
+* **Left (Undirected)**: Union–Find gives `{1, 2}` and `{3, 4}` as connected components.
+* **Right (Directed)**:
+
+  * **Weak connectivity** (Union–Find ignoring direction) still gives `{1, 2}` and `{3, 4}`.
+  * **Strong connectivity** splits them into `{1}`, `{2}`, `{3}`, `{4}` because there’s no path back in each pair.
+
