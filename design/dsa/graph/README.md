@@ -19,7 +19,8 @@
 - Minimum Spanning Tree 
 - Negative Edge
 - Bellman Ford
-
+- Bridge 
+- Articulation Points 
 
 
 
