@@ -16,7 +16,9 @@
 - Detecting Cycles 
 - Disjoint Set
 - Union-Find Datastructures 
+- Minimum Spanning Tree 
 - Negative Edge
+- Bellman Ford
 
 
 
