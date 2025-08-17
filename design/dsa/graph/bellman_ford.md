@@ -196,4 +196,120 @@ Bellman–Ford is a **single-source shortest path algorithm** that works with **
 
 ---
 
-Would you like me to also create a **side-by-side comparison: Dijkstra vs. Bellman–Ford vs. Floyd–Warshall** (with use cases)?
+Would you like me to also create a **side-by-side comparison: Dijkstra vs. Bellman–Ford vs. Floyd–Warshall** (with use cases)
+---
+**Bellman–Ford** and **Dijkstra’s** are two classic shortest path algorithms, and although they both find the shortest path from a **single source to all vertices**, they differ in important ways.
+
+---
+
+# 🔹 Key Differences: Bellman–Ford vs. Dijkstra
+
+| Feature             | **Dijkstra’s Algorithm**                         | **Bellman–Ford Algorithm**                                                 |
+| ------------------- | ------------------------------------------------ | -------------------------------------------------------------------------- |
+| **Graph type**      | Works with **non-negative edge weights** only.   | Works with **negative weights** too (as long as no negative weight cycle). |
+| **Complexity**      | $O((V+E)\log V)$ with min-heap (faster).         | $O(V \cdot E)$ (slower).                                                   |
+| **Cycle detection** | Cannot detect negative cycles.                   | Can detect **negative weight cycles**.                                     |
+| **Approach**        | Greedy (pick the nearest unexplored node).       | Dynamic Programming (relaxes all edges up to $V-1$ times).                 |
+| **Use cases**       | Fast for large graphs with non-negative weights. | Safer when graph may contain negative weights.                             |
+
+---
+
+# 🔹 Code Snippets (Python)
+
+### 1. **Dijkstra’s Algorithm**
+
+```python
+import heapq
+
+def dijkstra(graph, source):
+    # graph = {u: [(v, weight), ...]}
+    dist = {node: float('inf') for node in graph}
+    dist[source] = 0
+    pq = [(0, source)]  # (distance, node)
+
+    while pq:
+        current_dist, u = heapq.heappop(pq)
+        if current_dist > dist[u]:
+            continue
+        for v, weight in graph[u]:
+            if dist[u] + weight < dist[v]:
+                dist[v] = dist[u] + weight
+                heapq.heappush(pq, (dist[v], v))
+    
+    return dist
+
+# Example (non-negative weights)
+graph = {
+    'A': [('B', 4), ('C', 1)],
+    'B': [('E', 4)],
+    'C': [('B', 2), ('D', 4)],
+    'D': [('E', 4)],
+    'E': []
+}
+print(dijkstra(graph, 'A'))
+```
+
+👉 Works only if all edge weights are **non-negative**.
+
+---
+
+### 2. **Bellman–Ford Algorithm**
+
+```python
+def bellman_ford(graph, vertices, source):
+    # graph = [(u, v, weight), ...]
+    dist = {v: float('inf') for v in vertices}
+    dist[source] = 0
+
+    # Relax edges V-1 times
+    for _ in range(len(vertices) - 1):
+        for u, v, w in graph:
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+
+    # Check for negative weight cycle
+    for u, v, w in graph:
+        if dist[u] + w < dist[v]:
+            raise ValueError("Graph contains a negative weight cycle")
+    
+    return dist
+
+# Example (with negative weights but no negative cycle)
+vertices = ['A', 'B', 'C', 'D']
+graph = [
+    ('A', 'B', 1),
+    ('B', 'C', 3),
+    ('A', 'C', -2),
+    ('C', 'D', 2)
+]
+
+print(bellman_ford(graph, vertices, 'A'))
+```
+
+👉 Handles **negative weights** and can detect **negative cycles**.
+
+---
+
+# 🔹 Intuition with Example
+
+Suppose we have this graph:
+
+```
+A --(4)--> B
+A --(1)--> C
+C --(-2)--> B
+```
+
+* **Dijkstra** fails ❌ because it assumes once you visit `B` with distance `4`, that’s the best. But later `C → B` with `-2` gives a shorter path (`A → C → B = -1`).
+* **Bellman–Ford** works ✅ because it keeps relaxing edges multiple times.
+
+---
+
+✅ **Summary**:
+
+* Use **Dijkstra** if weights are **non-negative** and you need speed.
+* Use **Bellman–Ford** if the graph might have **negative weights** or you want to check for **negative cycles**.
+
+---
+
+Would you like me to also show you a **side-by-side dry run on the same graph** (with a negative edge) so you can see exactly how Dijkstra fails but Bellman–Ford succeeds?
