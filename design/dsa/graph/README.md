@@ -20,6 +20,8 @@
 - Minimum Spanning Tree 
 - Negative Edge
 - Bellman Ford
+- Floyd-Warshall 
+- All pair shortest path 
 - Bridge 
 - Articulation Points 
 
