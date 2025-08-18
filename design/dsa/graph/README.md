@@ -25,6 +25,7 @@
 
 
 
+
 ## **Graph in Data Structures & Algorithms (DSA)**  
 
 A **graph** is a non-linear data structure consisting of **nodes (vertices)** connected by **edges**. Graphs are widely used in real-world applications such as **social networks, shortest path algorithms (Google Maps), recommendation systems, and network topology**.
