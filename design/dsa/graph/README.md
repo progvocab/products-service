@@ -6,6 +6,7 @@
 - Breadth-First Search 
 - Queue
 - Shortest Part from a Vertex 
+- Greedy Algorithm 
 - Dijkstra 
 - Priority Queue 
 - Tuples 
