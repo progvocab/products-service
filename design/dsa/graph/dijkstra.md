@@ -1,4 +1,4 @@
-Here's a complete Python implementation of a **dense graph using an adjacency matrix**, along with **Dijkstra's algorithm** to find the shortest path from a source node.
+Here's a complete Python implementation of a **dense graph using an adjacency matrix**, along with **Dijkstra's algorithm** to find the shortest path from a source node.It makes a greedy choice: pick the smallest tentative distance node first.
 
 ---
 
