@@ -1,3 +1,73 @@
+ These three concepts — **negative edge, negative path, and negative cycle** — are related but distinct. Let’s break them down clearly:
+
+---
+
+## 1. **Negative Edge**
+
+* An **edge** in a graph with **negative weight**.
+* It means moving from one node to another reduces the total cost (like a discount, cashback, or profit).
+
+✅ Example:
+
+```
+A --(-3)--> B
+```
+
+Here, going from `A` to `B` reduces the path cost by 3.
+
+---
+
+## 2. **Negative Path**
+
+* A **path** (sequence of edges) whose **total weight sum < 0**.
+* This may happen even if no single edge is negative — but usually involves one or more negative edges.
+
+✅ Example:
+
+```
+A --(2)--> B --(-5)--> C
+```
+
+Path `A → B → C` = `2 + (-5) = -3` (negative path).
+
+---
+
+## 3. **Negative Cycle**
+
+* A **cycle** (path that starts and ends at the same vertex) with **total weight < 0**.
+* The most critical case, because you can loop around infinitely and reduce cost without bound.
+* This means **no shortest path exists** (you can always find a cheaper one by looping).
+
+✅ Example:
+
+```
+A --(2)--> B --(-5)--> C --(1)--> A
+```
+
+Cycle `A → B → C → A` = `2 + (-5) + 1 = -2` (negative cycle).
+
+---
+
+### 🔑 Differences at a glance
+
+| Concept            | Definition                              | Example              | Impact                                     |
+| ------------------ | --------------------------------------- | -------------------- | ------------------------------------------ |
+| **Negative Edge**  | Single edge with negative weight        | `A --(-4)--> B`      | May reduce path cost                       |
+| **Negative Path**  | Sequence of edges with total weight < 0 | `A → B → C = -3`     | Some shortest paths can be negative        |
+| **Negative Cycle** | Cycle with total weight < 0             | `A → B → C → A = -2` | Shortest paths undefined (loop infinitely) |
+
+---
+
+💡 **Algorithms**:
+
+* **Dijkstra** ❌ does **not** work with negative edges.
+* **Bellman–Ford** ✅ works with negative edges and can detect **negative cycles**.
+
+---
+
+Would you like me to **illustrate with a small Python example** showing how Bellman–Ford detects a **negative cycle** vs just a negative edge?
+
+
 Here's a complete and clean implementation of the **Bellman-Ford algorithm** in Python to find the **shortest path from a single source node** in a **weighted graph**, including support for **negative weights** and detection of **negative weight cycles**.
 
 ---
