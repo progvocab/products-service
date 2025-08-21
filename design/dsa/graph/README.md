@@ -12,7 +12,9 @@
 - Tuples 
 - Travelling Salesman Problem 
 - Dynamic Programming 
+- Permutation using Regression 
 - Bit Manipulation 
+- Permutation using Bit Masking 
 - LRU Cache
 - Detecting Cycles 
 - Disjoint Set
