@@ -145,6 +145,103 @@ This works for any list of numbers or characters.
 
 Would you like me to also show you how to generate **nPr** (permutations of length r) from this same function?
 
+Great question 🚀 Let’s break it down:
+
+---
+
+## 🔹 1. Time Complexity of Generating Permutations
+
+For an array of size **n**, the number of permutations is **n!**.
+Each permutation is of length **n**, so printing/storing it costs **O(n)**.
+
+👉 Total complexity =
+
+$$
+O(n \cdot n!)
+$$
+
+This is the best we can do because we must generate all $n!$ permutations.
+
+---
+
+## 🔹 2. Space Complexity
+
+* Recursion depth = **O(n)**
+* Storage of results = **O(n · n!)**
+
+---
+
+## 🔹 3. Using Bitmasking
+
+Yes ✅, **bitmasking** can simplify the logic by avoiding array slicing (`arr[:i] + arr[i+1:]`, which costs extra copying).
+
+Instead of slicing, we keep:
+
+* A **bitmask** (`visited`) to track which elements are used.
+* A **list `current`** to build the permutation.
+
+---
+
+## 🔹 Bitmask Implementation in Python
+
+```python
+def permute(nums):
+    n = len(nums)
+    result = []
+
+    def backtrack(current, visited_mask):
+        if len(current) == n:
+            result.append(current[:])
+            return
+        
+        for i in range(n):
+            if visited_mask & (1 << i):  # if i-th element already used
+                continue
+            # Choose nums[i]
+            current.append(nums[i])
+            backtrack(current, visited_mask | (1 << i))  # mark i as used
+            current.pop()  # undo choice
+    
+    backtrack([], 0)
+    return result
+
+
+nums = [1, 2, 3]
+perms = permute(nums)
+
+print("Permutations:")
+for p in perms:
+    print(p)
+```
+
+---
+
+## ✅ Output
+
+```
+Permutations:
+[1, 2, 3]
+[1, 3, 2]
+[2, 1, 3]
+[2, 3, 1]
+[3, 1, 2]
+[3, 2, 1]
+```
+
+---
+
+## 🔹 Comparison: Recursion vs Bitmasking
+
+| Approach          | Time Complexity | Space Complexity | Simplicity                     |
+| ----------------- | --------------- | ---------------- | ------------------------------ |
+| Recursive slicing | O(n · n!)       | O(n · n!)        | Simple, but extra slicing cost |
+| Bitmasking        | O(n · n!)       | O(n · n!)        | Faster (no slicing), efficient |
+
+---
+
+👉 **Bitmasking helps by reducing overhead (no list copying)** and makes the algorithm closer to optimal.
+
+Would you like me to also show you how to extend this **bitmask approach** to generate **nPr** (choosing r out of n elements)?
 
 Great! Let's walk through **a simple problem using backtracking** for both **combinations** and **permutations**, similar in spirit to what we just did earlier.
 
