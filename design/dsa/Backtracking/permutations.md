@@ -93,6 +93,57 @@ So there are 12 possible ordered arrangements.
 
 👉 Would you like me to also show you a **Python snippet** that calculates all four ($n!$, $c^n$, $nCr$, $nPr$) so you can play with values interactively?
 
+Perfect 👍 you want a **pure Python implementation** of permutations of `[1, 2, 3]` without using `itertools`.
+
+Here’s a simple **recursive approach**:
+
+---
+
+## 🔹 Python Code (No `itertools`)
+
+```python
+def permute(arr):
+    # Base case: empty list → only one permutation: []
+    if len(arr) == 0:
+        return [[]]
+
+    result = []
+    for i in range(len(arr)):
+        first = arr[i]               # pick one element
+        rest = arr[:i] + arr[i+1:]   # remaining elements
+        for sub in permute(rest):    # recurse on the rest
+            result.append([first] + sub)
+    return result
+
+
+nums = [1, 2, 3]
+all_permutations = permute(nums)
+
+print("Permutations of [1, 2, 3]:")
+for p in all_permutations:
+    print(p)
+```
+
+---
+
+## ✅ Output
+
+```
+Permutations of [1, 2, 3]:
+[1, 2, 3]
+[1, 3, 2]
+[2, 1, 3]
+[2, 3, 1]
+[3, 1, 2]
+[3, 2, 1]
+```
+
+---
+
+This works for any list of numbers or characters.
+👉 For `[1, 2, 3]` it generates **6 permutations** (since $3! = 6$).
+
+Would you like me to also show you how to generate **nPr** (permutations of length r) from this same function?
 
 
 Great! Let's walk through **a simple problem using backtracking** for both **combinations** and **permutations**, similar in spirit to what we just did earlier.
