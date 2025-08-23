@@ -14,8 +14,10 @@
 - Dynamic Programming 
 - Permutation using Regression 
 - Bit Manipulation 
-- Permutation using Bit Masking 
+- Permutation using Bit Masking
+- Held Karp
 - LRU Cache
+- Top Down and Bottom-up Approach 
 - Detecting Cycles 
 - Disjoint Set
 - Union-Find Datastructures 
