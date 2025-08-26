@@ -136,4 +136,83 @@ Git is traversing the **tree object** inside the latest commit.
 
 ---
 
-Would you like me to **draw a diagram showing how commits (graph) link to trees (hierarchy of blobs)** so you can visualize the connection between Git’s tree and graph?
+
+Let’s visualize how **Git’s commit graph** (DAG) connects to **tree structures** (directory snapshots).
+
+---
+
+# 🔹 Git Commit Graph + Tree Diagram
+
+```
+ Commit DAG (History)
+ ┌───────────┐
+ │ Commit A  │───┐
+ │ Tree: T1  │   │
+ └───────────┘   │
+                  │
+ ┌───────────┐    │
+ │ Commit B  │◀───┘   (B has parent A)
+ │ Tree: T2  │
+ └───────────┘
+      │
+      ▼
+ ┌───────────┐
+ │ Commit C  │
+ │ Tree: T3  │
+ └───────────┘
+```
+
+Each **commit** points to:
+
+* A **tree object** (snapshot of the repo)
+* One or more **parent commits** (forming a DAG)
+
+---
+
+# 🔹 Tree Objects (Directory Snapshots)
+
+Let’s expand **Tree T2**:
+
+```
+Tree T2 (root directory)
+├── src/  → Tree T2.1
+│   ├── main.c   → Blob (file contents)
+│   └── util.c   → Blob
+└── README.md    → Blob
+```
+
+Where:
+
+* **Tree** = directory
+* **Blob** = file contents
+
+---
+
+# 🔹 Full Connection Example
+
+```
+Commit C (hash: c3)
+│
+├── points to Tree T3 (root)
+│   ├── src/ → Tree T3.1
+│   │   ├── main.c → Blob (hash: ab1)
+│   │   └── util.c → Blob (hash: cd2)
+│   └── README.md → Blob (hash: ef3)
+│
+└── parent: Commit B (hash: b2)
+```
+
+So Git history is **graph of commits** → each commit points to a **tree** → tree recursively points to blobs.
+
+---
+
+# 🔹 Intuition
+
+* **Graph (Commits)** = time dimension (history, merges, branches)
+* **Tree (Directories)** = space dimension (files at that moment)
+
+That’s why Git is so powerful: it combines a **time graph** with a **space tree**.
+
+---
+
+👉 Do you want me to go one level deeper and **show you the actual C structs in Git’s source code that link commits → trees → blobs**, with an annotated diagram of memory layout? That would tie the theory directly to Git internals.
