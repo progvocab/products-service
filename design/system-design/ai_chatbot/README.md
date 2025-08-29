@@ -243,3 +243,144 @@ data: {"delta":"Sure—first, I'll pull recent pricing notes [S1] ..."}
 ---
 
 If you tell me your **latency target, context size, and QPS**, I can propose **concrete instance counts, GPU types, and cost estimates**, plus a Terraform-style component list to get you from prototype → prod.
+
+
+Great 👍 Let’s design a **unified configuration layer** for all the controllable generation knobs you asked about:
+
+* **Temperature**
+* **Top-p (nucleus sampling)**
+* **Frequency penalty**
+* **Max tokens**
+
+---
+
+# ⚙️ Unified Configuration Layer (System Design for GenAI Chatbot)
+
+### 1. **User / Frontend**
+
+* UI provides controls (sliders, dropdowns, or advanced settings).
+* Example frontend settings:
+
+| Parameter             | Range / Options           | Default |
+| --------------------- | ------------------------- | ------- |
+| **Temperature**       | 0.0 – 1.5 (slider)        | 0.7     |
+| **Top-p**             | 0.1 – 1.0 (slider)        | 0.9     |
+| **Frequency Penalty** | –2.0 – +2.0 (slider)      | 0.0     |
+| **Max Tokens**        | 50 – 2000 (numeric input) | 512     |
+
+---
+
+### 2. **Request Payload**
+
+When the user hits “Send,” the frontend attaches parameters:
+
+```json
+POST /chat
+{
+  "prompt": "Explain quantum entanglement simply",
+  "temperature": 0.8,
+  "top_p": 0.85,
+  "frequency_penalty": 0.5,
+  "max_tokens": 300
+}
+```
+
+---
+
+### 3. **Orchestrator / Middleware Layer**
+
+* **Validation**
+
+  * Ensure values are within safe ranges.
+  * Apply defaults if missing.
+  * Apply **policy overrides** for certain tasks (e.g., force `temperature=0.3` for legal/finance).
+
+* **Config Normalization**
+
+  ```python
+  def normalize_config(user_config):
+      return {
+          "temperature": min(max(user_config.get("temperature", 0.7), 0.0), 1.5),
+          "top_p": min(max(user_config.get("top_p", 0.9), 0.1), 1.0),
+          "frequency_penalty": min(max(user_config.get("frequency_penalty", 0.0), -2.0), 2.0),
+          "max_tokens": min(user_config.get("max_tokens", 512), 2000)
+      }
+  ```
+
+* **Adaptive Layer (optional)**
+
+  * Could dynamically adjust knobs:
+
+    * If **user asks for “precise answer”** → lower temperature + lower top-p.
+    * If **user asks for “creative story”** → increase temperature + top-p.
+
+---
+
+### 4. **Model Inference Layer**
+
+* Pass parameters to the underlying LLM:
+
+**OpenAI API example**
+
+```python
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": prompt}],
+    temperature=config["temperature"],
+    top_p=config["top_p"],
+    frequency_penalty=config["frequency_penalty"],
+    max_tokens=config["max_tokens"]
+)
+```
+
+**Hugging Face Transformers example**
+
+```python
+outputs = model.generate(
+    **inputs,
+    do_sample=True,
+    temperature=config["temperature"],
+    top_p=config["top_p"],
+    max_length=config["max_tokens"]
+)
+```
+
+---
+
+### 5. **Diagram**
+
+```
+User (UI: sliders, inputs)
+        │
+        ▼
+Frontend Request
+  {prompt, temperature, top_p, freq_penalty, max_tokens}
+        │
+        ▼
+Orchestrator
+  - Validate ranges
+  - Apply defaults
+  - Apply policy overrides
+  - Normalize config
+        │
+        ▼
+Inference Engine (LLM API / HF model / custom backend)
+        │
+        ▼
+Response
+```
+
+---
+
+### 6. **Benefits**
+
+* **Flexibility** → advanced users can tweak.
+* **Safety** → defaults + limits prevent abuse.
+* **Task-aware control** → orchestrator can tune based on use case.
+* **Consistency** → unified config layer keeps model behavior predictable.
+
+---
+
+👉 Next Step: I can sketch **preset profiles** (e.g., *Creative*, *Balanced*, *Deterministic*) so users don’t have to manually adjust all 4 knobs every time.
+
+Would you like me to design that **preset strategy** on top of this config layer?
