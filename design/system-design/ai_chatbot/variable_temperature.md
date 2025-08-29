@@ -96,3 +96,85 @@ POST /chat
 ---
 
 Would you like me to **draw a full flow diagram** of where the **temperature parameter fits in a GenAI + RAG system** (user → orchestrator → retriever → LLM → response)?
+
+
+let’s tie **temperature** and **PDF/PMF** together in the context of language models.
+
+---
+
+## 1️⃣ Reminder: PDF vs PMF
+
+* **PDF**: For continuous variables (heights, weights).
+* **PMF**: For discrete variables (tokens in vocab).
+
+👉 Language models use a **PMF over tokens** at each step.
+But since the math generalizes, people often loosely call it a **distribution** (like a PDF).
+
+---
+
+## 2️⃣ Where Temperature Fits In
+
+Before sampling a token, the model outputs **logits** (raw scores, real numbers).
+We convert them into probabilities using **softmax**:
+
+$$
+P(t_i) = \frac{e^{z_i}}{\sum_j e^{z_j}}
+$$
+
+where $z_i$ is the logit for token $i$.
+
+If we apply **temperature $T$**, the formula becomes:
+
+$$
+P_T(t_i) = \frac{e^{z_i / T}}{\sum_j e^{z_j / T}}
+$$
+
+---
+
+## 3️⃣ Effect of Temperature on the Distribution (PMF, analogous to PDF)
+
+* **Low T (<1)** → probabilities get **sharper** (closer to a “spike” distribution).
+
+  * The highest-probability token dominates.
+  * Like a PDF with a tall narrow peak.
+* **High T (>1)** → probabilities get **flatter** (more uniform).
+
+  * Randomness increases, tail tokens get more chance.
+  * Like a PDF that spreads out wide and flat.
+* **T → 0** → becomes **greedy deterministic** (always picks max token).
+* **T → ∞** → approaches **uniform distribution** (every token equally likely).
+
+---
+
+## 4️⃣ Analogy with PDF
+
+If you think of the output distribution as a **probability landscape** (like a bell curve PDF):
+
+* **Temperature scaling** stretches or squeezes that curve.
+
+  * $T<1$: Curve gets **narrower and taller** (model is confident, less random).
+  * $T>1$: Curve gets **wider and flatter** (model is uncertain, more random).
+
+So temperature is essentially a **re-scaling of the distribution’s entropy**.
+
+---
+
+## 5️⃣ Connection to Top-p
+
+* **Temperature** changes the *shape* of the PMF/PDF.
+* **Top-p** cuts off the *tail* of low-probability values.
+
+👉 Together, they define how much **creativity vs determinism** the model shows.
+
+---
+
+✅ **In short**:
+
+* The model outputs a **PMF (like a discrete PDF)** over tokens.
+* **Temperature scales the sharpness** of this distribution.
+* **Lower T → spiky distribution** (less randomness).
+* **Higher T → flatter distribution** (more randomness).
+
+---
+
+Would you like me to show you a **Python visualization** (plotting token probabilities with different temperatures) so you can **see how the PMF changes shape**?
