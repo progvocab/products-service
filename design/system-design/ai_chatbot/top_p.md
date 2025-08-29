@@ -118,6 +118,102 @@ outputs = model.generate(
 
 ---
 
-⚡ Now you’ve asked about **temperature**, **frequency penalty**, **max tokens**, and **top\_p**.
+
+
+---
+
+# 1️⃣ **Probability Mass Function (PMF)**
+
+* **Used for discrete random variables** (things you can count: dice rolls, words in a vocabulary, etc.).
+* A PMF gives the **probability of each exact outcome**.
+* Example: Rolling a fair 6-sided die
+
+  $$
+  P(X = k) = \frac{1}{6}, \quad k \in \{1,2,3,4,5,6\}
+  $$
+* All probabilities sum to 1:
+
+  $$
+  \sum_{k} P(X = k) = 1
+  $$
+
+---
+
+# 2️⃣ **Probability Density Function (PDF)**
+
+* **Used for continuous random variables** (things you measure: height, temperature, etc.).
+* Instead of giving the probability of one exact point, it gives a **density** — we need to integrate to get actual probabilities.
+* Example: Standard normal distribution:
+
+  $$
+  f(x) = \frac{1}{\sqrt{2\pi}} e^{-\frac{x^2}{2}}
+  $$
+* Probability of being between $a$ and $b$:
+
+  $$
+  P(a \leq X \leq b) = \int_a^b f(x) dx
+  $$
+
+---
+
+# 3️⃣ **How This Relates to Language Models**
+
+When a language model generates text:
+
+* The **next token distribution** is a **PMF** (since the vocabulary is discrete).
+* Each token $t_i$ has a probability:
+
+  $$
+  P(t_i | \text{context})
+  $$
+* Example:
+
+  | Token    | Probability |
+  | -------- | ----------- |
+  | "cat"    | 0.45        |
+  | "dog"    | 0.30        |
+  | "car"    | 0.15        |
+  | "banana" | 0.10        |
+
+This is a **discrete PMF**.
+
+---
+
+# 4️⃣ **What is Top-p Sampling (a.k.a. Nucleus Sampling)?**
+
+* Instead of picking only the single most likely token (greedy search) or from the top-k tokens, **Top-p** selects the *smallest set of tokens whose cumulative probability ≥ p*.
+* Then the model samples from that set.
+
+### Example with p = 0.8
+
+From the table above:
+
+* "cat" (0.45) → cumulative = 0.45
+* "dog" (0.30) → cumulative = 0.75
+* "car" (0.15) → cumulative = 0.90 ✅ (stop, cumulative ≥ 0.8)
+
+So candidate set = {"cat", "dog", "car"} (not "banana").
+Then one token is chosen randomly according to their **normalized probabilities**.
+
+---
+
+# 5️⃣ **Connection to PMF/PDF**
+
+* The **softmax output of the model** is a PMF over tokens.
+* **Top-p** modifies this PMF by truncating the distribution to the "nucleus" of most probable tokens until cumulative probability ≥ p.
+* For continuous variables (with a PDF), a similar thing would be **sampling only from a high-probability region of the density**.
+
+---
+
+✅ **Summary**
+
+* **PMF**: probabilities for discrete events (words/tokens).
+* **PDF**: probability densities for continuous events (heights, speeds).
+* **Top-p**: dynamically selects the smallest set of tokens whose PMF sum ≥ p, then samples from them.
+
+---
+
+Would you like me to also **draw a probability distribution diagram** to visually show how **Top-p cuts off the tail** of low-probability tokens?
+
 
 👉 Do you want me to design a **unified configuration layer** diagram showing how *all these knobs* flow from **user → frontend → orchestrator → model inference** (so you can see them together)?
