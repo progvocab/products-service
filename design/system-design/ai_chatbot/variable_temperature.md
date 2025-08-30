@@ -309,3 +309,143 @@ $$
 ---
 
 Do you want me to also explain how **logits + temperature interact with Top-p (nucleus sampling)**? That’s the full picture of how models control randomness.
+
+Nice follow-up 🔥 — let’s go step by step into **class log probabilities**, how they’re computed, and why we use them.
+
+---
+
+# 🔹 What are Class Log Probabilities?
+
+* In classification (e.g., predicting digit from MNIST, or next token in language modeling), the model outputs **logits** (raw scores).
+* We convert logits → **probabilities** using softmax.
+* But instead of probabilities, we often work with **log-probabilities**:
+
+$$
+\log P(y = c \mid x) = \log \left( \frac{e^{z_c}}{\sum_j e^{z_j}} \right)
+$$
+
+where:
+
+* $z_c$ = logit for class $c$
+* denominator = sum of exponentials of all logits
+
+---
+
+# 🔹 Why use Log Probabilities?
+
+1. **Numerical Stability**
+
+   * Probabilities can be very small (e.g., $10^{-30}$).
+   * Logs prevent underflow.
+   * Example: multiplying probabilities (e.g., sequence models) becomes adding logs.
+
+2. **Efficient Loss Computation**
+
+   * Cross-entropy loss is naturally defined using log probabilities:
+
+   $$
+   L = -\log P(y_\text{true} \mid x)
+   $$
+
+3. **Interpretability in Language Models**
+
+   * When decoding, we track **log-likelihood of sequences**.
+   * A higher log probability (closer to 0) = more likely sequence.
+
+---
+
+# 🔹 Example (3-class problem)
+
+Suppose logits = `[2.0, 1.0, 0.1]`
+
+### Step 1: Convert to probabilities
+
+$$
+P(i) = \frac{e^{z_i}}{\sum_j e^{z_j}}
+$$
+
+Denominator = $e^2 + e^1 + e^{0.1} \approx 7.389 + 2.718 + 1.105 = 11.212$
+
+$$
+P(1) = 7.389 / 11.212 \approx 0.66
+$$
+
+$$
+P(2) = 2.718 / 11.212 \approx 0.24
+$$
+
+$$
+P(3) = 1.105 / 11.212 \approx 0.10
+$$
+
+### Step 2: Take log
+
+$$
+\log P(1) \approx -0.41
+$$
+
+$$
+\log P(2) \approx -1.43
+$$
+
+$$
+\log P(3) \approx -2.30
+$$
+
+👉 These are **class log probabilities**.
+
+---
+
+# 🔹 In Language Models
+
+For next-token prediction:
+
+* Model outputs logits for entire vocabulary (say 50,000 words).
+* Convert to **log probs**.
+* Sampling/beam search uses these values:
+
+  * Greedy decoding → pick token with highest log prob.
+  * Beam search → track sum of log probs across sequence.
+
+Example sequence scoring:
+
+```
+P("the") = 0.5 → log = -0.69
+P("cat") = 0.2 → log = -1.60
+Total log prob("the cat") = -0.69 + (-1.60) = -2.29
+```
+
+---
+
+# 🔹 Relationship with Temperature
+
+When temperature $T$ is applied, logits are scaled:
+
+$$
+P(c) = \frac{e^{z_c / T}}{\sum_j e^{z_j / T}}
+$$
+
+Then:
+
+$$
+\log P(c) = \frac{z_c}{T} - \log \sum_j e^{z_j / T}
+$$
+
+So:
+
+* **Lower T (<1)** → spreads log probabilities farther apart (makes one class dominate).
+* **Higher T (>1)** → log probs get closer (distribution more uniform).
+
+---
+
+✅ **Summary**
+
+* **Class log probabilities** = log of softmaxed logits.
+* Used for **stability, efficient loss computation, and sequence scoring**.
+* In LMs, they are the backbone of sampling strategies (greedy, beam search, top-k, nucleus).
+* Temperature directly modifies them by scaling logits before softmax.
+
+---
+
+Would you like me to also show you a **Python/PyTorch example** where we compute logits → probs → log probs, and how temperature changes them?
+
