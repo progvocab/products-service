@@ -444,6 +444,7 @@ So:
 * Used for **stability, efficient loss computation, and sequence scoring**.
 * In LMs, they are the backbone of sampling strategies (greedy, beam search, top-k, nucleus).
 * Temperature directly modifies them by scaling logits before softmax.
+* Logits are raw, unnormalized scores from a neural network's final layer, while softmax is an activation function that converts these logits into probabilities that sum to 1. The softmax function uses the exponential of each logit, then normalizes by the sum of all exponentials to produce a probability distribution, which is useful for multi-class classification tasks. 
 
 ---
 
