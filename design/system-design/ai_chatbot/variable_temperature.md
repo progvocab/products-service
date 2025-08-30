@@ -178,3 +178,134 @@ So temperature is essentially a **re-scaling of the distribution’s entropy**.
 ---
 
 Would you like me to show you a **Python visualization** (plotting token probabilities with different temperatures) so you can **see how the PMF changes shape**?
+
+
+Great question 🔥 — this goes right into the **mathematical foundation of language models and system design of sampling**.
+
+---
+
+# 🔹 What are *Logits*?
+
+* In machine learning (esp. neural networks), **logits** are the **raw, unnormalized outputs** of the final layer of a model **before applying softmax**.
+* For a language model, each logit corresponds to a vocabulary token.
+* Example: If the vocabulary size = 50,000, the model outputs a **vector of 50,000 logits** at each step.
+
+👉 They can be **positive, negative, or zero**, and don’t sum to 1.
+👉 To turn them into probabilities, we apply the **softmax function**.
+
+---
+
+# 🔹 From Logits → Probabilities
+
+The **softmax function** converts logits into a probability distribution:
+
+$$
+P(x_i) = \frac{e^{z_i}}{\sum_j e^{z_j}}
+$$
+
+* $z_i$ = logit for token $i$
+* $P(x_i)$ = probability of token $i$
+
+So, higher logits → higher probability after normalization.
+
+---
+
+# 🔹 Temperature in Sampling
+
+**Temperature** is a scaling factor applied to logits **before softmax**:
+
+$$
+P(x_i) = \frac{e^{z_i / T}}{\sum_j e^{z_j / T}}
+$$
+
+where:
+
+* $T = 1.0$ → default (no scaling).
+* $T < 1.0$ → makes distribution **sharper** (more deterministic).
+* $T > 1.0$ → makes distribution **flatter** (more random).
+
+---
+
+# 🔹 Intuition
+
+1. **Low Temperature (T → 0):**
+
+   * Makes the softmax output **peakier**.
+   * Model always picks the token with highest logit.
+   * Good for deterministic text generation.
+   * Risk: outputs become repetitive.
+
+2. **High Temperature (T > 1):**
+
+   * Makes softmax output more **uniform**.
+   * Encourages more exploration / creativity.
+   * Risk: incoherent or random responses.
+
+---
+
+# 🔹 Example Walkthrough
+
+Suppose logits for 3 tokens are:
+
+```
+Token A → 2.0
+Token B → 1.0
+Token C → 0.1
+```
+
+### Case 1: Temperature = 1
+
+$$
+P(A) = \frac{e^2}{e^2 + e^1 + e^{0.1}} \approx 0.62
+$$
+
+$$
+P(B) \approx 0.23,\; P(C) \approx 0.15
+$$
+
+→ Token A is most likely.
+
+---
+
+### Case 2: Temperature = 0.5 (sharper)
+
+Logits scaled up: `[4.0, 2.0, 0.2]`
+
+$$
+P(A) \approx 0.88,\; P(B) \approx 0.12,\; P(C) \approx 0.004
+$$
+
+→ Model almost always picks A (deterministic).
+
+---
+
+### Case 3: Temperature = 2.0 (flatter)
+
+Logits scaled down: `[1.0, 0.5, 0.05]`
+
+$$
+P(A) \approx 0.42,\; P(B) \approx 0.26,\; P(C) \approx 0.32
+$$
+
+→ More randomness, even C becomes viable.
+
+---
+
+# 🔹 Relationship Summary
+
+* **Logits** = raw model scores.
+* **Temperature** = scaling factor that **controls how sharply logits convert to probabilities**.
+* **Low T** → exploit (focus on top tokens).
+* **High T** → explore (spread probability).
+
+---
+
+✅ So in **system design of a language model inference layer**:
+
+* Logits come from the model.
+* Before applying softmax, they are divided by temperature.
+* Then, depending on sampling strategy (top-k, nucleus/top-p, greedy), the final token is chosen.
+
+---
+
+Do you want me to also explain how **logits + temperature interact with Top-p (nucleus sampling)**? That’s the full picture of how models control randomness.
