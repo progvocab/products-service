@@ -12,6 +12,7 @@ In machine learning, there are **several model types** depending on the **task**
 
   * Example: Logistic Regression, SVM, Random Forest Classifier
   * Use case: Email spam detection
+  * kNN : character recognition 
 
 * **Regression** → Predict continuous values
 
