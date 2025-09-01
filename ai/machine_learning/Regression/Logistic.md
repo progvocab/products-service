@@ -217,3 +217,55 @@ for hours in [3, 6]:
 ✅ This way, you see how the **logit (linear function)** transforms into a **probability (sigmoid curve)**.
 
 Do you want me to also explain **how the decision boundary (cutoff point ≈ where prob = 0.5)** can be found directly from the coefficients?
+
+
+Good question 👍 — let’s clear this up carefully.
+
+---
+
+## 🔹 Logistic Regression Model
+
+The model is:
+
+$$
+p(y=1|x) = \sigma(w \cdot x + b)
+$$
+
+where
+
+* $w$ = weight vector (slope(s))
+* $b$ = bias (intercept)
+* $\sigma(z) = \frac{1}{1 + e^{-z}}$ = sigmoid function
+
+---
+
+## 🔹 Parameters vs Hyperparameters
+
+* **Parameters**: learned from training data by optimization (gradient descent, maximum likelihood, etc.).
+* **Hyperparameters**: set by the practitioner before training, not learned directly (e.g., learning rate, regularization strength, number of iterations).
+
+👉 In **logistic regression**:
+
+* **Slope(s) $w$** = **parameters**
+* **Intercept $b$** = **parameter**
+* They are **not hyperparameters** because the model learns them from data.
+
+---
+
+## 🔹 Examples of Hyperparameters in Logistic Regression
+
+* Regularization strength ($C$ in scikit-learn, inverse of $\lambda$).
+* Type of regularization (L1, L2, ElasticNet).
+* Solver choice (liblinear, saga, newton-cg).
+* Maximum iterations for convergence.
+* Learning rate (if using gradient descent).
+
+---
+
+✅ **Answer:**
+The **slope(s) and intercept in logistic regression are model parameters, not hyperparameters**.
+Hyperparameters are things like regularization and solver settings that you configure before training.
+
+---
+
+Would you like me to also explain this in terms of **scikit-learn’s LogisticRegression** (which attributes are parameters vs hyperparameters)?
