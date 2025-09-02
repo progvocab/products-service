@@ -131,3 +131,118 @@ def flood_fill_bfs(image, sr, sc, new_color):
 ---
 
 Would you like to try a flood fill practice problem (e.g., LeetCode 733) or add diagonal connectivity (8 directions)?
+
+
+
+---
+
+## 🔹 1. **Flood Fill Algorithm**
+
+**Definition**:
+
+* A graph/grid traversal algorithm.
+* Used to determine and “fill” a connected region starting from a seed point.
+* Common in **image editing** (paint-bucket tool) or **maze solving**.
+
+**How it works**:
+
+* Start at a cell/pixel.
+* Recursively (DFS/BFS) visit all neighboring cells of the same "type".
+* Change/mark them with a new value (e.g., color).
+
+**Key Points**:
+
+* Input: grid, starting point, target value, replacement value.
+* Output: modified grid where the region is filled.
+* Time complexity: $O(N \times M)$ for an $N \times M$ grid.
+
+**Python Example**:
+
+```python
+def flood_fill(grid, x, y, new_color):
+    rows, cols = len(grid), len(grid[0])
+    old_color = grid[x][y]
+    if old_color == new_color:
+        return grid
+
+    def dfs(i, j):
+        if 0 <= i < rows and 0 <= j < cols and grid[i][j] == old_color:
+            grid[i][j] = new_color
+            dfs(i+1, j)
+            dfs(i-1, j)
+            dfs(i, j+1)
+            dfs(i, j-1)
+
+    dfs(x, y)
+    return grid
+```
+
+---
+
+## 🔹 2. **Trapping Rain Water Problem**
+
+**Definition**:
+
+* Classic algorithmic problem from arrays.
+* Given bar heights, compute how much rainwater is trapped between them.
+
+**How it works**:
+
+* For each index, trapped water = `min(max_left, max_right) - height[i]` (if positive).
+* Efficient solution uses two-pointer technique.
+
+**Key Points**:
+
+* Input: array of heights.
+* Output: integer (total trapped water).
+* Time complexity: $O(n)$.
+* Space complexity: $O(1)$ with two pointers.
+
+**Python Example**:
+
+```python
+def trap(height):
+    left, right = 0, len(height) - 1
+    left_max = right_max = 0
+    water = 0
+
+    while left < right:
+        if height[left] < height[right]:
+            if height[left] >= left_max:
+                left_max = height[left]
+            else:
+                water += left_max - height[left]
+            left += 1
+        else:
+            if height[right] >= right_max:
+                right_max = height[right]
+            else:
+                water += right_max - height[right]
+            right -= 1
+    return water
+```
+
+---
+
+## 🔹 3. **Flood Fill vs Trapping Rain Water**
+
+| Aspect           | Flood Fill 🌊🎨                           | Trapping Rain Water 💧🏔️                   |
+| ---------------- | ----------------------------------------- | ------------------------------------------- |
+| **Problem Type** | Grid traversal / connected region marking | Array-based / trapping capacity calculation |
+| **Domain**       | Images, games, pathfinding                | Algorithmic puzzles, water storage modeling |
+| **Input**        | 2D grid, seed point, colors/values        | 1D array of heights                         |
+| **Output**       | Modified grid (filled region)             | Integer (amount of trapped water)           |
+| **Algorithm**    | DFS/BFS (recursion or stack/queue)        | Two pointers / dynamic programming          |
+| **Use Cases**    | Paint bucket tool, map region filling     | Rainwater harvesting, histogram analysis    |
+
+---
+
+✅ **Summary**:
+
+* **Flood Fill** is about *spreading/marking connected areas* in 2D.
+* **Trapping Rain Water** is about *computing storage capacity* in 1D heights.
+
+---
+
+👉 Do you want me to also show you how **Flood Fill can be adapted to 2D Trapping Rain Water** (the harder variation where water can be trapped inside a 2D grid)?
+
