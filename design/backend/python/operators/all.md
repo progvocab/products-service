@@ -112,7 +112,7 @@ Used for assigning values to variables.
 | `%=` | Modulus & assign | `x %= 3  # x = x % 3` |
 | `**=` | Exponentiate & assign | `x **= 3  # x = x ** 3` |
 | `&=` | Bitwise AND & assign | `x &= 3  # x = x & 3` |
-| `|=` | Bitwise OR & assign | `x |= 3  # x = x | 3` |
+| `\|=` | Bitwise OR & assign | `x \|= 3  # x = x \| 3` |
 | `^=` | Bitwise XOR & assign | `x ^= 3  # x = x ^ 3` |
 | `<<=` | Left shift & assign | `x <<= 3  # x = x << 3` |
 | `>>=` | Right shift & assign | `x >>= 3  # x = x >> 3` |
@@ -190,7 +190,7 @@ Operator precedence determines the order of execution.
 | 6 | `<<, >>` (Bitwise shifts) |
 | 7 | `&` (Bitwise AND) |
 | 8 | `^` (Bitwise XOR) |
-| 9 | `|` (Bitwise OR) |
+| 9 | `\|` (Bitwise OR) |
 | 10 | `==, !=, >, <, >=, <=` (Comparison) |
 | 11 | `not` (Logical NOT) |
 | 12 | `and` (Logical AND) |
