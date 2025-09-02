@@ -79,7 +79,7 @@ Used for bit-level operations.
 | Operator | Description | Example |
 |----------|------------|---------|
 | `&` | Bitwise AND | `5 & 3  # 1` |
-| `|` | Bitwise OR | `5 | 3  # 7` |
+| `\|` | Bitwise OR | `5 \| 3  # 7` |
 | `^` | Bitwise XOR | `5 ^ 3  # 6` |
 | `~` | Bitwise NOT | `~5  # -6` |
 | `<<` | Left shift | `5 << 1  # 10` |
