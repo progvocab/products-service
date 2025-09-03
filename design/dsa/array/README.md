@@ -340,6 +340,33 @@ def maxSubArray(nums):
 
 print(maxSubArray([-2,1,-3,4,-1,2,1,-5,4]))  # 6
 ```
+### Maximum Product Subarray is a classic array DP problem
+
+```python
+def maxProduct(nums):
+    if not nums:
+        return 0
+    
+    max_prod = min_prod = result = nums[0]
+    
+    for num in nums[1:]:
+        # if num is negative, swap max and min
+        if num < 0:
+            max_prod, min_prod = min_prod, max_prod
+        
+        max_prod = max(num, num * max_prod)
+        min_prod = min(num, num * min_prod)
+        
+        result = max(result, max_prod)
+    
+    return result
+
+
+# Example usage
+print(maxProduct([2,3,-2,4]))      # 6 (subarray [2,3])
+print(maxProduct([-2,0,-1]))       # 0 (subarray [0])
+print(maxProduct([-2,3,-4]))       # 24 (subarray [-2,3,-4])
+```
 
 ---
 
