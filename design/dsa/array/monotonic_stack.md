@@ -35,8 +35,9 @@ def nextGreaterElements(nums):
     stack = []  # store indices
 
     for i in range(n):
-        while stack and nums[i] > nums[stack[-1]]:
-            idx = stack.pop()
+        while stack and nums[i] > nums[stack[-1]]: 
+# -1 index is used to peek the top of the stack , without pulling it
+            idx = stack.pop() #pop the first greater and break
             res[idx] = nums[i]
         stack.append(i)
     return res
