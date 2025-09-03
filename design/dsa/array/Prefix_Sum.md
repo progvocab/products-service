@@ -74,11 +74,11 @@ print(range_sum(prefix, 1, 3))  # Output: 18 (4 + 6 + 8)
 
 Would you like examples for 2D prefix sum or use in competitive problems?
 
-Great question! Here’s a detailed walkthrough of the **prefix-sum + hashmap** pattern used to count how many **contiguous subarrays** sum to `k`.
+Here’s a detailed walkthrough of the **prefix-sum + hashmap** pattern used to count how many **contiguous subarrays** sum to `k`.
 
 ---
 
-# The program (for reference)
+# The program  
 
 ```python
 def subarraySum(nums, k):
@@ -94,7 +94,7 @@ def subarraySum(nums, k):
 
 ---
 
-## What each variable means
+
 
 * **`prefix_sum`**
   Running total up to the current index:
