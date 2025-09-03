@@ -372,25 +372,29 @@ print(maxProduct([-2,3,-4]))       # 24 (subarray [-2,3,-4])
 
 ## 5. **Sorting + Two Pointers**
 
-Example: 3Sum
+### Example: 3Sum
+- Given an integer array nums, return all unique triplets [a, b, c] such that: ```a+b+c = 0```
+- Triplets should not repeat.
+- Order of elements inside a triplet doesn’t matter.
 
 ```python
 def threeSum(nums):
-    nums.sort()
+    nums.sort() # Sort the array 
     res = []
     for i in range(len(nums)-2):
         if i > 0 and nums[i] == nums[i-1]: continue
-        l, r = i+1, len(nums)-1
+        l, r = i+1, len(nums)-1 # the two pointers
         while l < r:
             s = nums[i] + nums[l] + nums[r]
             if s == 0:
                 res.append([nums[i], nums[l], nums[r]])
                 l += 1; r -= 1
+                # Skip duplicates for left & right
                 while l < r and nums[l] == nums[l-1]: l += 1
                 while l < r and nums[r] == nums[r+1]: r -= 1
-            elif s < 0:
+            elif s < 0: # move right
                 l += 1
-            else:
+            else:  # move left
                 r -= 1
     return res
 
