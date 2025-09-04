@@ -223,6 +223,8 @@ print(sumOfTwo([2,7,11,15], 9))  # [0,1]
 ## 8. **Greedy**
 
 Example: Jump Game - can be solved by greedy algorithm as well as dynamic programming 
+- You are given an array of non-negative integers nums, where each element represents your maximum jump length from that position.
+Your task is to determine if you can reach the last index starting from index 0
 
 ```python
 def canJump(nums):
