@@ -126,7 +126,7 @@ print(maxProduct([-2,3,-4]))       # 24 (subarray [-2,3,-4])
 - Order of elements inside a triplet doesn’t matter.
 
 ```python
-def threeSum(nums):
+def sumOfTriplets(nums):
     nums.sort() # Sort the array 
     res = []
     for i in range(len(nums)-2):
@@ -134,19 +134,19 @@ def threeSum(nums):
         l, r = i+1, len(nums)-1 # the two pointers
         while l < r:
             s = nums[i] + nums[l] + nums[r]
-            if s == 0:
+            if s == 0: # check if sum is equal to zero or target K
                 res.append([nums[i], nums[l], nums[r]])
                 l += 1; r -= 1
-                # Skip duplicates for left & right
+                # Skip duplicates for left & right 
                 while l < r and nums[l] == nums[l-1]: l += 1
                 while l < r and nums[r] == nums[r+1]: r -= 1
-            elif s < 0: # move right
+            elif s < 0: # move right if sum is less than target
                 l += 1
             else:  # move left
                 r -= 1
     return res
 
-print(threeSum([-1,0,1,2,-1,-4]))  
+print(sumOfTriplets([-1,0,1,2,-1,-4]))  
 # [[-1,-1,2], [-1,0,1]]
 ```
 
@@ -154,7 +154,29 @@ print(threeSum([-1,0,1,2,-1,-4]))
 
 ## 6. **Binary Search**
 
-Example: Search in Rotated Sorted Array
+- Example : rotate an array
+
+```python
+# arr [1,2,3,4,5] k : 3
+# 1.   reverse all         [5,4,3,2,1]
+# 2.   reverse k           [3,4,5,2,1]
+# 3.   reverse remaining   [3,4,5,1,2]
+def rotatearray(arr,k) :
+    
+    n=len(arr)
+    k=k % n
+    reverse(arr,0, n-1)
+    reverse(arr,0,k-1 )
+    reverse(arr,k,n-1)
+
+def reverse(arr,start,end):
+    while start < end :
+        arr[start] , arr[end] = arr[end] , arr[start]
+        start +=1
+        end -=1
+```  
+
+- Example: Search in Rotated Sorted Array
 
 ```python
 def search(nums, target):
@@ -163,7 +185,7 @@ def search(nums, target):
         mid = (l+r)//2
         if nums[mid] == target:
             return mid
-        if nums[l] <= nums[mid]:  # left sorted
+        if nums[l] <= nums[mid]:  # left is sorted
             if nums[l] <= target < nums[mid]:
                 r = mid-1
             else:
@@ -185,7 +207,7 @@ print(search([4,5,6,7,0,1,2], 0))  # 4
 Example:  Sum of two numbers matching the target
 
 ```python
-def twoSum(nums, target):
+def sumOfTwo(nums, target):
     seen = {} #hash table 
     for i, num in enumerate(nums):
         if target - num in seen:
@@ -193,7 +215,7 @@ def twoSum(nums, target):
         seen[num] = i
     return []
 
-print(twoSum([2,7,11,15], 9))  # [0,1]
+print(sumOfTwo([2,7,11,15], 9))  # [0,1]
 ```
 
 ---
