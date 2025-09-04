@@ -339,16 +339,94 @@ print(m.sumRegion(2,1,4,3))  # 8
 ```
 
 ---
+## 13. Find Missing Number
+- list of Natural numbers from 1 to n is missing one element , find it
+- Using formula of sum of first n natual numbers
+```python
+def missing_number(nums):
+    n = len(nums) + 1            # expected array size should be one more than current 
+    expected = n * (n + 1) // 2  # find expected sum using formula of sum of n natural numbers 
+    actual = sum(nums)           # get the sum of current list
+    return expected - actual     # number is expected sum minus current sum  
+
+print(missing_number([1,2,4,5,6]))  # 3
+
+``` 
+- Using XOR
+```python
+def missing_number_xor(nums):
+    n = len(nums) + 1  # expected count of numbers is one more than the current size 
+    xor_all = 0
+    xor_nums = 0
+    
+    # find XOR of first n natual numbers 
+    for i in range(1, n+1):
+        xor_all ^= i
+    
+    # find XOR of numbers in array
+    for num in nums:
+        xor_nums ^= num
+    # missing number is XOR is cumulative current XOS and expected XOR
+    return xor_all ^ xor_nums
+
+print(missing_number_xor([1,2,4,5,6]))  # 3
+
+```
+---
+
+## 14. Find Duplicate Number : 
+Given an array nums containing n+1 integers, where each integer is between 1 and n inclusive, find the duplicate number.
+- 1. Using Hashing
+```python
+def findDuplicate_hash(nums):
+    seen = set() # Hash set 
+    for num in nums:
+        if num in seen:
+            return num
+        seen.add(num)
+    return -1  
+
+print(findDuplicate_hash([3,1,3,4,2]))  # 3
+```
+- 2. Using Floyd’s Tortoise & Hare
+- Use 2 pointers , one fast and other slow
+```python
+def findDuplicate(nums):
+    # Phase 1: Detect intersection point
+    slow = nums[0]
+    fast = nums[0]
+
+    while True:
+        slow = nums[slow]
+        fast = nums[nums[fast]] # since the largest element is n and size of array is n+1
+        if slow == fast:
+            break
+
+    # Phase 2: Find entrance to the cycle (duplicate number)
+    slow = nums[0]
+    while slow != fast:
+        slow = nums[slow]
+        fast = nums[fast]
+
+    return slow
+
+
+# Example
+print(findDuplicate([3,1,3,4,2]))  # 3
+
+```
+
+---
 #  ** Most Common Array Algorithm Questions**
 
 ## 1. **Searching & Sorting**
 
-* **Find the missing number** in `1…n` (sum or XOR method).
-* **Find the duplicate number** (Floyd’s cycle detection / Hashing).
-* **Binary Search** in a sorted array. 
-* **Search in rotated sorted array**. ( Binary Search )
-* ** Sum of Two Numbers ** (Hash Table).
-* ** Sum of Triplets ** (two pointers).
+* **Find the missing number** in `1…n` (sum or XOR method).   ✅ 
+* **Find the duplicate number** (Floyd’s cycle detection / Hashing). 
+* **Binary Search** in a sorted array.   ✅ 
+* **Search in rotated sorted array**. ( Binary Search )  ✅ 
+* ** Sum of Two Numbers ** (Hash Table).  ✅ 
+* ** Sum of Triplets ** (two pointers).  ✅ 
 * **Merge Intervals**.
 * **Sort Colors (Dutch National Flag problem)**.
 
