@@ -415,30 +415,125 @@ def findDuplicate(nums):
 print(findDuplicate([3,1,3,4,2]))  # 3
 
 ```
+---
+## 14. Merge intervals 
+Input [1,4] [2,5]
+Output [1,5]
+```python
+def merge(intervals):
+    # Step 1: sort intervals by start time
+    intervals.sort(key=lambda x: x[0])
+    merged = []
+
+    for interval in intervals:
+        # If merged is empty OR no overlap → add interval
+        if not merged or merged[-1][1] < interval[0]:
+            merged.append(interval)
+        else:
+            # Overlap → merge by updating the end time
+            merged[-1][1] = max(merged[-1][1], interval[1])
+
+    return merged
+
+```
+## 15. Equilibrium Index :
+Given a List of n numbers equilibrium index is an index such that sum of elements to the left of the index is equal to sum of elements to the right of index
+```python
+def equilibrium_index(arr):
+    total_sum = sum(arr)
+    left_sum = 0
+
+    for i, num in enumerate(arr):
+        # right sum = total - left - current
+        right_sum = total_sum - left_sum - num
+        if left_sum == right_sum:
+            return i
+        left_sum += num
+    
+    return -1  # if no equilibrium index exists
+
+```
+---
+## 16. Dutch National Flag Problem
+- You are given an array nums with values only 0, 1, and 2 Sort them in-place   so that all 0’s come first, then 1’s, then 2’s.
+```python
+def sortColors( nums):
+    """
+    :type nums: List[int]
+    :rtype: None Do not return anything, modify nums in-place instead.
+    """
+    n = len(nums)
+    l=0 # two pointers
+    r=n-1
+    i=0
+    while l <= i <= r :
+        if nums[i] == 0 :
+            nums[l], nums[i] = nums[i] , nums[l]
+            l+=1
+            i+=1
+        elif nums[i] == 2 :
+            nums[r], nums[i] = nums[i] , nums[r]
+            r -=1
+        else :
+            i+=1
+```
+---
+## 17. Trapping Rain water 
+Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.
+```python
+def trap(height):
+    if not height:
+        return 0
+
+    left, right = 0, len(height) - 1
+    left_max, right_max = 0, 0
+    water = 0
+
+    while left < right:
+        if height[left] < height[right]:
+            if height[left] >= left_max:
+                left_max = height[left]
+            else:
+                water += left_max - height[left]
+            left += 1
+        else:
+            if height[right] >= right_max:
+                right_max = height[right]
+            else:
+                water += right_max - height[right]
+            right -= 1
+
+    return water
+
+
+# Example usage
+heights = [0,1,0,2,1,0,1,3,2,1,2,1]
+print("Trapped Water:", trap(heights))  # Output: 6
+```
 
 ---
 #  ** Most Common Array Algorithm Questions**
 
 ## 1. **Searching & Sorting**
 
-* **Find the missing number** in `1…n` (sum or XOR method).   ✅ 
-* **Find the duplicate number** (Floyd’s cycle detection / Hashing). 
-* **Binary Search** in a sorted array.   ✅ 
-* **Search in rotated sorted array**. ( Binary Search )  ✅ 
-* ** Sum of Two Numbers ** (Hash Table).  ✅ 
-* ** Sum of Triplets ** (two pointers).  ✅ 
-* **Merge Intervals**.
-* **Sort Colors (Dutch National Flag problem)**.
+* **Find the missing number** in `1…n` (sum or XOR method).          ✅ 
+* **Find the duplicate number** (Floyd’s cycle detection / Hashing). ✅
+* **Binary Search** in a sorted array.                               ✅ 
+* **Search in rotated sorted array**. ( Binary Search )              ✅ 
+* ** Sum of Two Numbers ** (Hash Table).                             ✅ 
+* ** Sum of Triplets ** (two pointers).                              ✅ 
+* **Merge Intervals**.                                               ✅ 
+* **Sort Colors (Dutch National Flag problem)**.                     ✅ 
 
 ---
 
 ## 2. **Prefix Sum & Subarray**
 
-* **Maximum Subarray Sum** (Kadane’s algorithm).
-* **Subarray Sum Equals K** (Prefix sum + HashMap).
-* **Maximum Product Subarray**.
-* **Equilibrium index** (left sum = right sum).
-* **Rainwater Trapping** (prefix max + suffix max / 2 pointers).
+* **Maximum Subarray Sum** (Kadane’s algorithm).                      ✅ 
+* **Subarray Sum Equals K** (Prefix sum + Hash Table).                ✅ 
+* **Maximum Product Subarray**.                                       ✅          
+* **Equilibrium index** (left sum = right sum).                       ✅
+* **Rainwater Trapping** (prefix max + suffix max / 2 pointers).      ⌛
 
 ---
 
