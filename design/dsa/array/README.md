@@ -1,10 +1,10 @@
-Perfect 👍 — array problems are some of the **most common algorithm interview questions** because arrays are fundamental and allow testing **time complexity, data structures, and problem-solving techniques**.
+array problems are some of the **most common algorithm interview questions** because arrays are fundamental and allow testing **time complexity, data structures, and problem-solving techniques**.
 
-Here’s a **curated list of the most common array algorithm questions**, grouped by concept 👇
+Here’s a **curated list of the most common array algorithm questions**, grouped by concept 
 
 ---
 
-# 🔥 **Most Common Array Algorithm Questions**
+#  **Most Common Array Algorithm Questions**
 
 ## 1. **Searching & Sorting**
 
@@ -77,7 +77,7 @@ Here’s a **curated list of the most common array algorithm questions**, groupe
 
 ---
 
-# 📊 Summary Table
+# Summary Table
 
 | Category                | Common Questions                                                           |
 | ----------------------- | -------------------------------------------------------------------------- |
@@ -91,15 +91,15 @@ Here’s a **curated list of the most common array algorithm questions**, groupe
 
 ---
 
-👉 Most interviews pick **medium-level problems** like **Two Sum, Kadane’s, Rainwater Trapping, Rotate Matrix, Kth Largest, Longest Substring Without Repeating Characters**.
+Most interviews pick **medium-level problems** like **Two Sum, Kadane’s, Rainwater Trapping, Rotate Matrix, Kth Largest, Longest Substring Without Repeating Characters**.
 
-Great question 👍 — arrays are probably the **most common data structure** in coding interviews, and there are several “go-to” algorithmic techniques you’ll see repeatedly.
+arrays are probably the **most common data structure** in coding interviews, and there are several “go-to” algorithmic techniques you’ll see repeatedly.
 
 Here’s a structured list:
 
 ---
 
-# 🔑 Common Algorithms & Techniques for Array Problems
+#  Common Algorithms & Techniques for Array Problems
 
 ### 1. **Two-Pointer Technique**
 
@@ -245,7 +245,7 @@ Here’s a structured list:
 
 ---
 
-✅ **Quick Table Summary**
+**Quick Table Summary**
 
 | Technique           | Typical Problems                          |
 | ------------------- | ----------------------------------------- |
@@ -260,9 +260,7 @@ Here’s a structured list:
 
 ---
 
-👉 Do you want me to also give you **one easy → medium → hard LeetCode example for each technique** (with short explanations), so you can directly practice in increasing order?
-
-Perfect 🚀 — let’s go through **each common array algorithm/technique** with a **Python code example** (easy-to-follow). I’ll keep each example short and well-commented so you can see the **pattern**.
+let’s go through **each common array algorithm/technique** with a **Python code example** (easy-to-follow).  each example short and well-commented so you can see the **pattern**.
 
 ---
 
@@ -272,7 +270,7 @@ Perfect 🚀 — let’s go through **each common array algorithm/technique** wi
 
 ## 1. **Two Pointers**
 
-Example: Move Zeroes
+Example: Move Zeroes ( in place )
 
 ```python
 def moveZeroes(nums):
@@ -370,9 +368,9 @@ print(maxProduct([-2,3,-4]))       # 24 (subarray [-2,3,-4])
 
 ---
 
-## 5. **Sorting + Two Pointers**
+## 5. **Sorting and  Two Pointers**
 
-### Example: 3Sum
+### Example: Sum of Triplets
 - Given an integer array nums, return all unique triplets [a, b, c] such that: ```a+b+c = 0```
 - Triplets should not repeat.
 - Order of elements inside a triplet doesn’t matter.
@@ -434,11 +432,11 @@ print(search([4,5,6,7,0,1,2], 0))  # 4
 
 ## 7. **Hashing**
 
-Example: Two Sum
+Example:  Sum of two numbers matching the target
 
 ```python
 def twoSum(nums, target):
-    seen = {}
+    seen = {} #hash table 
     for i, num in enumerate(nums):
         if target - num in seen:
             return [seen[target-num], i]
@@ -452,7 +450,7 @@ print(twoSum([2,7,11,15], 9))  # [0,1]
 
 ## 8. **Greedy**
 
-Example: Jump Game
+Example: Jump Game - can be solved by greedy algorithm as well as dynamic programming 
 
 ```python
 def canJump(nums):
@@ -507,9 +505,12 @@ def nextGreater(nums):
     res = [-1]*len(nums)
     stack = []
     for i in range(len(nums)):
-        while stack and nums[i] > nums[stack[-1]]:
+        while stack and nums[i] > nums[stack[-1]]: 
+# loop till current number is greater than previous number 
             res[stack.pop()] = nums[i]
+# next greater number found for previous index
         stack.append(i)
+# loop by adding next index of array to the stack one at a time
     return res
 
 print(nextGreater([2,1,2,4,3]))  # [4,2,4,-1,-1]
