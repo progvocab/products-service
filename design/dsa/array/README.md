@@ -280,7 +280,7 @@ def nextGreater(nums):
     stack = []
     for i in range(len(nums)):
         while stack and nums[i] > nums[stack[-1]]: 
-# loop till current number is greater than previous number 
+# loop till current number is greater than previous numbers
             res[stack.pop()] = nums[i]
 # next greater number found for previous index
         stack.append(i)
@@ -295,6 +295,10 @@ print(nextGreater([2,1,2,4,3]))  # [4,2,4,-1,-1]
 ## 11. **Dynamic Programming**
 
 Example: Longest Increasing Subsequence (LIS)
+- Subsequence is derived from a sequence , by removing any or none elements . [7,2,3,4,5] -> [7,2,4] or [7,2,5] or [7.3.5]
+- Elements in Subsequence should follow the same order as the Sequence .
+- For Increasing subsequence the current element should be greter than previous element [7,2,3,4,5] -> [ 2,4] or [ 2,5] or [ 3.5]
+- Longest Increasing Subsequence [2,3,4,5]
 
 ```python
 def lengthOfLIS(nums):
