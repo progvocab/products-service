@@ -3,6 +3,313 @@ array problems are some of the **most common algorithm interview questions** bec
 Here’s a **curated list of the most common array algorithm questions**, grouped by concept 
 
 ---
+# 🔑 Common Array Algorithms with Python Examples
+
+---
+
+## 1. **Two Pointers**
+
+Example: Move Zeroes ( in place )
+
+```python
+def moveZeroes(nums):
+    left = 0
+    for right in range(len(nums)):
+        if nums[right] != 0:
+            nums[left], nums[right] = nums[right], nums[left]
+            left += 1
+    return nums
+
+print(moveZeroes([0,1,0,3,12]))  # [1,3,12,0,0]
+```
+
+---
+
+## 2. **Sliding Window**
+
+Example: Maximum sum subarray of size k
+
+```python
+def maxSubarraySum(nums, k):
+    window_sum = sum(nums[:k])
+# find the sum of all elements in the array
+    max_sum = window_sum
+    for i in range(k, len(nums)):
+        window_sum += nums[i] - nums[i-k]
+# find the window sum by adding current element and removing element before the window
+        max_sum = max(max_sum, window_sum)
+# check if the current window sum is greater than earlier window sums
+    return max_sum
+
+print(maxSubarraySum([1,2,3,4,5,6], 3))  # 15
+```
+
+---
+
+## 3. **Prefix Sum**
+
+Example: Count of Subarray Sum which Equals K
+
+```python
+def subarraySum(nums, k):
+    prefix_sum = 0
+    count = 0
+    seen = {0: 1}
+# # prefix sum count hash table
+    for num in nums:
+        prefix_sum += num 
+        count += seen.get(prefix_sum - k, 0)
+# check if there is any prefix sum which when excluded from total sum till now will match the target
+# if yes count how many are there
+        seen[prefix_sum] = seen.get(prefix_sum, 0) + 1
+#add new prefix sum entry or update the count of existing prefix sum entry in hash table 
+    return count
+
+print(subarraySum([1,1,1], 2))  # 2
+# input  array  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# target 5
+# prefix sum hash table : {0: 1, 1: 1, 3: 1, 6: 1, 10: 1, 15: 1, 21: 1, 28: 1, 36: 1, 45: 1, 55: 1}
+# number of Subarray Sum which Equals target is 2 - 2,3 and 1,4
+```
+
+---
+
+## 4. **Kadane’s Algorithm**
+
+Example: Maximum Subarray
+
+```python
+def maxSubArray(nums):
+    curr_sum = max_sum = nums[0]
+    for num in nums[1:]:
+        curr_sum = max(num, curr_sum + num)
+        max_sum = max(max_sum, curr_sum)
+    return max_sum
+
+print(maxSubArray([-2,1,-3,4,-1,2,1,-5,4]))  # 6
+```
+### Maximum Product Subarray is a classic array DP problem
+
+```python
+def maxProduct(nums):
+    if not nums:
+        return 0
+    
+    max_prod = min_prod = result = nums[0]
+    
+    for num in nums[1:]:
+        # if num is negative, swap max and min
+        if num < 0:
+            max_prod, min_prod = min_prod, max_prod
+        
+        max_prod = max(num, num * max_prod)
+        min_prod = min(num, num * min_prod)
+        
+        result = max(result, max_prod)
+    
+    return result
+
+
+# Example usage
+print(maxProduct([2,3,-2,4]))      # 6 (subarray [2,3])
+print(maxProduct([-2,0,-1]))       # 0 (subarray [0])
+print(maxProduct([-2,3,-4]))       # 24 (subarray [-2,3,-4])
+```
+
+---
+
+## 5. **Sorting and  Two Pointers**
+
+### Example: Sum of Triplets
+- Given an integer array nums, return all unique triplets [a, b, c] such that: ```a+b+c = 0```
+- Triplets should not repeat.
+- Order of elements inside a triplet doesn’t matter.
+
+```python
+def threeSum(nums):
+    nums.sort() # Sort the array 
+    res = []
+    for i in range(len(nums)-2):
+        if i > 0 and nums[i] == nums[i-1]: continue
+        l, r = i+1, len(nums)-1 # the two pointers
+        while l < r:
+            s = nums[i] + nums[l] + nums[r]
+            if s == 0:
+                res.append([nums[i], nums[l], nums[r]])
+                l += 1; r -= 1
+                # Skip duplicates for left & right
+                while l < r and nums[l] == nums[l-1]: l += 1
+                while l < r and nums[r] == nums[r+1]: r -= 1
+            elif s < 0: # move right
+                l += 1
+            else:  # move left
+                r -= 1
+    return res
+
+print(threeSum([-1,0,1,2,-1,-4]))  
+# [[-1,-1,2], [-1,0,1]]
+```
+
+---
+
+## 6. **Binary Search**
+
+Example: Search in Rotated Sorted Array
+
+```python
+def search(nums, target):
+    l, r = 0, len(nums)-1
+    while l <= r:
+        mid = (l+r)//2
+        if nums[mid] == target:
+            return mid
+        if nums[l] <= nums[mid]:  # left sorted
+            if nums[l] <= target < nums[mid]:
+                r = mid-1
+            else:
+                l = mid+1
+        else:  # right sorted
+            if nums[mid] < target <= nums[r]:
+                l = mid+1
+            else:
+                r = mid-1
+    return -1
+
+print(search([4,5,6,7,0,1,2], 0))  # 4
+```
+
+---
+
+## 7. **Hashing**
+
+Example:  Sum of two numbers matching the target
+
+```python
+def twoSum(nums, target):
+    seen = {} #hash table 
+    for i, num in enumerate(nums):
+        if target - num in seen:
+            return [seen[target-num], i]
+        seen[num] = i
+    return []
+
+print(twoSum([2,7,11,15], 9))  # [0,1]
+```
+
+---
+
+## 8. **Greedy**
+
+Example: Jump Game - can be solved by greedy algorithm as well as dynamic programming 
+
+```python
+def canJump(nums):
+    max_reach = 0
+    for i, num in enumerate(nums):
+        if i > max_reach:
+            return False
+        max_reach = max(max_reach, i+num)
+    return True
+
+print(canJump([2,3,1,1,4]))  # True
+```
+
+---
+
+## 9. **Divide & Conquer**
+
+Example: Maximum Subarray (recursive)
+
+```python
+def maxCrossingSum(nums, l, m, r):
+    left_sum = right_sum = float('-inf')
+    s = 0
+    for i in range(m, l-1, -1):
+        s += nums[i]
+        left_sum = max(left_sum, s)
+    s = 0
+    for i in range(m+1, r+1):
+        s += nums[i]
+        right_sum = max(right_sum, s)
+    return left_sum + right_sum
+
+def maxSubArray(nums):
+    def helper(l, r):
+        if l == r:
+            return nums[l]
+        m = (l+r)//2
+        return max(helper(l,m), helper(m+1,r), maxCrossingSum(nums,l,m,r))
+    return helper(0, len(nums)-1)
+
+print(maxSubArray([-2,1,-3,4,-1,2,1,-5,4]))  # 6
+```
+
+---
+
+## 10. **Monotonic Stack**
+
+Example: Next Greater Element
+
+```python
+def nextGreater(nums):
+    res = [-1]*len(nums)
+    stack = []
+    for i in range(len(nums)):
+        while stack and nums[i] > nums[stack[-1]]: 
+# loop till current number is greater than previous number 
+            res[stack.pop()] = nums[i]
+# next greater number found for previous index
+        stack.append(i)
+# loop by adding next index of array to the stack one at a time
+    return res
+
+print(nextGreater([2,1,2,4,3]))  # [4,2,4,-1,-1]
+```
+
+---
+
+## 11. **Dynamic Programming**
+
+Example: Longest Increasing Subsequence (LIS)
+
+```python
+def lengthOfLIS(nums):
+    dp = [1]*len(nums)
+    for i in range(len(nums)):
+        for j in range(i):
+            if nums[j] < nums[i]:
+                dp[i] = max(dp[i], dp[j]+1)
+    return max(dp)
+
+print(lengthOfLIS([10,9,2,5,3,7,101,18]))  # 4
+```
+
+---
+
+## 12. **2D Array / Matrix Extension**
+
+Example: 2D Prefix Sum (sumRegion query)
+
+```python
+class NumMatrix:
+    def __init__(self, matrix):
+        m, n = len(matrix), len(matrix[0])
+        self.prefix = [[0]*(n+1) for _ in range(m+1)]
+        for i in range(m):
+            for j in range(n):
+                self.prefix[i+1][j+1] = matrix[i][j] + self.prefix[i][j+1] + self.prefix[i+1][j] - self.prefix[i][j]
+
+    def sumRegion(self, r1, c1, r2, c2):
+        return self.prefix[r2+1][c2+1] - self.prefix[r1][c2+1] - self.prefix[r2+1][c1] + self.prefix[r1][c1]
+
+m = NumMatrix([[3,0,1,4,2],[5,6,3,2,1],[1,2,0,1,5],[4,1,0,1,7],[1,0,3,0,5]])
+print(m.sumRegion(2,1,4,3))  # 8
+```
+
+---
+
+✅ Now you have **12 core techniques + examples**.
+
 
 #  **Most Common Array Algorithm Questions**
 
@@ -264,301 +571,7 @@ let’s go through **each common array algorithm/technique** with a **Python cod
 
 ---
 
-# 🔑 Common Array Algorithms with Python Examples
 
----
-
-## 1. **Two Pointers**
-
-Example: Move Zeroes ( in place )
-
-```python
-def moveZeroes(nums):
-    left = 0
-    for right in range(len(nums)):
-        if nums[right] != 0:
-            nums[left], nums[right] = nums[right], nums[left]
-            left += 1
-    return nums
-
-print(moveZeroes([0,1,0,3,12]))  # [1,3,12,0,0]
-```
-
----
-
-## 2. **Sliding Window**
-
-Example: Maximum sum subarray of size k
-
-```python
-def maxSubarraySum(nums, k):
-    window_sum = sum(nums[:k])
-    max_sum = window_sum
-    for i in range(k, len(nums)):
-        window_sum += nums[i] - nums[i-k]
-        max_sum = max(max_sum, window_sum)
-    return max_sum
-
-print(maxSubarraySum([1,2,3,4,5,6], 3))  # 15
-```
-
----
-
-## 3. **Prefix Sum**
-
-Example: Subarray Sum Equals K
-
-```python
-def subarraySum(nums, k):
-    prefix_sum = 0
-    count = 0
-    seen = {0: 1}
-    for num in nums:
-        prefix_sum += num
-        count += seen.get(prefix_sum - k, 0)
-        seen[prefix_sum] = seen.get(prefix_sum, 0) + 1
-    return count
-
-print(subarraySum([1,1,1], 2))  # 2
-```
-
----
-
-## 4. **Kadane’s Algorithm**
-
-Example: Maximum Subarray
-
-```python
-def maxSubArray(nums):
-    curr_sum = max_sum = nums[0]
-    for num in nums[1:]:
-        curr_sum = max(num, curr_sum + num)
-        max_sum = max(max_sum, curr_sum)
-    return max_sum
-
-print(maxSubArray([-2,1,-3,4,-1,2,1,-5,4]))  # 6
-```
-### Maximum Product Subarray is a classic array DP problem
-
-```python
-def maxProduct(nums):
-    if not nums:
-        return 0
-    
-    max_prod = min_prod = result = nums[0]
-    
-    for num in nums[1:]:
-        # if num is negative, swap max and min
-        if num < 0:
-            max_prod, min_prod = min_prod, max_prod
-        
-        max_prod = max(num, num * max_prod)
-        min_prod = min(num, num * min_prod)
-        
-        result = max(result, max_prod)
-    
-    return result
-
-
-# Example usage
-print(maxProduct([2,3,-2,4]))      # 6 (subarray [2,3])
-print(maxProduct([-2,0,-1]))       # 0 (subarray [0])
-print(maxProduct([-2,3,-4]))       # 24 (subarray [-2,3,-4])
-```
-
----
-
-## 5. **Sorting and  Two Pointers**
-
-### Example: Sum of Triplets
-- Given an integer array nums, return all unique triplets [a, b, c] such that: ```a+b+c = 0```
-- Triplets should not repeat.
-- Order of elements inside a triplet doesn’t matter.
-
-```python
-def threeSum(nums):
-    nums.sort() # Sort the array 
-    res = []
-    for i in range(len(nums)-2):
-        if i > 0 and nums[i] == nums[i-1]: continue
-        l, r = i+1, len(nums)-1 # the two pointers
-        while l < r:
-            s = nums[i] + nums[l] + nums[r]
-            if s == 0:
-                res.append([nums[i], nums[l], nums[r]])
-                l += 1; r -= 1
-                # Skip duplicates for left & right
-                while l < r and nums[l] == nums[l-1]: l += 1
-                while l < r and nums[r] == nums[r+1]: r -= 1
-            elif s < 0: # move right
-                l += 1
-            else:  # move left
-                r -= 1
-    return res
-
-print(threeSum([-1,0,1,2,-1,-4]))  
-# [[-1,-1,2], [-1,0,1]]
-```
-
----
-
-## 6. **Binary Search**
-
-Example: Search in Rotated Sorted Array
-
-```python
-def search(nums, target):
-    l, r = 0, len(nums)-1
-    while l <= r:
-        mid = (l+r)//2
-        if nums[mid] == target:
-            return mid
-        if nums[l] <= nums[mid]:  # left sorted
-            if nums[l] <= target < nums[mid]:
-                r = mid-1
-            else:
-                l = mid+1
-        else:  # right sorted
-            if nums[mid] < target <= nums[r]:
-                l = mid+1
-            else:
-                r = mid-1
-    return -1
-
-print(search([4,5,6,7,0,1,2], 0))  # 4
-```
-
----
-
-## 7. **Hashing**
-
-Example:  Sum of two numbers matching the target
-
-```python
-def twoSum(nums, target):
-    seen = {} #hash table 
-    for i, num in enumerate(nums):
-        if target - num in seen:
-            return [seen[target-num], i]
-        seen[num] = i
-    return []
-
-print(twoSum([2,7,11,15], 9))  # [0,1]
-```
-
----
-
-## 8. **Greedy**
-
-Example: Jump Game - can be solved by greedy algorithm as well as dynamic programming 
-
-```python
-def canJump(nums):
-    max_reach = 0
-    for i, num in enumerate(nums):
-        if i > max_reach:
-            return False
-        max_reach = max(max_reach, i+num)
-    return True
-
-print(canJump([2,3,1,1,4]))  # True
-```
-
----
-
-## 9. **Divide & Conquer**
-
-Example: Maximum Subarray (recursive)
-
-```python
-def maxCrossingSum(nums, l, m, r):
-    left_sum = right_sum = float('-inf')
-    s = 0
-    for i in range(m, l-1, -1):
-        s += nums[i]
-        left_sum = max(left_sum, s)
-    s = 0
-    for i in range(m+1, r+1):
-        s += nums[i]
-        right_sum = max(right_sum, s)
-    return left_sum + right_sum
-
-def maxSubArray(nums):
-    def helper(l, r):
-        if l == r:
-            return nums[l]
-        m = (l+r)//2
-        return max(helper(l,m), helper(m+1,r), maxCrossingSum(nums,l,m,r))
-    return helper(0, len(nums)-1)
-
-print(maxSubArray([-2,1,-3,4,-1,2,1,-5,4]))  # 6
-```
-
----
-
-## 10. **Monotonic Stack**
-
-Example: Next Greater Element
-
-```python
-def nextGreater(nums):
-    res = [-1]*len(nums)
-    stack = []
-    for i in range(len(nums)):
-        while stack and nums[i] > nums[stack[-1]]: 
-# loop till current number is greater than previous number 
-            res[stack.pop()] = nums[i]
-# next greater number found for previous index
-        stack.append(i)
-# loop by adding next index of array to the stack one at a time
-    return res
-
-print(nextGreater([2,1,2,4,3]))  # [4,2,4,-1,-1]
-```
-
----
-
-## 11. **Dynamic Programming**
-
-Example: Longest Increasing Subsequence (LIS)
-
-```python
-def lengthOfLIS(nums):
-    dp = [1]*len(nums)
-    for i in range(len(nums)):
-        for j in range(i):
-            if nums[j] < nums[i]:
-                dp[i] = max(dp[i], dp[j]+1)
-    return max(dp)
-
-print(lengthOfLIS([10,9,2,5,3,7,101,18]))  # 4
-```
-
----
-
-## 12. **2D Array / Matrix Extension**
-
-Example: 2D Prefix Sum (sumRegion query)
-
-```python
-class NumMatrix:
-    def __init__(self, matrix):
-        m, n = len(matrix), len(matrix[0])
-        self.prefix = [[0]*(n+1) for _ in range(m+1)]
-        for i in range(m):
-            for j in range(n):
-                self.prefix[i+1][j+1] = matrix[i][j] + self.prefix[i][j+1] + self.prefix[i+1][j] - self.prefix[i][j]
-
-    def sumRegion(self, r1, c1, r2, c2):
-        return self.prefix[r2+1][c2+1] - self.prefix[r1][c2+1] - self.prefix[r2+1][c1] + self.prefix[r1][c1]
-
-m = NumMatrix([[3,0,1,4,2],[5,6,3,2,1],[1,2,0,1,5],[4,1,0,1,7],[1,0,3,0,5]])
-print(m.sumRegion(2,1,4,3))  # 8
-```
-
----
-
-✅ Now you have **12 core techniques + examples**.
 
 👉 Do you want me to also prepare a **progressive practice plan** (easy → medium → hard LeetCode problems mapped to these techniques) so you can study them step by step?
 
