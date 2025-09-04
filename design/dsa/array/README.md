@@ -303,9 +303,13 @@ Example: Longest Increasing Subsequence (LIS)
 ```python
 def lengthOfLIS(nums):
     dp = [1]*len(nums)
+    # each element in array has LIS as 1 initially
     for i in range(len(nums)):
         for j in range(i):
             if nums[j] < nums[i]:
+    # pick an element and traverse to that from the first element
+    # if current element is less than the picked element LIS of picked element extends the LIS of current element 
+    # If the LIS of current element it is greater previous LIS of picked element 
                 dp[i] = max(dp[i], dp[j]+1)
     return max(dp)
 
@@ -335,20 +339,16 @@ print(m.sumRegion(2,1,4,3))  # 8
 ```
 
 ---
-
-✅ Now you have **12 core techniques + examples**.
-
-
-#  **Most Common Array Algorithm Questions**
+#  ** Most Common Array Algorithm Questions**
 
 ## 1. **Searching & Sorting**
 
 * **Find the missing number** in `1…n` (sum or XOR method).
 * **Find the duplicate number** (Floyd’s cycle detection / Hashing).
-* **Binary Search** in a sorted array.
-* **Search in rotated sorted array**.
-* **Two Sum** (hashmap).
-* **Three Sum** (two pointers).
+* **Binary Search** in a sorted array. 
+* **Search in rotated sorted array**. ( Binary Search )
+* ** Sum of Two Numbers ** (Hash Table).
+* ** Sum of Triplets ** (two pointers).
 * **Merge Intervals**.
 * **Sort Colors (Dutch National Flag problem)**.
 
