@@ -49,7 +49,14 @@ Output:
 ---
 
 ## **Example 2 — Most Common Word (LeetCode 819)**
+You are given:
 
+- A paragraph (string of text).
+
+- A list of banned words.
+
+You need to find the most frequent word in the paragraph that is not in the banned list.
+Ignore capitalization and punctuation.
 ```python
 import re
 from collections import Counter
