@@ -66,7 +66,32 @@ print(longestCommonPrefix(["dog","racecar","car"]))     # ""
 
 ```
 ---
+## 3. Matching Bracket 
 
+```python 
+
+def isValid(s: str) -> bool:
+    # mapping of closing to opening
+    mapping = {')': '(', '}': '{', ']': '['}
+    stack = []
+
+    for ch in s:
+        if ch in mapping:  # if it's a closing bracket
+            # pop from stack if not empty, else assign dummy
+            top = stack.pop() if stack else '#'
+            if mapping[ch] != top:
+                return False
+        else:
+            # it's an opening bracket
+            stack.append(ch)
+
+    # valid only if stack is empty
+    return not stack
+
+
+```
+
+---
 # 🔹 Classic String Algorithm Questions
 
 | #  | Problem                                            | Key Idea / Algorithm                                 |   Status   |
