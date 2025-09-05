@@ -80,12 +80,17 @@ Output:
 
 ## **Example 3 — Groups of Special-Equivalent Strings (LeetCode 893)**
 
+You are given an array of strings words.
+Two strings are special-equivalent if, after any number of swaps of characters at even indices or swaps of characters at odd indices, the two strings become equal.
+
+Return the number of groups of special-equivalent strings.
+
 ```python
 def numSpecialEquivGroups(words):
     seen = set()
     for w in words:
-        even = sorted(w[::2])
-        odd = sorted(w[1::2])
+        even = sorted(w[::2]) # two step at a time 
+        odd = sorted(w[1::2]) 
         seen.add(("".join(even), "".join(odd)))  # canonical form
     return len(seen)
 
