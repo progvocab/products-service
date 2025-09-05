@@ -90,21 +90,75 @@ def isValid(s: str) -> bool:
 
 
 ```
+---
+## 4. Levenshtein Distance 
+- Time: O(m × n)
+- Space: O(m × n)
+Given two strings word1 and word2, return the minimum number of operations required to convert word1 into word2.
+Allowed operations:
+- Insert a character
+- Delete a character
+- Replace a character
+```python
+def minDistance(word1: str, word2: str) -> int:
+    m, n = len(word1), len(word2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
 
+    # Base cases
+    for i in range(m + 1):
+        dp[i][0] = i
+    for j in range(n + 1):
+        dp[0][j] = j
+
+    # Fill DP table
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if word1[i - 1] == word2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1]
+            else:
+                dp[i][j] = 1 + min(
+                    dp[i - 1][j],     # delete
+                    dp[i][j - 1],     # insert
+                    dp[i - 1][j - 1]  # replace
+                )
+
+    return dp[m][n]
+
+```
+---
+5. Longest Common Subsequence
+Given two strings text1 and text2, return the length of their longest common subsequence (LCS).
+- A subsequence is a sequence derived from another string by deleting some or no characters without changing the order of the remaining characters.
+- Unlike substrings, subsequences don’t have to be contiguous.
+```python
+def longestCommonSubsequence(text1: str, text2: str) -> int:
+    m, n = len(text1), len(text2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)] # Dynamic Programming 2D array 
+
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if text1[i - 1] == text2[j - 1]: # if character matches 
+                dp[i][j] = 1 + dp[i - 1][j - 1] # LCS is one more than previous 
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]) #
+
+    return dp[m][n]
+
+```
 ---
 # 🔹 Classic String Algorithm Questions
 
-| #  | Problem                                            | Key Idea / Algorithm                                 |   Status   |
+| #  | Problem                                            | Key Idea / Algorithm                                 | Status |
 | -- | -------------------------------------------------- | ---------------------------------------------------- | ---- |
-| 1  | **Reverse a String / Words in a String**           | Two-pointer, stack, or built-ins.                    |   ✅   |
-| 2  | **Check Palindrome**                               | Two-pointer or reverse check.                        |  ✅    |
-| 3  | **Longest Palindromic Substring**                  | Expand Around Center / DP / Manacher’s Algorithm.    |      |
+| 1  | **Reverse a String / Words in a String**           | Two-pointer, stack, or built-ins.                    |  ✅  |
+| 2  | **Check Palindrome**                               | Two-pointer or reverse check.                        |  ✅  |
+| 3  | **Longest Palindromic Substring**                  | Expand Around Center / DP / Manacher’s Algorithm.    |  ✅  |
 | 4  | **Longest Common Prefix**                          | Horizontal/Vertical Scanning, Trie.                  |      |
 | 5  | **Anagram Check**                                  | Sorting or HashMap (character counts).               |      |
-| 6  | **Group Anagrams**                                 | HashMap with sorted string / frequency tuple as key. |      |
-| 7  | **Valid Parentheses**                              | Stack for bracket matching.                          |      |
+| 6  | **Group Anagrams**                                 | HashMap with sorted string / frequency tuple as key. |  ✅    |
+| 7  | **Valid Parentheses**                              | Stack for bracket matching.                          |  ✅    |
 | 8  | **Implement strStr() (Substring Search)**          | Naïve O(n·m), KMP algorithm, or Rabin-Karp.          |      |
-| 9  | **Longest Common Subsequence**                     | DP (classic DP table).                               |      |
+| 9  | **Longest Common Subsequence**                     | DP (classic DP table).                               |  ✅    |
 | 10 | **Edit Distance (Levenshtein Distance)**           | DP with insert/delete/replace transitions.           |      |
 | 11 | **Minimum Window Substring**                       | Sliding window + HashMap.                            |      |
 | 12 | **Longest Substring Without Repeating Characters** | Sliding window + HashSet/Map.                        |      |
