@@ -53,7 +53,7 @@ def longestCommonPrefix(strs):
     for s in strs[1:]:
         # Reduce prefix until it matches the start of s
         while not s.startswith(prefix):
-            prefix = prefix[:-1]
+            prefix = prefix[:-1] # remove last character 
             if not prefix:
                 return ""
     
