@@ -189,6 +189,29 @@ def min_window(s: str, t: str) -> str:
 ```
 
 ---
+##7 . Zigzag Pattern :
+You are given a string s and a number of rows numRows.
+Write the string in a zigzag pattern across those rows, then read line by line.
+```python
+def convert(s: str, numRows: int) -> str:
+    if numRows == 1 or numRows >= len(s):
+        return s
+    
+    rows = [""] * numRows
+    cur_row, step = 0, 1
+
+    for c in s:
+        rows[cur_row] += c
+        if cur_row == 0:
+            step = 1  # go down
+        elif cur_row == numRows - 1:
+            step = -1  # go up
+        cur_row += step
+    
+    return "".join(rows)
+
+```
+---
 ---
 # 🔹 Classic String Algorithm Questions
 
