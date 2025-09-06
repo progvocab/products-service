@@ -126,7 +126,7 @@ def minDistance(word1: str, word2: str) -> int:
 
 ```
 ---
-5. Longest Common Subsequence
+## 5. Longest Common Subsequence
 Given two strings text1 and text2, return the length of their longest common subsequence (LCS).
 - A subsequence is a sequence derived from another string by deleting some or no characters without changing the order of the remaining characters.
 - Unlike substrings, subsequences don’t have to be contiguous.
@@ -145,6 +145,50 @@ def longestCommonSubsequence(text1: str, text2: str) -> int:
     return dp[m][n]
 
 ```
+---
+## 6. **Minimum Window Substring**  
+Given two strings s and t, find the minimum window substring of s such that every character in t (including duplicates) is included in the window.
+
+```python
+from collections import Counter
+
+def min_window(s: str, t: str) -> str:
+    if not t or not s:
+        return ""
+    
+    t_count = Counter(t)          # Count characters in t "abcabb" -> "a" :2 , "b":3 , "c" :1 
+    window = {}
+    
+    have, need = 0, len(t_count)  # track when window is valid
+    res, res_len = [-1, -1], float("inf")
+    l = 0
+    
+    for r in range(len(s)):
+        c = s[r]
+        window[c] = window.get(c, 0) + 1
+        
+        if c in t_count and window[c] == t_count[c]:
+            have += 1
+        
+        # Shrink window from left
+        while have == need:
+            # Update result if smaller window found
+            if (r - l + 1) < res_len:
+                res = [l, r]
+                res_len = r - l + 1
+            
+            # Pop from left
+            window[s[l]] -= 1
+            if s[l] in t_count and window[s[l]] < t_count[s[l]]:
+                have -= 1
+            l += 1
+    
+    l, r = res
+    return s[l:r+1] if res_len != float("inf") else ""
+
+```
+
+---
 ---
 # 🔹 Classic String Algorithm Questions
 
