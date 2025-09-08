@@ -2,7 +2,27 @@
 
 # 🔹 Minimum Swaps to Sort (Cycle Decomposition Idea)
 
-When sorting an array, each element can be seen as part of a **permutation cycle**.
+- When sorting an array, each element can be seen as part of a **permutation cycle**.
+
+- Every permutation can be uniquely expressed as a product of disjoint cycles meaning every element moves within its own independent cycle. 
+- To find the disjoint cycle decomposition of a permutation, start with an element, trace its path through the permutation until it returns to its starting position, and write this as a cycle.
+- Repeat this process with any remaining elements that haven't been included in a cycle until all elements are accounted for. 
+
+
+the permutation (1 3 2 5)(4 1 3): 
+1. Start with 1:
+From (4 1 3), 1 goes to 4.
+From (1 3 2 5), 4 goes to 3.
+From (4 1 3), 3 goes to nothing in this step.
+From (1 3 2 5), 3 goes to 2.
+From (1 3 2 5), 2 goes to nothing in this step.
+From (4 1 3), 2 goes to nothing in this step.
+From (1 3 2 5), 2 goes to 1.
+So, we have the cycle (1 4 3 2).
+2. Next element: 5:
+From (1 3 2 5), 5 goes to 1. But 1 is already in our cycle.
+So, the element 5 is a fixed point and can be written as the cycle (5).
+Therefore, the disjoint cycle decomposition is (1 4 3 2)(5). 
 
 👉 Key fact:
 A cycle of length `k` can be sorted in **k − 1 swaps**.
