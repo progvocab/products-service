@@ -115,3 +115,124 @@ print(min_swaps_to_sort([2, 3, 4, 1]))   # Output: 3
 ---
 
 👉 Do you want me to also **prove this mathematically** using permutation cycle decomposition (group theory style), not just with examples?
+
+
+This is the **core beauty** of the minimum-swaps-to-sort algorithm 🙂. Let’s carefully unpack **why just visiting unvisited elements (and counting cycles) is enough** to compute the number of swaps.
+
+---
+
+# 🔹 Step 1: Sorting = Rearranging a Permutation
+
+When you compare an array with its sorted version, you can think of it as a **permutation of indices**.
+
+Example:
+
+```
+arr = [4, 3, 2, 1]
+sorted = [1, 2, 3, 4]
+```
+
+If we track original indices:
+
+```
+arr_pos = [(3,1), (2,2), (1,3), (0,4)]
+```
+
+This tells us:
+
+* Position 0 should get the element from index 3
+* Position 1 should get the element from index 2
+* Position 2 should get the element from index 1
+* Position 3 should get the element from index 0
+
+That’s a **permutation of indices**:
+
+```
+0 → 3 → 0,   1 → 2 → 1
+```
+
+---
+
+# 🔹 Step 2: Permutations Decompose into Cycles
+
+Every permutation can be split into **disjoint cycles**.
+Here, we have 2 cycles:
+
+* Cycle 1: (0, 3)
+* Cycle 2: (1, 2)
+
+---
+
+# 🔹 Step 3: Sorting a Cycle
+
+Inside a cycle of length `k`:
+
+* Every element is in the wrong place
+* To sort it, you must rotate elements until all are correct
+* This always takes exactly `k − 1` swaps
+
+### Example
+
+Cycle = (0, 3), elements `[4, 1]`
+
+Swaps:
+
+```
+[4, 3, 2, 1]
+swap → [1, 3, 2, 4] ✅ cycle fixed in 1 = (2−1) swap
+```
+
+Cycle = (1, 2), elements `[3, 2]`
+
+```
+[1, 3, 2, 4]
+swap → [1, 2, 3, 4] ✅ cycle fixed in 1 = (2−1) swap
+```
+
+Total = 2 swaps.
+
+---
+
+# 🔹 Step 4: Why Just Visiting Works
+
+When you “visit” unvisited elements:
+
+* You are traversing a cycle
+* Once you’ve seen the whole cycle, you know its length = `cycle_size`
+* Minimum swaps for that cycle = `cycle_size − 1`
+
+So the algorithm doesn’t need to *actually perform* the swaps — it only needs to count them using cycle sizes.
+
+---
+
+# 🔹 General Formula
+
+If the permutation has `c` disjoint cycles with lengths `k₁, k₂, …, k_c`, then:
+
+```
+Minimum swaps = Σ (kᵢ − 1) = (n − c)
+```
+
+(where `n` = number of elements, `c` = number of cycles).
+
+---
+
+# ✅ Visualization
+
+For `arr = [4,3,2,1]`:
+
+* n = 4
+* cycles = 2
+* answer = 4 − 2 = 2 swaps ✔
+
+---
+
+# 🔹 Intuition
+
+* Each cycle is like a “closed loop” of misplaced elements.
+* Sorting the cycle requires putting everyone in their place, which takes `k − 1` moves.
+* By visiting non-visited elements, we’re essentially counting the cycle sizes → and from that, the number of swaps.
+
+---
+
+👉 Do you want me to **show the same with a graph diagram** (nodes = indices, arrows = where element should go), so you can *see the cycles* and why it’s `k − 1`?
