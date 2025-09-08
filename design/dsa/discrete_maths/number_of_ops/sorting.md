@@ -256,3 +256,102 @@ For `arr = [4,3,2,1]`:
 ---
 
 👉 Do you want me to **show the same with a graph diagram** (nodes = indices, arrows = where element should go), so you can *see the cycles* and why it’s `k − 1`?
+
+
+Perfect 👍 now let’s tackle **minimum rotations to sort an array**.
+
+---
+
+# 🔹 Problem: Minimum Rotations to Sort an Array
+
+**Operation allowed**: rotate array left or right (cyclic shift).
+**Goal**: find the minimum number of rotations needed to make the array sorted.
+If not possible, return `-1`.
+
+---
+
+## 🔹 Step 1: When is it possible?
+
+A rotated array is just a **cyclic shift** of a sorted array.
+
+Example:
+Sorted array = `[1,2,3,4,5]`
+Rotations:
+
+```
+[1,2,3,4,5]   (0 shifts)
+[2,3,4,5,1]   (1 shift)
+[3,4,5,1,2]   (2 shifts)
+[4,5,1,2,3]   (3 shifts)
+[5,1,2,3,4]   (4 shifts)
+```
+
+👉 So an array is sortable by rotation **iff it is a rotation of the sorted version**.
+
+---
+
+## 🔹 Step 2: How to check?
+
+* Let `target = sorted(arr)`
+* Make a double array: `target + target`
+* Check if `arr` appears inside.
+* Index = number of rotations needed.
+
+---
+
+## 🔹 Step 3: Python Implementation
+
+```python
+def min_rotations_to_sort(arr):
+    n = len(arr)
+    target = sorted(arr)
+
+    # Concatenate sorted array with itself
+    doubled = target + target
+
+    # Try to match arr inside doubled
+    for i in range(n):
+        if doubled[i:i+n] == arr:
+            return i  # min rotations
+    return -1  # not possible
+
+
+# 🔹 Examples
+print(min_rotations_to_sort([3,4,5,1,2]))  # 3 rotations
+print(min_rotations_to_sort([2,3,4,5,1]))  # 1 rotation
+print(min_rotations_to_sort([1,2,3,4,5]))  # 0 rotations
+print(min_rotations_to_sort([2,1,3,4,5]))  # -1 (not a rotation of sorted)
+```
+
+---
+
+## 🔎 Walkthrough
+
+Example: `[3,4,5,1,2]`
+
+* Sorted target = `[1,2,3,4,5]`
+* Doubled = `[1,2,3,4,5,1,2,3,4,5]`
+* Check windows of size 5:
+
+  * Found match at index 2 → need **2 rotations left** (or 3 right).
+
+---
+
+## 🔹 Complexity
+
+* Naive check = O(n²).
+* Can be improved with **KMP (string matching)** → O(n).
+
+---
+
+✅ Summary:
+
+* **Swaps** → use cycle decomposition.
+* **Reversals** → pancake greedy.
+* **Rotations** → check if array is a rotation of sorted version (string matching trick).
+
+---
+
+👉 Do you want me to also cover **“minimum adjacent swaps to sort”** (where only neighbors can be swapped)? That’s another common competitive programming variant.
+
+
