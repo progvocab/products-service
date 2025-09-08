@@ -1,6 +1,6 @@
 The parity of a permutation can be determined by counting the number of inversions or by analyzing its cycle decomposition. 
 Method 1: Counting Inversions 
-An inversion in a permutation $\pi$ is a pair of indices $(i, j)$ such that $i < j$ but $\pi(i) > \pi(j)$. A permutation is even if it has an even number of inversions, and odd if it has an odd number of inversions. 
+An inversion in a permutation $\pi$ is a pair of indices $(i, j)$ such that $i < j$ but ` $\pi(i) > \pi(j)$ `. A permutation is even if it has an even number of inversions, and odd if it has an odd number of inversions. 
 ```python 
 def get_parity_inversions(permutation):
     """
