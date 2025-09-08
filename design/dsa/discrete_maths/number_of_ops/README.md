@@ -116,3 +116,121 @@ Cycle of length `k`:
 ---
 
 Do you want me to take **one specific operation type** (say, swap + rotate or swap + reverse) and walk you through how to derive the **minimum number of operations formula** step by step, with Python code?
+---
+Great 👍 let’s pick **one operation type** and go step by step:
+
+I’ll take the most common one in competitive programming:
+
+---
+
+# 🔹 Problem: Minimum Swaps to Sort an Array
+
+**Operation allowed**: swap any two elements.
+**Goal**: sort the array in ascending order using minimum swaps.
+
+---
+
+## 🔹 Step 1: What changes when we swap?
+
+* A swap moves **two elements** to different positions.
+* But when we think in terms of cycles, each swap places **at least one element in its correct position**.
+
+---
+
+## 🔹 Step 2: Represent the array as a permutation
+
+Suppose array = `[4, 3, 2, 1]`.
+Sorted array = `[1, 2, 3, 4]`.
+
+Map positions:
+
+```
+value : index_in_sorted
+4 -> 3
+3 -> 2
+2 -> 1
+1 -> 0
+```
+
+So permutation = `[3,2,1,0]`.
+
+---
+
+## 🔹 Step 3: Cycle Decomposition
+
+Let’s follow cycles:
+
+* Start at 0 → goes to 3 → goes to 0 → cycle `(0 3)`.
+* Next unvisited 1 → goes to 2 → goes to 1 → cycle `(1 2)`.
+
+So we have 2 cycles, each of length 2.
+
+---
+
+## 🔹 Step 4: How many swaps does a cycle need?
+
+* A cycle of length `k` can be fixed in **k-1 swaps**.
+* Reason:
+
+  * Take one element and swap it into its correct place.
+  * Each swap fixes at least 1 element.
+  * After `k-1` swaps, all `k` are in place.
+
+👉 That’s why not `k/2`.
+If you try `k/2`, you’ll leave some elements misplaced.
+
+---
+
+## 🔹 Step 5: Formula
+
+$$
+\text{min_swaps} = n - \text{number_of_cycles}
+$$
+
+---
+
+## ✅ Python Code
+
+```python
+def min_swaps_to_sort(arr):
+    n = len(arr)
+    arr_pos = sorted([(val, i) for i, val in enumerate(arr)])
+    visited = [False] * n
+    swaps = 0
+
+    for i in range(n):
+        if visited[i] or arr_pos[i][1] == i:
+            continue
+
+        cycle_size = 0
+        j = i
+        while not visited[j]:
+            visited[j] = True
+            j = arr_pos[j][1]
+            cycle_size += 1
+
+        if cycle_size > 1:
+            swaps += (cycle_size - 1)
+
+    return swaps
+
+
+# 🔹 Example
+print(min_swaps_to_sort([4,3,2,1]))  # Output: 2
+print(min_swaps_to_sort([2,3,4,1,5]))  # Output: 3
+```
+
+---
+
+## 🔹 Verification
+
+* `[4,3,2,1]` → 2 swaps (swap 4↔1, swap 3↔2).
+* `[2,3,4,1,5]` → needs 3 swaps.
+
+---
+
+✅ This is the **cycle decomposition method** for minimum swaps.
+
+---
+
+👉 Do you want me to now take **minimum operations with rotations or reversals** (instead of swaps) and show how to derive the formula step by step in the same way?
