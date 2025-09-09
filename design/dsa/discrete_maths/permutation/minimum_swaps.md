@@ -184,6 +184,93 @@ Array `[3,5,4,2,1]` inversions are:
 * (3,2), (3,1), (5,4), (5,2), (5,1), (4,2), (4,1), (2,1) → total **8 inversions**.
   Even ✅ matches cycle result.
 
+Let’s slow this down and see **how we systematically list inversions** for
+
+$$
+A = [3,5,4,2,1]
+$$
+
+---
+
+## 🔹 Definition
+
+An **inversion** is a pair `(A[i], A[j])` with $i < j$ but $A[i] > A[j]$.
+So we scan each element and compare it with all to its right.
+
+---
+
+## 🔹 Step 1: Start with 3 at index 0
+
+Check elements to its right: `[5,4,2,1]`
+
+* 3 > 5? ❌
+* 3 > 4? ❌
+* 3 > 2? ✅ → (3,2)
+* 3 > 1? ✅ → (3,1)
+
+So from `3` we get **2 inversions**.
+
+---
+
+## 🔹 Step 2: Take 5 at index 1
+
+Check `[4,2,1]`
+
+* 5 > 4? ✅ → (5,4)
+* 5 > 2? ✅ → (5,2)
+* 5 > 1? ✅ → (5,1)
+
+So from `5` we get **3 inversions**.
+
+---
+
+## 🔹 Step 3: Take 4 at index 2
+
+Check `[2,1]`
+
+* 4 > 2? ✅ → (4,2)
+* 4 > 1? ✅ → (4,1)
+
+So from `4` we get **2 inversions**.
+
+---
+
+## 🔹 Step 4: Take 2 at index 3
+
+Check `[1]`
+
+* 2 > 1? ✅ → (2,1)
+
+So from `2` we get **1 inversion**.
+
+---
+
+## 🔹 Step 5: Take 1 at index 4
+
+No elements to the right → no inversions.
+
+---
+
+## 🔹 Total
+
+Add them all up:
+
+* From 3: (3,2), (3,1)
+* From 5: (5,4), (5,2), (5,1)
+* From 4: (4,2), (4,1)
+* From 2: (2,1)
+
+That’s **8 inversions** in total.
+
+---
+
+✅ So the inversion list comes naturally from a **nested loop check** of all pairs `(i,j)` with `i<j`.
+
+---
+
+Would you like me to also show you how to **count inversions efficiently** in $O(n \log n)$ using merge sort (the standard trick in competitive programming)?
+
+
 ---
 
 ## 🔹 Step 6: Summary
