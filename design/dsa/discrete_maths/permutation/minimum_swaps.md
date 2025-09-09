@@ -96,3 +96,108 @@ for a in tests:
 * `parity(cycles)` equals `parity(inversions)`, and both match `min_swaps % 2`.
 
 If you’d like, I can also give you an **O(n log n)** inversion counter (Fenwick/Merge Sort) to handle big arrays efficiently.
+
+
+Great choice 👍 Let’s carefully go through the array
+
+$$
+A = [3, 5, 4, 2, 1]
+$$
+
+and explain everything step by step.
+
+---
+
+## 🔹 Step 1: Sorted version
+
+Sorted array = `[1, 2, 3, 4, 5]`.
+
+---
+
+## 🔹 Step 2: Index mapping (permutation representation)
+
+We want to see: **where does each element currently sit, vs. where should it go in the sorted array?**
+
+* Element `1` → should be at index `0`, but is at index `4`.
+* Element `2` → should be at index `1`, but is at index `3`.
+* Element `3` → should be at index `2`, but is at index `0`.
+* Element `4` → should be at index `3`, but is at index `2`.
+* Element `5` → should be at index `4`, but is at index `1`.
+
+So mapping **current index → correct index**:
+
+```
+0 → 2   (A[0]=3 should go to index 2)
+1 → 4   (A[1]=5 should go to index 4)
+2 → 3   (A[2]=4 should go to index 3)
+3 → 1   (A[3]=2 should go to index 1)
+4 → 0   (A[4]=1 should go to index 0)
+```
+
+Permutation (on indices):
+
+$$
+P = [2, 4, 3, 1, 0]
+$$
+
+---
+
+## 🔹 Step 3: Disjoint cycle decomposition
+
+Now trace cycles in this permutation:
+
+* Start at `0`:
+  `0 → 2 → 3 → 1 → 4 → 0`
+  That’s one cycle: **(0 2 3 1 4)**
+
+That covers all indices → only **1 cycle of length 5**.
+
+---
+
+## 🔹 Step 4: Minimum swaps
+
+Formula:
+
+$$
+\text{min\_swaps} = n - \text{number of cycles}
+$$
+
+Here: $n = 5$, cycles = 1
+
+$$
+\text{min\_swaps} = 5 - 1 = 4
+$$
+
+So it takes **4 swaps**.
+
+---
+
+## 🔹 Step 5: Parity
+
+* A cycle of length $k$ has parity = $(k-1) \bmod 2$.
+* Here $k=5$, so parity = $4 \bmod 2 = 0$.
+* That means this permutation is **even**.
+
+Check with inversions:
+Array `[3,5,4,2,1]` inversions are:
+
+* (3,2), (3,1), (5,4), (5,2), (5,1), (4,2), (4,1), (2,1) → total **8 inversions**.
+  Even ✅ matches cycle result.
+
+---
+
+## 🔹 Step 6: Summary
+
+* **Permutation mapping:** `[0→2, 1→4, 2→3, 3→1, 4→0]`
+* **Cycle decomposition:** (0 2 3 1 4)
+* **Number of cycles:** 1
+* **Min swaps to sort:** 4
+* **Parity:** Even permutation
+
+---
+
+✅ So, `[3,5,4,2,1]` can be sorted in **4 swaps**.
+
+---
+
+Do you want me to also **show the actual swaps sequence** (which elements swap at each step) that achieves the minimum?
