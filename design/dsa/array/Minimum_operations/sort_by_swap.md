@@ -27,33 +27,6 @@ Array = `[4, 3, 2, 1]` → permutation cycles: `(1 4)(2 3)`
 * Each cycle has length 2 → needs `2 - 1 = 1` swap.
 * Total swaps = 2. ✅
 
----
-
-## 🔹 General Formula for Total Minimum Swaps
-
-Let $n$ = array size.
-Let $C$ = number of cycles in permutation decomposition.
-
-$$
-\text{Minimum Swaps} = n - C
-$$
-
-This comes from summing all cycles:
-
-$$
-\sum (k_i - 1) = \left(\sum k_i\right) - \text{(number of cycles)} = n - C
-$$
-
----
-
-✅ So the answer is:
-
-* For a **single cycle of length $k$** → swaps = **$k - 1$**.
-* For the **whole array of size $n$** → swaps = **$n - C$**, where $C$ = number of cycles.
-
----
-
-👉 Do you want me to also give you a **Python implementation** that computes the minimum swaps using cycle decomposition?
 
 ---
  Let’s implement the **minimum swaps to sort** using **cycle decomposition** in Python.
