@@ -86,6 +86,60 @@ print(permutation_parity_cycles(perm2))      # -1 → odd
 
   * Inversions = 1 → odd → parity = -1.
   * Cycles = (0 1)(2) → 3 elements, 2 cycles → `3-2 = 1` odd → parity = -1.
+---
+# Inversions of `[1, 0, 2]` — step-by-step
+
+We look at all index pairs $i<j$ and check if `array[i] > array[j]`.
+
+1. Compare index `0` (value `1`) with index `1` (value `0`):
+   `1 > 0` → **inversion**. Record: index pair `(0,1)`, value pair `(1,0)`.
+
+2. Compare index `0` (value `1`) with index `2` (value `2`):
+   `1 > 2`? No → no inversion.
+
+3. Compare index `1` (value `0`) with index `2` (value `2`):
+   `0 > 2`? No → no inversion.
+
+**Result:** there is exactly **1 inversion**:
+
+* Index pair: `(0,1)`
+* Value pair: `(1,0)`
+
+Notes:
+
+* The inversion count (1) equals the minimum number of adjacent swaps needed to sort the array (swap indices 0 and 1 → `[0,1,2]`).
+* Since the count is odd, the permutation is an odd permutation — consistent with the cycle decomposition $(0\ 1)$ (a single transposition).
+---
+# Cycle decomposition of `[1, 0, 2]`
+
+Assume the array represents the permutation $p$ on indices $0,1,2$ with $p(i)=\text{array}[i]$. So:
+
+* $0 \mapsto 1$
+* $1 \mapsto 0$
+* $2 \mapsto 2$
+
+Step-by-step:
+
+1. Start at index `0` (not visited).
+
+   * Visit `0`, follow $0 \mapsto 1$. Cycle so far: `[0, 1]`.
+   * From `1`, follow $1 \mapsto 0$ and we return to the start → cycle closed. Cycle = `(0 1)`.
+
+2. Move to index `1` — already visited, skip.
+
+3. Move to index `2` (not visited).
+
+   * Visit `2`, follow $2 \mapsto 2$. Immediately returns to itself → cycle closed. Cycle = `(2)` (a fixed point).
+
+Final cycle decomposition: $(0\ 1)(2)$.
+(Usually the fixed point `(2)` is omitted, so you may simply write $(0\ 1)$.)
+
+Extra facts:
+
+* Cycle lengths: 2 and 1.
+* Minimum swaps to sort (if sorting to identity) = sum over cycles of $(\text{length}-1) = (2-1)+(1-1)=1$.
+  Concretely, swapping positions `0` and `1` transforms `[1,0,2]` → `[0,1,2]`.
+
 
 Both methods agree ✅
 
