@@ -145,6 +145,71 @@ Both methods agree ✅
 
 ---
 
+
+ Let’s carefully do **cycle decomposition** for the array `[4, 3, 2, 1]`.
+
+We interpret the array as a permutation $p$ on indices $0,1,2,3$ such that:
+
+$$
+p(i) = \text{array}[i]
+$$
+
+So:
+
+* $0 \mapsto 4$
+* $1 \mapsto 3$
+* $2 \mapsto 2$
+* $3 \mapsto 1$
+
+---
+
+### Step 1: Start with index 0
+
+* Start at `0`, follow $0 \mapsto 4$.
+* From `4` … uh-oh! Our array only has indices `0,1,2,3`. So here’s the key point:
+
+👉 If the array is meant to be a **permutation of 0..n-1**, `[4,3,2,1]` is **not valid** (because `4` is outside the range `0..3`).
+
+But if it’s meant to be a permutation of **1..n**, then we should reinterpret:
+
+* For **1-based indexing**:
+  `[4,3,2,1]` means
+
+  * $1 \mapsto 4$
+  * $2 \mapsto 3$
+  * $3 \mapsto 2$
+  * $4 \mapsto 1$
+
+---
+
+### Step 2: Decompose into cycles (assuming 1-based indexing)
+
+* Start at `1`:
+  $1 \mapsto 4,\ 4 \mapsto 1$ → cycle: `(1 4)`
+
+* Move to `2`:
+  $2 \mapsto 3,\ 3 \mapsto 2$ → cycle: `(2 3)`
+
+* `3` and `4` are already visited, so we’re done.
+
+---
+
+### Final Cycle Decomposition
+
+$$
+(1\ 4)(2\ 3)
+$$
+
+---
+
+✅ If interpreted as a permutation of `1..n`, `[4,3,2,1]` decomposes into **two disjoint transpositions**.
+❌ If interpreted as a permutation of `0..n-1`, `[4,3,2,1]` is **invalid** because of the `4`.
+
+---
+
+Do you want me to **always assume arrays are 1-based permutations** (like `[4,3,2,1]` → a permutation of 1..4), or should I strictly treat them as 0-based unless values go out of range?
+
+
 👉 Do you want me to also show how **permutation parity is used in problems like checking solvability of the 15-puzzle** (a classic CP + math application)?
 
 ---
