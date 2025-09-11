@@ -271,8 +271,9 @@ print(maxSubArray([-2,1,-3,4,-1,2,1,-5,4]))  # 6
 ---
 
 ## 10. **Monotonic Stack**
-
+- keywords: nearest smallest element 
 Example: Next Greater Element
+
 
 ```python
 def nextGreater(nums):
