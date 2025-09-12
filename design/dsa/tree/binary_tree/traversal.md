@@ -1,3 +1,140 @@
+let’s cover **Depth First Search (DFS)** and **Breadth First Search (BFS)** on a **binary tree** in Python.
+
+---
+
+# 🔹 Binary Tree Node Definition
+
+We’ll use a simple class to define tree nodes:
+
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+```
+
+---
+
+# 🔹 1. Depth First Search (DFS)
+
+DFS explores as deep as possible before backtracking.
+For trees, we usually write it **recursively** or with a **stack**.
+
+### (a) Recursive DFS Traversals
+
+* **Preorder (Root → Left → Right)**
+* **Inorder (Left → Root → Right)**
+* **Postorder (Left → Right → Root)**
+
+```python
+def preorder(root):
+    if not root: return []
+    return [root.val] + preorder(root.left) + preorder(root.right)
+
+def inorder(root):
+    if not root: return []
+    return inorder(root.left) + [root.val] + inorder(root.right)
+
+def postorder(root):
+    if not root: return []
+    return postorder(root.left) + postorder(root.right) + [root.val]
+```
+
+---
+
+### (b) Iterative DFS (using stack)
+
+```python
+def dfs_iterative(root):
+    if not root:
+        return []
+    
+    stack, result = [root], []
+    
+    while stack:
+        node = stack.pop()
+        result.append(node.val)
+        
+        # Push right first so left is processed first
+        if node.right:
+            stack.append(node.right)
+        if node.left:
+            stack.append(node.left)
+    
+    return result
+```
+
+✅ This is a **preorder traversal**.
+
+---
+
+# 🔹 2. Breadth First Search (BFS)
+
+BFS explores level by level (root, then children, then grandchildren).
+We use a **queue**.
+
+```python
+from collections import deque
+
+def bfs(root):
+    if not root:
+        return []
+    
+    queue = deque([root])
+    result = []
+    
+    while queue:
+        node = queue.popleft()
+        result.append(node.val)
+        
+        if node.left:
+            queue.append(node.left)
+        if node.right:
+            queue.append(node.right)
+    
+    return result
+```
+
+---
+
+# 🔹 Example Usage
+
+```python
+# Build a sample tree:
+#        1
+#       / \
+#      2   3
+#     / \   \
+#    4   5   6
+
+root = TreeNode(1)
+root.left = TreeNode(2, TreeNode(4), TreeNode(5))
+root.right = TreeNode(3, None, TreeNode(6))
+
+print("Preorder DFS:", preorder(root))     # [1, 2, 4, 5, 3, 6]
+print("Inorder DFS:", inorder(root))       # [4, 2, 5, 1, 3, 6]
+print("Postorder DFS:", postorder(root))   # [4, 5, 2, 6, 3, 1]
+print("Iterative DFS:", dfs_iterative(root)) # [1, 2, 4, 5, 3, 6]
+print("BFS:", bfs(root))                   # [1, 2, 3, 4, 5, 6]
+```
+
+---
+
+# 🔹 Summary
+
+| Algorithm | Data Structure       | Typical Order                |
+| --------- | -------------------- | ---------------------------- |
+| DFS       | Stack (or recursion) | Preorder, Inorder, Postorder |
+| BFS       | Queue                | Level-order traversal        |
+
+---
+
+👉 Do you want me to also show how DFS and BFS differ when used for **searching a target value** in a binary tree?
+
+---
+
+---
 Traversing a **binary tree** means visiting all its nodes in a specific order. There are **three main types** of traversal:  
 
 ## **1. Depth-First Traversal (DFS)**  
