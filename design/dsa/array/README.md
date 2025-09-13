@@ -1,5 +1,74 @@
 array problems are some of the **most common algorithm interview questions** because arrays are fundamental and allow testing **time complexity, data structures, and problem-solving techniques**.
 
+---
+### Concepts 
+---
+
+## 1. **Subset**
+
+* A subset is **any selection of elements from the array**, regardless of their order or position.
+* **Properties**:
+
+  * Each element may be either **chosen** or **not chosen**.
+  * Order does **not** matter.
+  * An array of length $n$ has $2^n$ subsets.
+* **Examples**:
+  Array = `[1, 2, 3]`
+  Subsets =
+
+  * `[]` (empty set)
+  * `[1]`, `[2]`, `[3]`
+  * `[1, 2]`, `[1, 3]`, `[2, 3]`
+  * `[1, 2, 3]`
+
+`[2, 1]` is the **same subset** as `[1, 2]` (order ignored).
+
+---
+
+## 2. **Subsequence**
+
+* A subsequence is formed by **deleting some (or no) elements from the array without changing the order** of remaining elements.
+* **Properties**:
+
+  * Preserves **relative order**.
+  * Not necessarily contiguous (gap allowed).
+  * An array of length $n$ has $2^n$ subsequences.
+* **Examples**:
+  Array = `[1, 2, 3]`
+  Subsequences =
+
+  * `[]`
+  * `[1]`, `[2]`, `[3]`
+  * `[1, 2]`, `[1, 3]`, `[2, 3]`
+  * `[1, 2, 3]`
+
+👉 `[2, 1]` is **not a subsequence** of `[1, 2, 3]` because order is violated.
+
+---
+
+## 3. **Subarray **
+
+* A **subarray** is always **contiguous** (continuous block of elements).
+* Examples (for `[1, 2, 3]`):
+
+  * `[1]`, `[2]`, `[3]`
+  * `[1, 2]`, `[2, 3]`
+  * `[1, 2, 3]`
+    👉 `[1, 3]` is **not** a subarray because it skips `2`.
+
+---
+
+## 4. ✅ Quick Comparison Table
+
+| Concept         | Definition                          | Order Preserved? | Contiguous? | Count      |
+| --------------- | ----------------------------------- | ---------------- | ----------- | ---------- |
+| **Subset**      | Any selection of elements           | ❌ No             | ❌ No        | $2^n$      |
+| **Subsequence** | Remove some elements but keep order | ✅ Yes            | ❌ No        | $2^n$      |
+| **Subarray**    | Continuous block of array           | ✅ Yes            | ✅ Yes       | $n(n+1)/2$ |
+
+---
+---
+
 Here’s a **curated list of the most common array algorithm questions**, grouped by concept 
 
 ---
