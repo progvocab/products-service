@@ -34,9 +34,9 @@ Perfect 👍 — let’s connect the **number theory formulas** I explained with
 
 * Formula:
 
-  $$
-  d(n) = (e_1+1)(e_2+1)\dots
-  $$
+  
+  $d(n) = (e_1+1)(e_2+1)\dots$
+ 
 * 🔹 Problems:
 
   * **[LeetCode 1390 – Four Divisors](https://leetcode.com/problems/four-divisors/)** → divisor counting.
@@ -48,14 +48,11 @@ Perfect 👍 — let’s connect the **number theory formulas** I explained with
 
 * Formula:
 
-  $$
-  (a+b) \bmod m, \quad (a \cdot b) \bmod m
-  $$
+  $(a+b) \bmod m, \quad (a \cdot b) \bmod m$
+  
 * Binary exponentiation:
 
-  $$
-  a^b \bmod m \quad \text{in } O(\log b)
-  $$
+  $$a^b \bmod m \quad \text{in } O(\log b)$$
 * 🔹 Problems:
 
   * **[LeetCode 372 – Super Pow](https://leetcode.com/problems/super-pow/)** → fast exponentiation.
@@ -68,9 +65,7 @@ Perfect 👍 — let’s connect the **number theory formulas** I explained with
 
 * Formula:
 
-  $$
-  \phi(n) = n \prod_{p|n}\left(1 - \frac{1}{p}\right)
-  $$
+  $$\phi(n) = n \prod_{p|n}\left(1 - \frac{1}{p}\right)$$
 * 🔹 Problems:
 
   * **[LeetCode 2654 – Minimum Number of Operations to Make All Array Elements Equal to 1](https://leetcode.com/problems/minimum-number-of-operations-to-make-all-array-elements-equal-to-1/)** → relies on gcd coprime properties.
@@ -93,15 +88,11 @@ Perfect 👍 — let’s connect the **number theory formulas** I explained with
 
 * Formula:
 
-  $$
-  a^{p-1} \equiv 1 \pmod{p}
-  $$
+  $$a^{p-1} \equiv 1 \pmod{p}$$
 
   Modular inverse:
 
-  $$
-  a^{-1} \equiv a^{p-2} \pmod{p}
-  $$
+  $$a^{-1} \equiv a^{p-2} \pmod{p}$$
 * 🔹 Problems:
 
   * **[LeetCode 1862 – Sum of Floored Pairs](https://leetcode.com/problems/sum-of-floored-pairs/)** (modular arithmetic for large sums).
