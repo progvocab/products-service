@@ -46,7 +46,7 @@ array problems are some of the **most common algorithm interview questions** bec
 
 ---
 
-## 3. **Subarray **
+## 3. **Subarray**
 
 * A **subarray** is always **contiguous** (continuous block of elements).
 * Examples (for `[1, 2, 3]`):
