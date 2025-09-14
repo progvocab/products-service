@@ -48,9 +48,31 @@
 
 ## Example Problem and Python Solution
 
-### Problem:
+### Find all Divisors of n
+```python
+  def divisors(n):
+      divs = [1]
+      for i in range(2,int(math.sqrt(n))+1):
+          if n%i == 0:
+              divs.extend([i,n//i])
+      divs.extend([n])
+      return list(set(divs))
+```
 
-Count the number of subarrays with **GCD exactly equal to 1**.
+### Find GDC of Array
+```python
+# Euclidean algorithm
+      def gcd(a, b):
+          while b:
+              a, b = b, a % b
+          return a
+
+# GCD of array using reduce
+    def gcd_a(arr):
+      return reduce(gcd, arr)
+```
+
+### Count the number of subarrays with **GCD exactly equal to 1**.
 
 ### Solution Idea:
 
@@ -99,4 +121,123 @@ print(count_subarrays_gcd_one(arr))  # Output -> number of subarrays with gcd=1
 
 ---
 
-👉 Do you want me to **pick one concrete competitive programming problem** (say from Codeforces/LeetCode/Hackerrank) and explain its solution in full, or should I give you a **general template** for solving *any subarray GCD* problem?
+Perfect 👍 You’re asking about **range queries with GCD** → classic use case for both **Segment Trees** and **Sparse Tables**.
+Let me show you both approaches.
+
+---
+
+# 🔹 1. Segment Tree for GCD
+
+### Idea
+
+* Build a segment tree where each node stores the **GCD of its segment**.
+* Query `[l, r]` by combining results from relevant segments.
+* Update supported (if array changes).
+
+### Python Implementation
+
+```python
+from math import gcd
+
+class SegmentTree:
+    def __init__(self, arr):
+        self.n = len(arr)
+        self.tree = [0] * (4 * self.n)  # safe size
+        self._build(arr, 0, 0, self.n - 1)
+    
+    def _build(self, arr, idx, left, right):
+        if left == right:
+            self.tree[idx] = arr[left]
+            return
+        mid = (left + right) // 2
+        self._build(arr, 2*idx+1, left, mid)
+        self._build(arr, 2*idx+2, mid+1, right)
+        self.tree[idx] = gcd(self.tree[2*idx+1], self.tree[2*idx+2])
+    
+    def query(self, ql, qr):
+        return self._query(0, 0, self.n - 1, ql, qr)
+    
+    def _query(self, idx, left, right, ql, qr):
+        if ql > right or qr < left:   # disjoint
+            return 0
+        if ql <= left and right <= qr:  # fully covered
+            return self.tree[idx]
+        mid = (left + right) // 2
+        return gcd(
+            self._query(2*idx+1, left, mid, ql, qr),
+            self._query(2*idx+2, mid+1, right, ql, qr)
+        )
+
+# Example usage
+arr = [2, 6, 9, 3, 15]
+seg = SegmentTree(arr)
+print(seg.query(1, 3))  # gcd(6,9,3) = 3
+print(seg.query(0, 4))  # gcd(2,6,9,3,15) = 1
+```
+
+**Complexity:**
+
+* Build: `O(n)`
+* Query: `O(log n)`
+* Update: `O(log n)`
+
+---
+
+# 🔹 2. Sparse Table for GCD
+
+### Idea
+
+* Precompute `st[i][j]` = GCD of subarray starting at `i` of length `2^j`.
+* Answer query `[l, r]` by combining **two overlapping intervals** that cover `[l, r]`.
+* Immutable array (no updates).
+
+### Python Implementation
+
+```python
+from math import gcd, log2
+
+class SparseTable:
+    def __init__(self, arr):
+        self.n = len(arr)
+        self.K = int(log2(self.n)) + 1
+        self.st = [[0] * self.K for _ in range(self.n)]
+        
+        for i in range(self.n):
+            self.st[i][0] = arr[i]
+        
+        j = 1
+        while (1 << j) <= self.n:
+            i = 0
+            while i + (1 << j) <= self.n:
+                self.st[i][j] = gcd(self.st[i][j-1], self.st[i + (1 << (j-1))][j-1])
+                i += 1
+            j += 1
+    
+    def query(self, l, r):
+        j = int(log2(r - l + 1))
+        return gcd(self.st[l][j], self.st[r - (1 << j) + 1][j])
+
+# Example usage
+arr = [2, 6, 9, 3, 15]
+sp = SparseTable(arr)
+print(sp.query(1, 3))  # gcd(6,9,3) = 3
+print(sp.query(0, 4))  # gcd(2,6,9,3,15) = 1
+```
+
+**Complexity:**
+
+* Build: `O(n log n)`
+* Query: `O(1)`
+* Update: ❌ Not supported efficiently.
+
+---
+
+# ✅ When to use which?
+
+* **Segment Tree** → if array updates are required.
+* **Sparse Table** → if array is static and many queries need fast answers.
+
+---
+
+ 
+
