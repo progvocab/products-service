@@ -9,9 +9,7 @@ Let’s focus on **first-order recurrence relations** and how to solve them effi
 
 A **first-order recurrence relation** expresses $T(n)$ in terms of **only the previous term** $T(n-1)$:
 
-$$
-T(n) = a \cdot T(n-1) + f(n), \quad \text{with initial condition } T(0) \text{ or } T(1).
-$$
+$$T(n) = a \cdot T(n-1) + f(n), \quad \text{with initial condition } T(0) \text{ or } T(1).$$
 
 Where:
 
@@ -24,37 +22,27 @@ Where:
 
 ### Case 1: **Homogeneous recurrence**
 
-$$
-T(n) = a \cdot T(n-1)
-$$
+$$T(n) = a \cdot T(n-1)$$
 
 * Solution:
 
-$$
-T(n) = T(0) \cdot a^n
-$$
+$$T(n) = T(0) \cdot a^n$$
 
 ---
 
 ### Case 2: **Non-homogeneous recurrence**
 
-$$
-T(n) = a \cdot T(n-1) + b
-$$
+$$T(n) = a \cdot T(n-1) + b$$
 
 (“affine recurrence”, very common in DP)
 
 * Expand:
 
-$$
-T(n) = a^n \cdot T(0) + b \cdot \frac{a^n - 1}{a - 1}, \quad \text{if } a \neq 1
-$$
+$$T(n) = a^n \cdot T(0) + b \cdot \frac{a^n - 1}{a - 1}, \quad \text{if } a \neq 1$$
 
 * If $a = 1$:
 
-$$
-T(n) = T(0) + n \cdot b
-$$
+$$T(n) = T(0) + n \cdot b$$
 
 ---
 
@@ -64,15 +52,11 @@ If $T(n) = a \cdot T(n-1) + f(n)$,
 use **iteration / unrolling** until you spot a pattern.
 For example:
 
-$$
-T(n) = T(n-1) + n
-$$
+$$T(n) = T(n-1) + n$$
 
 Unroll:
 
-$$
-T(n) = T(0) + 1 + 2 + \dots + n = T(0) + \frac{n(n+1)}{2}
-$$
+$$T(n) = T(0) + 1 + 2 + \dots + n = T(0) + \frac{n(n+1)}{2}$$
 
 ---
 
@@ -80,47 +64,33 @@ $$
 
 ### Example 1: Compound Interest
 
-$$
-A(n) = r \cdot A(n-1), \quad A(0) = P
-$$
+$$A(n) = r \cdot A(n-1), \quad A(0) = P$$
 
 Solution:
 
-$$
-A(n) = P \cdot r^n
-$$
+$$A(n) = P \cdot r^n$$
 
 ---
 
 ### Example 2: Arithmetic Sum Recurrence
 
-$$
-S(n) = S(n-1) + n, \quad S(0)=0
-$$
+$$S(n) = S(n-1) + n, \quad S(0)=0$$
 
 Solution:
 
-$$
-S(n) = \frac{n(n+1)}{2}
-$$
+$$S(n) = \frac{n(n+1)}{2}$$
 
 ---
 
 ### Example 3: DP with Constant Addition
 
-$$
-T(n) = 2T(n-1) + 3, \quad T(0)=1
-$$
+$$T(n) = 2T(n-1) + 3, \quad T(0)=1$$
 
 Solution:
 
-$$
-T(n) = 2^n \cdot T(0) + 3 \cdot (2^n - 1)
-$$
+$$T(n) = 2^n \cdot T(0) + 3 \cdot (2^n - 1)$$
 
-$$
-T(n) = 2^n + 3(2^n - 1) = 4\cdot 2^n - 3
-$$
+$$T(n) = 2^n + 3(2^n - 1) = 4\cdot 2^n - 3$$
 
 ---
 
