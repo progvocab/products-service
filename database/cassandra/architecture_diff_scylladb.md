@@ -130,3 +130,82 @@ Both **Apache Cassandra** and **ScyllaDB** are **distributed, highly available N
 - **ScyllaDB** is a **drop-in replacement** that is **faster, more efficient, and scales better**.
 
 Would you like a **performance benchmark comparison** or a **real-world case study**? 🚀
+
+
+Great question 👍 — this gets into the **design philosophy of Cassandra vs ScyllaDB**, and whether choosing a **concurrent garbage collector in the JVM** closes the performance gap.
+
+Let’s break it down step by step:
+
+---
+
+## 🔹 1. Cassandra and the JVM GC
+
+* **Cassandra** is written in **Java**, so it depends on the **JVM’s garbage collector**.
+* Even if you use a **concurrent GC** like **G1, ZGC, Shenandoah**, you *still* pay costs:
+
+  * **Pause times**: although shorter, they’re not zero.
+  * **Write/read barriers**: e.g., ZGC and Shenandoah insert memory barriers in every object access, adding overhead.
+  * **Heap management**: Cassandra’s data model creates lots of short-lived and long-lived objects, stressing the heap.
+* Cassandra’s performance is sensitive to heap tuning, GC tuning, and allocation patterns.
+
+So even with a concurrent GC, there is **overhead baked into the JVM model**.
+
+---
+
+## 🔹 2. ScyllaDB’s Design
+
+* **ScyllaDB** is a rewrite of Cassandra in **C++** using the **Seastar framework**.
+* Seastar uses **shard-per-core** architecture:
+
+  * Each CPU core runs its own reactor loop.
+  * No shared memory or locks across cores → eliminates GC + thread contention.
+* Memory management:
+
+  * ScyllaDB has its own allocator, avoids GC entirely.
+  * Allocations are predictable, and long-lived data is pinned in place.
+* Result: predictable **low latency (99.999% tail)** and **much higher throughput** than Cassandra.
+
+---
+
+## 🔹 3. Why GC ≠ Scylla Performance
+
+Even if you configure Cassandra with **ZGC or Shenandoah**, you don’t get Scylla-level performance because:
+
+| Factor                     | Cassandra (Java, Concurrent GC)               | ScyllaDB (C++, Seastar)                  |
+| -------------------------- | --------------------------------------------- | ---------------------------------------- |
+| **GC Overhead**            | Always some barriers, metadata, write costs   | None (manual allocators, no GC)          |
+| **Pause Times**            | Small, but nonzero (few ms possible)          | Zero (no GC at all)                      |
+| **Memory Locality**        | JVM heap fragmentation + object indirection   | Shard-per-core, NUMA-aware memory pools  |
+| **Threading Model**        | Multiple threads, locks, context switches     | Event loop per core, lock-free           |
+| **Tail Latency (p99.999)** | Still affected by JVM GC safepoints, barriers | Extremely predictable, microsecond-level |
+
+So, **Concurrent GC makes Cassandra better**, but it **can’t remove the JVM abstraction overhead**. ScyllaDB wins by never having GC in the first place.
+
+---
+
+## 🔹 4. Real Benchmark Numbers
+
+* Vendors have published **ScyllaDB vs Cassandra benchmarks**:
+
+  * ScyllaDB often delivers **10x–20x higher throughput**.
+  * Tail latencies (p99, p999) are **orders of magnitude lower** in Scylla.
+  * Even with ZGC, Cassandra shows **pause spikes** under high load.
+
+---
+
+## 🔹 5. Bottom Line
+
+👉 **No, Cassandra with a concurrent GC will not have the same performance as ScyllaDB.**
+
+* Concurrent GC reduces pause times but introduces **runtime barriers and CPU overhead**.
+* JVM safepoints, object model, and heap fragmentation still cause unpredictability.
+* ScyllaDB avoids the GC problem entirely with its **C++ shard-per-core model**, so it’s fundamentally more efficient.
+
+---
+
+✅ If your use case is **low-latency, high-throughput, predictable performance (especially at scale)** → ScyllaDB will always outperform Cassandra, even with the best GC tuning.
+✅ If you want **ecosystem maturity, flexibility, JVM familiarity** → Cassandra with concurrent GC is still viable, just less predictable.
+
+---
+
+Would you like me to draw a **timeline comparison** (Cassandra w/ GC vs ScyllaDB’s shard-per-core) to visually show why Scylla avoids GC-induced stalls?
