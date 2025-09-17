@@ -1,5 +1,6 @@
 ## **G1 Garbage Collector (G1 GC)**
 - has been the **default collector since Java 9**.
+- Concorrent Garbage collector , does not pauses the application thread - only a short pause is required
 
 ---
 
