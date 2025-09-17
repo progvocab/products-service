@@ -6,6 +6,8 @@ Got it 👍 Let’s go in detail about the **Parallel Garbage Collector** in Jav
 
 * The **Parallel GC** (a.k.a. "Throughput Collector") is the **default garbage collector** in Java 8.
 * It focuses on **maximizing application throughput** (total work done by the application vs. GC overhead).
+* Pauses the application threads while performing garbage collection
+* Uses multi cores of CPU for parallel operation 
 * It does this by using **multiple threads in parallel** to speed up garbage collection tasks (mainly **minor GC** in the Young Generation and also major GC in the Old Generation).
 
 ---
