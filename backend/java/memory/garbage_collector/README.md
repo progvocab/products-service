@@ -123,3 +123,55 @@ Examples: **CMS (Concurrent Mark-Sweep, deprecated in Java 9+)**, **G1 GC (defau
 ---
 
 👉 Do you want me to also **draw a timeline diagram** showing how GC and mutator threads interleave in **Parallel GC vs Concurrent GC**?
+
+
+Great question 👌 Let’s carefully break this down.
+
+---
+
+## 1. **Parallel Garbage Collector**
+
+* **Also called**: *Throughput Collector* (`-XX:+UseParallelGC`).
+* **How it works**:
+
+  * It **stops all application threads (STW: Stop-The-World)** during GC.
+  * Uses **multiple CPU cores/threads** to perform **young generation collection** (copying live objects, clearing dead ones).
+  * Old generation collection (full GC) can also run in parallel using multiple cores.
+* **Goal**: Maximize **throughput** (ratio of time spent running application code vs. time spent in GC).
+* **Good for**: Applications that want **high throughput** and can tolerate **longer pause times**.
+
+✅ Yes, it **uses multiple cores of the CPU** (e.g., a 16-core machine will run parallel GC threads across multiple cores).
+
+---
+
+## 2. **Concurrent Collectors (like CMS / G1)**
+
+* **CMS (Concurrent Mark-Sweep)** and **G1 (Garbage First)** are examples of *concurrent* collectors.
+* **How they work**:
+
+  * They do **most of their GC work concurrently** (while the application is running).
+  * Only **short pauses** are needed for some phases (like initial marking).
+  * They also use multiple CPU cores for certain phases, but their key advantage is **reduced pause times**.
+
+---
+
+## 3. **Parallel vs Concurrent**
+
+| Aspect         | Parallel GC                                                             | Concurrent GC (CMS, G1)                                                |
+| -------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Pause time** | Long pauses (STW), but done faster using multiple cores                 | Shorter pauses, since many tasks run alongside the app                 |
+| **CPU usage**  | Uses multiple cores, but **only during STW pauses**                     | Uses CPU cores concurrently, which can slightly reduce app throughput  |
+| **Throughput** | High (good if pause time doesn’t matter much)                           | Slightly lower (because GC runs alongside app threads)                 |
+| **Best for**   | Batch jobs, backend services where throughput matters more than latency | Low-latency apps, interactive systems, real-time response requirements |
+
+---
+
+### 🔑 Summary
+
+* **Parallel GC**: "Stop the world, clean fast with many cores." Good for *throughput*.
+* **Concurrent GC (CMS/G1/ZGC)**: "Keep the app running, clean gradually with short pauses." Good for *low latency*.
+
+---
+
+Would you like me to also **draw a heap + CPU utilization diagram** comparing Parallel GC vs Concurrent GC? That might make the difference very clear visually.
+
