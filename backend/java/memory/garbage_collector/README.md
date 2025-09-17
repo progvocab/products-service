@@ -1,4 +1,51 @@
-Awesome question 👍 — let’s go deep into **Parallel GC** and **Concurrent GC** in Java, since these are two key types of garbage collectors that often confuse people.
+Got it 👍 Let’s build a **complete table of Java versions, their default GC, and new GC collectors introduced** over time.
+
+---
+
+### Java Garbage Collector Evolution
+
+| Java Version        | Default Garbage Collector | New Garbage Collectors Introduced                    |
+| ------------------- | ------------------------- | ---------------------------------------------------- |
+| **Java 1.2 (1998)** | Serial GC                 | First introduction of **Generational GC** (Serial)   |
+| **Java 1.3**        | Serial GC                 | –                                                    |
+| **Java 1.4**        | Serial GC                 | **Parallel GC** (young gen parallelization)          |
+| **Java 5 (1.5)**    | Parallel GC               | **Concurrent Mark-Sweep (CMS) GC**                   |
+| **Java 6**          | Parallel GC               | Parallel Old GC (parallel compaction for old gen)    |
+| **Java 7**          | Parallel GC               | **G1 GC** (experimental)                             |
+| **Java 8**          | Parallel GC               | G1 officially supported & stable                     |
+| **Java 9**          | G1 GC                     | –                                                    |
+| **Java 10**         | G1 GC                     | **Experimental ZGC**                                 |
+| **Java 11 (LTS)**   | G1 GC                     | **ZGC (improved)**, **Epsilon GC** (no-op collector) |
+| **Java 12**         | G1 GC                     | **Shenandoah GC** (experimental, Red Hat)            |
+| **Java 13**         | G1 GC                     | Improvements to ZGC (support for macOS & Windows)    |
+| **Java 14**         | G1 GC                     | ZGC goes **production-ready**                        |
+| **Java 15**         | G1 GC                     | **Shenandoah GC production-ready**                   |
+| **Java 16**         | G1 GC                     | ZGC & Shenandoah fully optimized                     |
+| **Java 17 (LTS)**   | G1 GC                     | Nothing new (ZGC & Shenandoah stable)                |
+| **Java 18**         | G1 GC                     | Minor improvements in ZGC                            |
+| **Java 19**         | G1 GC                     | **Generational ZGC (experimental)**                  |
+| **Java 20**         | G1 GC                     | Improvements to Generational ZGC                     |
+| **Java 21 (LTS)**   | G1 GC                     | **Generational ZGC (production-ready)**              |
+| **Java 22**         | G1 GC                     | Refinements in ZGC, Shenandoah                       |
+| **Java 23**         | G1 GC                     | Ongoing refinements only                             |
+
+---
+
+🔑 **Quick Takeaways**
+
+* **Serial GC** → earliest, single-threaded.
+* **Parallel GC** → throughput-focused (multi-threaded stop-the-world).
+* **CMS** → first low-latency concurrent collector.
+* **G1 GC** → default since Java 9 (balanced throughput + low pause).
+* **ZGC** & **Shenandoah** → ultra-low latency, scalable to **multi-TB heaps**.
+* **Epsilon GC** → "no-op" GC for testing / benchmarking.
+* **Generational ZGC** (Java 21) → combines generational model + ZGC’s low-latency design.
+
+---
+ 
+
+
+### deep into **Parallel GC** and **Concurrent GC** in Java, since these are two key types of garbage collectors that often confuse people.
 
 ---
 
