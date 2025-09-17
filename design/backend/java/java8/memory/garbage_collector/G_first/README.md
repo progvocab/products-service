@@ -224,3 +224,103 @@ Time ─────────────────────────
 ---
 
 Would you like me to also draw a **heap diagram with regions (Eden, Survivor, Old, Humongous)** to show how G1 moves objects around during these phases?
+
+
+Perfect 👍 Let’s illustrate the **G1 GC heap layout with regions** and how objects move during GC.
+
+---
+
+# 🔹 1. Heap Partitioning in G1 GC
+
+Instead of fixed contiguous Young/Old generations, the heap is split into **equal-sized regions** (1MB–32MB).
+
+```
+Heap (divided into regions)
++----+----+----+----+----+----+----+----+----+
+| R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | R9 |
++----+----+----+----+----+----+----+----+----+
+
+Each region can be:
+- Eden (new allocations)
+- Survivor (young survivors)
+- Old (long-lived objects)
+- Humongous (very large objects)
+```
+
+---
+
+# 🔹 2. Young GC (Evacuation)
+
+When **Eden fills up**, a **Young GC** happens:
+
+```
+Before GC:
++----+----+----+----+----+----+----+
+|Eden|Eden|Eden|Surv|Old |Old |Old |
++----+----+----+----+----+----+----+
+
+After GC (evacuation):
++----+----+----+----+----+----+----+
+|Eden|Eden|Surv|Surv|Old |Old |Old |
++----+----+----+----+----+----+----+
+
+- Live objects from Eden → moved to Survivor or Old.
+- Dead objects in Eden → discarded.
+- Eden regions cleared for reuse.
+```
+
+👉 This **compacts memory** automatically — no fragmentation.
+
+---
+
+# 🔹 3. Concurrent Marking + Mixed GC
+
+During concurrent marking, G1 identifies Old regions with lots of garbage.
+Then it performs a **Mixed GC**: collects Eden + some Old regions with high garbage.
+
+```
+Before Mixed GC:
++----+----+----+----+----+----+----+
+|Eden|Eden|Surv|Old |Old*|Old*|Old |
++----+----+----+----+----+----+----+
+                (Old* = mostly garbage)
+
+After Mixed GC:
++----+----+----+----+----+----+----+
+|Eden|Eden|Surv|Old |Free|Free|Old |
++----+----+----+----+----+----+----+
+
+- Old* regions evacuated → objects moved elsewhere.
+- Regions reclaimed → now empty (Free).
+```
+
+👉 G1 focuses on “garbage-first” regions (the ones with most garbage) to meet pause-time goals.
+
+---
+
+# 🔹 4. Humongous Objects
+
+If an object > **50% of a region size**, it’s stored in **Humongous regions**.
+
+```
++----+----+----+----+----+
+|Humongous Object (spans)|
++----+----+----+----+----+
+```
+
+* These are more costly to manage.
+* G1 tries to collect them during mixed cycles.
+
+---
+
+# ✅ Summary
+
+* **Heap = partitioned into regions.**
+* **Young GC = evacuates Eden → Survivor/Old (compaction built-in).**
+* **Concurrent marking = finds garbage-heavy Old regions.**
+* **Mixed GC = reclaims Young + Old regions with most garbage.**
+* **Humongous objects = allocated in multiple contiguous regions.**
+
+---
+
+👉 Do you want me to now **compare G1 GC’s region-based compaction with CMS’s fragmentation issue** using a side-by-side diagram?
