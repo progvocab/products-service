@@ -26,6 +26,19 @@ This system design will outline the **architecture**, **components**, **data flo
    - **AWS Secret Manager**: Stores FCM API keys securely  
 
 ---
+### Example of Simple Web Application
+```mermaid
+graph TD
+    Client -->|HTTP| API_Gateway
+    API_Gateway --> Auth_Service
+    API_Gateway --> User_Service
+    API_Gateway --> Order_Service
+    User_Service --> Database[(PostgresDB)]
+    Order_Service --> Database
+```
+
+ 
+
 
 # **2. System Architecture Diagram**
 ```
