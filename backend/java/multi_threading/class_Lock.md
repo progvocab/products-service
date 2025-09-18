@@ -105,3 +105,88 @@ public class ClassLockExample {
 ---
 
 Would you like me to also **draw a diagram** (showing thread interactions with class lock vs object lock) to make it crystal clear?
+
+
+Excellent question 👍 — this is a common confusion when learning Java synchronization.
+Let’s clear it step by step.
+
+---
+
+## 🔒 What is an **Object Lock**?
+
+* In Java, every **object** has an **intrinsic lock** (a monitor lock).
+* When a thread enters a `synchronized` **instance method** (or a `synchronized (this)` block), it must **acquire the lock of that object**.
+* Only **one thread at a time** can hold that object’s lock.
+* Other threads trying to enter **any synchronized instance method** of the same object will be **blocked**, even if they’re different methods.
+
+---
+
+## 🧩 Scenario: Two Different Synchronized Methods in One Object
+
+```java
+class Shared {
+    public synchronized void methodA() {
+        System.out.println(Thread.currentThread().getName() + " entered methodA");
+        try { Thread.sleep(2000); } catch (InterruptedException e) {}
+        System.out.println(Thread.currentThread().getName() + " exiting methodA");
+    }
+
+    public synchronized void methodB() {
+        System.out.println(Thread.currentThread().getName() + " entered methodB");
+        try { Thread.sleep(2000); } catch (InterruptedException e) {}
+        System.out.println(Thread.currentThread().getName() + " exiting methodB");
+    }
+}
+
+public class ObjectLockExample {
+    public static void main(String[] args) {
+        Shared shared = new Shared();
+
+        Thread t1 = new Thread(shared::methodA, "Thread-1");
+        Thread t2 = new Thread(shared::methodB, "Thread-2");
+
+        t1.start();
+        t2.start();
+    }
+}
+```
+
+### 🔎 What happens?
+
+* `Thread-1` calls `methodA()` → acquires **object lock** on `shared`.
+* `Thread-2` calls `methodB()` → also needs the **same object lock**.
+* Since `Thread-1` holds the lock, `Thread-2` must **wait** until `Thread-1` exits.
+
+👉 Even though `methodA` and `methodB` are different methods, they both synchronize on the **same object lock (`shared`)**, so they cannot run concurrently.
+
+---
+
+## ✅ Variations
+
+1. **Different Objects → Different Locks**
+   If two threads call `methodA()` and `methodB()` on **different objects**, they can run in parallel (since each object has its own lock).
+
+   ```java
+   Shared obj1 = new Shared();
+   Shared obj2 = new Shared();
+
+   new Thread(obj1::methodA).start();
+   new Thread(obj2::methodB).start(); // runs in parallel
+   ```
+
+2. **Synchronized Instance vs Static Method**
+
+   * Instance methods lock on the **object instance** (`this`).
+   * Static synchronized methods lock on the **Class object** (`ClassName.class`).
+   * They don’t block each other unless both are static.
+
+---
+
+## 📌 Final Answer
+
+If a class has **two different synchronized instance methods**, then **two threads calling them on the same object will block each other**, because both methods require the **same object lock**.
+They can only run in parallel if they’re called on **different instances** (different object locks).
+
+---
+
+👉 Would you like me to also draw a **diagram of threads, object locks, and method calls** to visualize this better?
