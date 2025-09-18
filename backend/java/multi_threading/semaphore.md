@@ -1,6 +1,6 @@
 
 
-## 🔹 Semaphore in Threads (Java context)
+## 🔹 Semaphore
 
 A **semaphore** is a synchronization mechanism that **controls access to a shared resource** by maintaining a set number of permits.
 
@@ -11,7 +11,7 @@ Think of it like a counter for how many threads can access a resource at the sam
 
 ---
 
-## 🔹 How it Works
+##  How it Works
 
 1. A semaphore is initialized with a number of **permits**.
 2. A thread calls `acquire()` to get a permit:
@@ -22,7 +22,7 @@ Think of it like a counter for how many threads can access a resource at the sam
 
 ---
 
-## 🔹 Example 1 – Binary Semaphore (1 permit)
+##  Example 1 – Binary Semaphore (1 permit)
 
 ```java
 import java.util.concurrent.Semaphore;
@@ -68,7 +68,7 @@ Here only **one thread runs at a time** → acts like a mutex.
 
 ---
 
-## 🔹 Example 2 – Counting Semaphore (3 permits)
+##  Example 2 – Counting Semaphore (3 permits)
 
 ```java
 import java.util.concurrent.Semaphore;
@@ -132,10 +132,8 @@ At most **3 threads run in parallel**.
 
 ---
 
-Do you want me to also compare **Semaphore vs Lock vs Monitor (synchronized keyword)** so you clearly see when to use which?
 
-
-Perfect 👍, let’s compare **Semaphore vs Lock vs Monitor (`synchronized`)**.
+# Compare **Semaphore vs Lock vs Monitor (`synchronized`)**.
 
 ---
 
@@ -266,4 +264,3 @@ public class SemaphoreExample {
 
 ---
 
-👉 Do you want me to also show a **real-world analogy** (like parking lot, ATM, etc.) for these three so it’s super intuitive?
