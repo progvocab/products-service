@@ -105,4 +105,84 @@ flowchart TD
 
 ---
 
-👉 Do you want me to also show a **multi-process architecture** (like Chrome’s separate processes for each tab, renderer, GPU, network), or keep it at this single-process conceptual level?
+** flow when a user types a URL like `google.com`** into a browser
+- DNS resolution
+- TCP/TLS handshake
+- HTTP request/response
+- Rendering
+
+
+
+```mermaid
+flowchart TD
+    A[User types URL: google.com] --> B[Browser checks cache for DNS entry]
+    
+    B -->|Cache miss| C[OS checks local DNS cache]
+    C -->|Cache miss| D[Recursive DNS Resolver]
+    D --> E[Root DNS Server]
+    E --> F[TLD DNS Server  .com ]
+    F --> G[Authoritative DNS Server for google.com]
+    G --> H[Return IP to browser via resolver]
+    
+    H --> I[Browser initiates TCP connection to server IP]
+    I --> J[TCP 3-way handshake completes]
+    
+    J --> K[Browser initiates TLS handshake for HTTPS ]
+    K --> L[TLS session established]
+    
+    L --> M[Browser sends HTTP GET request to server]
+    M --> N[Server processes request]
+    N --> O[Server responds with HTML, CSS, JS, Images]
+    
+    O --> P[Browser parses HTML]
+    P --> Q[Builds DOM tree]
+    O --> R[Parses CSS → CSSOM tree]
+    Q & R --> S[Construct Render Tree]
+    S --> T[Layout calculation]
+    T --> U[Painting & Compositing]
+    U --> V[Home page displayed to user]
+    
+    %% Optional: Browser cache for resources
+    O --> W[Cache static resources for future requests]
+```
+
+---
+
+### 🔹 Flow Explanation:
+
+1. **DNS Resolution**
+
+   * Browser → OS → Recursive DNS → Root → TLD → Authoritative DNS → IP address.
+
+2. **TCP Connection**
+
+   * Browser establishes a TCP connection (3-way handshake) to the server.
+
+3. **TLS/SSL Handshake**
+
+   * Browser and server negotiate encryption (HTTPS).
+
+4. **HTTP Request**
+
+   * Browser sends GET request to fetch homepage.
+
+5. **Server Response**
+
+   * Server sends HTML, CSS, JS, images, etc.
+
+6. **Rendering**
+
+   * Browser parses HTML → DOM tree.
+   * Parses CSS → CSSOM tree.
+   * Combines to Render Tree → layout → painting → display.
+
+7. **Caching**
+
+   * Browser caches static resources for faster subsequent loads.
+
+---
+
+If you want, I can also **draw a more detailed diagram showing parallel requests for images, JS, CSS, and asynchronous loading of resources**, which happens in modern browsers for sites like Google.
+
+
+
