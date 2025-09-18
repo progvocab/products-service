@@ -2,7 +2,7 @@
 
 ---
 
-# 🔹 Key Multithreading Concepts in Java
+# Key Multithreading Concepts in Java
 
 | Concept                            | Explanation                                                                                                   |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -29,7 +29,7 @@
 
 ---
 
-# 🔹 Quick Notes
+#  Quick Notes
 
 * **Thread Safety**: Avoid race conditions using synchronization, locks, atomics.
 * **Executors**: Prefer over manual `Thread` creation for better scalability.
@@ -39,7 +39,7 @@
 ---
 
 
-# **brief list of locking mechanisms in Java multithreading**:
+# **List of locking mechanisms in Java multithreading**:
 
 ---
 
