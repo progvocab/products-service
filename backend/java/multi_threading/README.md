@@ -39,7 +39,7 @@
 ---
 
 
-# **List of locking mechanisms in Java multithreading**:
+# **List of Locking mechanism**:
 
 ---
 
