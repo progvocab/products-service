@@ -335,6 +335,113 @@ flowchart TD
 
 ---
 
-Would you like me to also include **Code Cache** (where JIT compiled methods are stored) in the final diagram, or keep it limited to Heap, Stack, and Metaspace?
+## On  **G1 Garbage Collector** run
+
+---
+
+## 🔹 Quick Recap of Our Program State
+
+```java
+Person p = new Person("Alice");
+String greeting = "Hello World";
+int x = 10;
+```
+
+* **Metaspace** → `Person` and `String` class metadata.
+* **Heap** → `Person` object, `"Alice"`, `"Hello World"`.
+* **Stack** → References: `p`, `greeting`, and primitive `x=10`.
+
+---
+
+##  G1 GC Key Points
+
+* G1 divides the heap into **regions** (young + old).
+* Collects garbage in **parallel** and **incrementally**.
+* When GC runs, **reachable objects (from stack, static vars, metaspace roots) are kept**.
+* **Unreachable objects are reclaimed**.
+
+In our example:
+
+* Both `p` and `greeting` are **reachable** → survive GC.
+* Suppose we set `p = null;` before GC → the `Person` object may be collected.
+
+---
+
+##  Case 1: Before GC (`p` still pointing to Person)
+
+```mermaid
+flowchart TD
+    subgraph Meta["Metaspace"]
+        C1["Class: Person"]
+        C2["Class: String"]
+    end
+
+    subgraph Heap["Heap (G1 regions)"]
+        O1["Person{name:'Alice'} (reachable)"]
+        S1["String: 'Alice' (reachable)"]
+        S2["String: 'Hello World' (reachable)"]
+    end
+
+    subgraph Stack["Thread Stack (main)"]
+        P["p → Person"]
+        G["greeting → 'Hello World'"]
+        X["x = 10"]
+    end
+
+    P --> O1
+    O1 --> S1
+    G --> S2
+```
+
+ GC runs → all objects are still referenced → **no cleanup happens**.
+
+---
+
+##  Case 2: After `p = null;` and then GC runs
+
+* Now `Person{name:'Alice'}` and `"Alice"` string are no longer referenced.
+* `"Hello World"` is still referenced by `greeting`.
+* GC will **reclaim Person and "Alice"**.
+
+```mermaid
+flowchart TD
+    subgraph Meta["Metaspace"]
+        C1["Class: Person"]
+        C2["Class: String"]
+    end
+
+    subgraph Heap["Heap (G1 regions)"]
+        S2["String: 'Hello World' (reachable)"]
+        O1x["Person{name:'Alice'} (unreachable ❌)"]
+        S1x["String: 'Alice' (unreachable ❌)"]
+    end
+
+    subgraph Stack["Thread Stack (main)"]
+        P["p = null"]
+        G["greeting → 'Hello World'"]
+        X["x = 10"]
+    end
+
+    G --> S2
+```
+
+✅ After GC completes →
+
+* `Person` and `"Alice"` are **removed from heap**.
+* `"Hello World"` remains.
+* Metaspace still keeps class definitions.
+
+---
+
+##  Case 3: After method exits (`main()` ends)
+
+* Stack frame for `main` is popped.
+* No references to heap objects remain.
+* GC eventually clears `"Hello World"`.
+* Metaspace keeps class metadata until JVM shutdown.
+
+---
+
+👉 Would you like me to **extend this with G1’s Young/Old region movement** (like how objects survive minor GC and get promoted), or keep it high-level with just “reachable vs unreachable” objects?
 
 
