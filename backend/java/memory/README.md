@@ -441,7 +441,140 @@ flowchart TD
 * Metaspace keeps class metadata until JVM shutdown.
 
 ---
+## **G1 GC (and other generational collectors)** handle object movement between **Eden → Survivor → Old Gen**. 
 
-👉 Would you like me to **extend this with G1’s Young/Old region movement** (like how objects survive minor GC and get promoted), or keep it high-level with just “reachable vs unreachable” objects?
+---
+
+## 🔹 Recap of Example
+
+```java
+Person p = new Person("Alice");
+String greeting = "Hello World";
+int x = 10;
+```
+
+* When objects are **newly created** (`Person`, `"Alice"`, `"Hello World"`) → they go to **Eden region** (young generation).
+* If they **survive GC**, they move to **Survivor regions**.
+* After surviving multiple collections, they get **promoted to Old Gen**.
+
+---
+
+## 🔹 Step 1: Allocation in Eden
+
+All new objects start in **Eden**:
+
+```mermaid
+flowchart TD
+    subgraph Young["Young Generation"]
+        subgraph Eden["Eden Region"]
+            O1["Person{name:'Alice'}"]
+            S1["String: 'Alice'"]
+            S2["String: 'Hello World'"]
+        end
+        subgraph Survivor["Survivor Region (empty)"]
+            Empty1[" "]
+        end
+    end
+
+    subgraph Old["Old Generation"]
+        Empty2[" "]
+    end
+
+    subgraph Stack["Thread Stack (main)"]
+        P["p → Person"]
+        G["greeting → 'Hello World'"]
+        X["x = 10"]
+    end
+
+    P --> O1
+    O1 --> S1
+    G --> S2
+```
+
+---
+
+## 🔹 Step 2: Minor GC Runs
+
+* GC checks **roots** (references from stack, static vars, metaspace).
+* `Person`, `"Alice"`, `"Hello World"` are **reachable**, so they survive.
+* They are **copied from Eden → Survivor**.
+* Eden is cleared.
+
+```mermaid
+flowchart TD
+    subgraph Young["Young Generation"]
+        subgraph Eden["Eden Region"]
+            Empty1["(cleared)"]
+        end
+        subgraph Survivor["Survivor Region"]
+            O1["Person{name:'Alice'} (age=1)"]
+            S1["String: 'Alice' (age=1)"]
+            S2["String: 'Hello World' (age=1)"]
+        end
+    end
+
+    subgraph Old["Old Generation"]
+        Empty2[" "]
+    end
+
+    subgraph Stack["Thread Stack (main)"]
+        P["p → Person"]
+        G["greeting → 'Hello World'"]
+        X["x = 10"]
+    end
+
+    P --> O1
+    O1 --> S1
+    G --> S2
+```
+
+---
+
+## 🔹 Step 3: Survive More GC Cycles → Promotion to Old Gen
+
+* After several GCs (depending on JVM thresholds, e.g., 15 by default but configurable), surviving objects are **promoted to Old Generation**.
+* Now `"Hello World"` and `Person` may move into **Old Gen**.
+
+```mermaid
+flowchart TD
+    subgraph Young["Young Generation"]
+        subgraph Eden["Eden Region"]
+            Empty1["(cleared)"]
+        end
+        subgraph Survivor["Survivor Region"]
+            Empty2["(emptied after promotion)"]
+        end
+    end
+
+    subgraph Old["Old Generation"]
+        O1["Person{name:'Alice'} (promoted)"]
+        S1["String: 'Alice' (promoted)"]
+        S2["String: 'Hello World' (promoted)"]
+    end
+
+    subgraph Stack["Thread Stack (main)"]
+        P["p → Person"]
+        G["greeting → 'Hello World'"]
+        X["x = 10"]
+    end
+
+    P --> O1
+    O1 --> S1
+    G --> S2
+```
+
+---
+
+## 🔹 Summary of Movement
+
+1. **New objects** → Eden.
+2. **Minor GC** → live objects copied Eden → Survivor.
+3. **Subsequent GC cycles** → objects age, eventually promoted to Old Gen.
+4. **Dead objects** → reclaimed when not referenced.
+
+---
+
+👉 Do you want me to also extend this explanation to show what happens if `p = null;` (so `Person` and `"Alice"` die early in Eden/Survivor before reaching Old Gen)?
+
 
 
