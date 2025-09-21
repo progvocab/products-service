@@ -237,7 +237,7 @@ So **Old Gen is not a single large contiguous block** like in Parallel GC. Inste
 
 ```mermaid
 graph TD
-    subgraph Heap (G1)
+    subgraph Heap G1
         E1[Eden Region]
         E2[Eden Region]
         S1[Survivor Region]
