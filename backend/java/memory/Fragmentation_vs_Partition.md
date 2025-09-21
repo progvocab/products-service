@@ -130,3 +130,136 @@ Fragmentation (Bad)                Partitioning (Good)
 ---
 
 Would you like me to also show **how G1 GC uses partitioning to avoid fragmentation** (by moving objects into empty regions instead of compacting the whole heap)?
+
+
+Good question 👍 Let’s compare **Parallel Garbage Collector** (a.k.a. *Throughput Collector*) with G1 in terms of **fragmentation vs partitioning**.
+
+---
+
+## 🔹 Parallel Garbage Collector (PGC)
+
+### 1. **Heap Layout**
+
+* Traditional **generational model**:
+
+  * **Young Generation** (Eden + 2 Survivors)
+  * **Old Generation**
+  * **Permanent Generation / Metaspace** (class metadata)
+
+Unlike G1, the **heap is not divided into equal-sized regions**. Instead, it’s a few large continuous spaces.
+
+---
+
+### 2. **Collection Algorithm**
+
+* **Young GC (Minor GC)**:
+
+  * Eden → Survivor → Promotion to Old.
+  * Uses **copying collection**, so **no fragmentation** in Eden/Survivors (compaction happens automatically since objects are copied).
+* **Old GC (Major GC)**:
+
+  * Uses **mark-sweep-compact**:
+
+    1. **Mark** reachable objects.
+    2. **Sweep** unreachable ones.
+    3. **Compact** live objects to eliminate fragmentation.
+
+---
+
+### 3. **Fragmentation Handling**
+
+* **Young Gen**: Safe (copying GC avoids fragmentation).
+* **Old Gen**: Fragmentation *can* occur after **mark-sweep**, so PGC often follows up with **compaction** to keep memory contiguous.
+
+  * This compaction step causes **long stop-the-world pauses**.
+
+---
+
+## 🔹 Parallel GC vs G1 GC
+
+| Feature                | Parallel GC                                  | G1 GC (Garbage-First)                                |
+| ---------------------- | -------------------------------------------- | ---------------------------------------------------- |
+| **Heap Division**      | Few large partitions (Young/Old)             | Many small equal-sized regions (1MB–32MB)            |
+| **Fragmentation Risk** | Yes, in Old Gen after sweep phase            | Very low (always uses region compaction via copying) |
+| **Compaction**         | Full compaction during Major GC (STW)        | Incremental compaction during Mixed GC               |
+| **Pause Times**        | Long (stop-the-world, especially for Old GC) | Predictable, tunable (`-XX:MaxGCPauseMillis`)        |
+| **Goal**               | High throughput (max app execution)          | Low latency (predictable pauses)                     |
+
+---
+
+## 🔑 Answer to your question:
+
+* **Parallel GC uses partitioning only at the generational level** (Young/Old).
+* It **does not partition into small regions like G1**.
+* To deal with **fragmentation in Old Gen**, Parallel GC performs **compaction** during Full GC / Major GC (but this is costly).
+
+---
+
+👉 Do you want me to also show you a **mermaid diagram of Parallel GC phases (Young vs Old)** so you can visually compare it with the G1 diagram we made earlier?
+
+
+Excellent follow-up 👍
+
+Yes — **G1 does partitioning in the Old Generation**, but it’s very different from the way the **Parallel GC** handles Old Gen.
+
+---
+
+## 🔹 How G1 Partitions the Heap
+
+* G1 **divides the entire heap** (not just Young) into **equal-sized regions** (1MB–32MB each).
+* These regions are dynamically tagged as:
+
+  * **Eden region**
+  * **Survivor region**
+  * **Old region**
+  * **Humongous region** (large object spans multiple regions)
+
+So **Old Gen is not a single large contiguous block** like in Parallel GC. Instead, it is a *set of scattered regions* across the heap, each managed independently.
+
+---
+
+## 🔹 Why This Matters
+
+1. **Fragmentation Control**
+
+   * In Parallel GC, Old Gen can become fragmented after multiple mark-sweep cycles, requiring a long STW compaction.
+   * In G1, Old Gen objects live in regions. When G1 reclaims garbage, it can **evacuate live objects into new regions** and free up fragmented ones → avoids global compaction.
+
+2. **Selective Collection (Garbage-First strategy)**
+
+   * After concurrent marking, G1 knows which Old Gen regions are “mostly garbage.”
+   * It collects only those regions in **mixed collections**, while leaving others untouched.
+   * This keeps pause times short and predictable.
+
+---
+
+## 🔹 Visualization – G1 Old Gen Partitioning
+
+```mermaid
+graph TD
+    subgraph Heap (G1)
+        E1[Eden Region]
+        E2[Eden Region]
+        S1[Survivor Region]
+        S2[Survivor Region]
+        O1[Old Region]
+        O2[Old Region]
+        O3[Old Region]
+        H1[Humongous Region]
+    end
+```
+
+* All regions are **same size**.
+* Some are tagged as **Old Gen**, but they’re scattered — not one big chunk.
+
+---
+
+## 🔑 Direct Answer:
+
+✔️ Yes, **G1 partitions the Old Generation into regions**, just like it does with Young Gen.
+✔️ This regional partitioning is what allows G1 to do **incremental evacuation and compaction**, avoiding long stop-the-world full compactions.
+
+---
+
+Would you like me to now **compare how compaction works in Old Gen for G1 vs Parallel GC** with a diagram? That way you’ll see exactly why G1 has less fragmentation.
+
