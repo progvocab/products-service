@@ -40,10 +40,10 @@ Absolutely — for **large-scale recommendation systems**, you want to decouple 
 flowchart LR
     A[User Interaction] -->|click/view| B[Interaction DB / Event Store]
     B --> C[Raw Data Lake]
-    C --> D[Batch ETL / Feature Engineering (Airflow DAG)]
+    C --> D[Batch ETL / Feature Engineering Airflow DAG]
     D --> E[Model Training]
     E --> F[Recommendation DB / Feature Store]
-    F -->|API Query| G[Serving Layer (Redis / DB)]
+    F -->|API Query| G[Serving Layer Redis or DB]
     G -->|Recommendations| A
 ```
 
@@ -103,6 +103,83 @@ flowchart LR
 * Mirrors **Netflix / Amazon Prime designs**: decoupled, scalable, hybrid batch + online updates.
 
 ---
+
+Ah, this is an important design choice! Let’s carefully compare **NMF (Non-negative Matrix Factorization)** and **TF-IDF vectorization** and why NMF was chosen for the recommendation system.
+
+---
+
+## **1. TF-IDF Vectorizer**
+
+* **What it is**: TF-IDF converts documents (or item descriptions) into **sparse vectors** based on term frequency and inverse document frequency.
+* **Use case**: Mainly used in **content-based recommendation**. For example, recommending articles or movies based on keywords in descriptions.
+* **Limitations for user-item recommendations**:
+
+  1. TF-IDF only captures **item content**, not **user interaction patterns**.
+  2. It cannot naturally model **latent preferences** across users and items.
+  3. Cannot handle **collaborative filtering**, i.e., "users who liked X also liked Y."
+
+**When to use TF-IDF**:
+
+* When you only have **item metadata** (titles, descriptions, tags) and no user ratings or clicks.
+
+---
+
+## **2. NMF (Non-negative Matrix Factorization)**
+
+* **What it is**: Factorizes a **user-item interaction matrix** (R) into two lower-dimensional matrices (U) (user factors) and (V) (item factors):
+
+[
+R \approx U \cdot V
+]
+
+* **Advantages for recommendations**:
+
+  1. **Captures latent features** of users and items. For example, "action movie fan," "comedy lover," etc.
+  2. Works well with **collaborative filtering**, using user ratings or implicit clicks.
+  3. Can generate **top-K recommendations** even for items a user hasn’t interacted with.
+  4. Produces **dense embeddings** that are suitable for ranking and similarity computations.
+
+**When to use NMF**:
+
+* When you have **user-item interactions** (ratings, clicks, views).
+* When you want **personalized recommendations** using collaborative filtering.
+
+---
+
+## **3. Key Differences**
+
+| Feature                 | TF-IDF                        | NMF                                  |
+| ----------------------- | ----------------------------- | ------------------------------------ |
+| Input                   | Item content / text           | User-item interaction matrix         |
+| Captures                | Item similarity based on text | Latent user/item features            |
+| Collaborative filtering | ❌ No                          | ✅ Yes                                |
+| Cold start              | Works for new items           | Needs at least some user interaction |
+| Output                  | Sparse item vectors           | Dense user & item embeddings         |
+| Top-K recommendations   | Needs similarity computation  | Direct from predicted scores         |
+
+---
+
+### **4. Why We Chose NMF**
+
+* Your system has **user preferences and click data**, not just item descriptions.
+* We want **collaborative filtering**, i.e., recommendations based on both **user behavior and item characteristics**.
+* NMF allows us to **factorize the user-item matrix**, capture **latent preferences**, and **predict scores for unseen items**, which TF-IDF cannot do effectively.
+
+---
+
+✅ **Summary**
+
+* TF-IDF → content-based, ignores user behavior.
+* NMF → collaborative filtering, leverages both user behavior and latent item features.
+* Since your system stores **user preferences and interactions**, **NMF (or other matrix factorization methods) is the right choice**.
+
+---
+
+If you want, I can **also show a hybrid approach**: combine **TF-IDF for item content** with **NMF embeddings** for users — this is similar to **what Netflix does for cold-start items**.
+
+Do you want me to show that hybrid approach?
+
+
 
 If you want, I can **draw a full production-ready architecture diagram** showing **Airflow DAGs, Kafka streaming, caching, and API layers**, similar to what Netflix uses.
 
