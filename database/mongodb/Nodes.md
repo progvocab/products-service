@@ -205,3 +205,91 @@ With this diagram, you can see how **MongoDB’s cluster topology** maps **infra
 ---
 
 👉 Do you also want me to **add the data flow** (client query → router → config server → shard → primary/secondary → response)?
+
+
+Perfect 🚀 Let’s draw a **full MongoDB sharded cluster diagram** showing:
+
+* Multiple **shards** (some with a single node, some as replica sets).
+* **Config servers**.
+* **Mongos routers**.
+* **Clients** connecting and querying.
+
+---
+
+# 📊 MongoDB Sharded Cluster – Mixed Shards (Single Node + Replica Set)
+
+```mermaid
+graph TD
+
+    subgraph Client_Layer["Client Layer"]
+        C1[Client App 1]
+        C2[Client App 2]
+    end
+
+    subgraph Router_Layer["Router Layer"]
+        R1[MongoS Router 1]
+        R2[MongoS Router 2]
+    end
+
+    subgraph Config_Layer["Config Servers"]
+        CFG1[Config Server 1]
+        CFG2[Config Server 2]
+        CFG3[Config Server 3]
+    end
+
+    subgraph Shard1["Shard 1 - Single Node Shard"]
+        N1[Node 1 - Primary Only]
+    end
+
+    subgraph Shard2["Shard 2 - Replica Set Shard"]
+        P2[Primary Node]
+        S2a[Secondary Node 1]
+        S2b[Secondary Node 2]
+    end
+
+    subgraph Shard3["Shard 3 - Replica Set Shard"]
+        P3[Primary Node]
+        S3a[Secondary Node 1]
+        S3b[Secondary Node 2]
+        A3[Arbiter Node]
+    end
+
+    %% Connections
+    C1 --> R1
+    C2 --> R2
+
+    R1 --> CFG1
+    R1 --> CFG2
+    R1 --> CFG3
+    R2 --> CFG1
+    R2 --> CFG2
+    R2 --> CFG3
+
+    R1 --> N1
+    R1 --> P2
+    R1 --> P3
+    R2 --> N1
+    R2 --> P2
+    R2 --> P3
+```
+
+---
+
+# 🔎 Explanation
+
+* **Clients** → Connect to **mongos routers** (entry points).
+* **Routers (mongos)** → Route queries to the correct shard.
+* **Config Servers** → Store cluster metadata (shard key ranges, chunk info).
+* **Shard 1** → A **single-node shard** (good for testing/dev, no HA).
+* **Shard 2 & 3** → Proper **replica set shards** (high availability).
+
+  * Shard 3 also includes an **arbiter node** for election purposes.
+
+---
+
+✅ This design shows how MongoDB supports **mixed shard setups** (single node or replica sets) in the same cluster.
+👉 In **production**, **every shard should be a replica set** for reliability.
+
+---
+
+Do you want me to **add the query flow** (e.g., client issues `find()` → mongos → config servers → correct shard → primary/secondary → response back to client)?
