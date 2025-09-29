@@ -335,3 +335,84 @@ If one node tried to be part of two shards, it would need to serve **two differe
 ---
 
 Do you want me to extend the **Mermaid diagram** to show an example where a **single physical server runs two mongod instances** that belong to **different shards**?
+
+
+Perfect 👍 Let’s compare **MongoDB cluster architecture** vs **Kubernetes cluster architecture**, so you can clearly see how terms like *node* and *deployment* differ.
+
+Here’s the **Mermaid diagram**:
+
+```mermaid
+flowchart TB
+
+subgraph MongoDB_Cluster["MongoDB Cluster"]
+    direction TB
+    Shard1["Shard 1 (Replica Set)"]
+    Shard2["Shard 2 (Replica Set)"]
+    ConfigS["Config Servers"]
+    Mongos["mongos Router"]
+
+    Shard1 --> Mongos
+    Shard2 --> Mongos
+    ConfigS --> Mongos
+end
+
+subgraph Shard1
+    RS1P["Primary Node"]
+    RS1S1["Secondary Node"]
+    RS1S2["Secondary Node"]
+end
+
+subgraph Shard2
+    RS2P["Primary Node"]
+    RS2S1["Secondary Node"]
+end
+
+subgraph Kubernetes_Cluster["Kubernetes Cluster"]
+    direction TB
+    K8sAPI["Kubernetes API Server"]
+    subgraph WorkerNodes["Worker Nodes"]
+        Pod1["Pod: MongoDB Primary"]
+        Pod2["Pod: MongoDB Secondary"]
+        Pod3["Pod: Config Server"]
+    end
+    Scheduler["K8s Scheduler"]
+    ETCD["etcd (State Store)"]
+
+    K8sAPI --> Scheduler
+    K8sAPI --> ETCD
+    Scheduler --> WorkerNodes
+end
+
+MongoDB_Cluster --> Kubernetes_Cluster
+```
+
+---
+
+### 🔹 Explanation
+
+#### MongoDB Cluster
+
+* **Shard** → Can be one node or a replica set.
+* **Replica Set** → Has 1 Primary + N Secondaries for redundancy.
+* **Config Servers** → Store cluster metadata.
+* **mongos Router** → Query router that directs requests to correct shard.
+
+#### Kubernetes Cluster
+
+* **Node (K8s)** → A physical/VM worker machine.
+* **Pod** → Smallest unit in K8s; can run one MongoDB instance (`mongod`).
+* **Deployment/StatefulSet** → Manages Pods. StatefulSet is usually used for MongoDB (because of stable identities).
+* **etcd** → Stores cluster state.
+* **Scheduler** → Assigns Pods to worker nodes.
+
+---
+
+👉 The key is:
+
+* **MongoDB node ≠ Kubernetes node.**
+* In K8s, a MongoDB *node* runs inside a **Pod**, which runs on a **K8s Node** (machine).
+
+---
+
+Would you like me to extend this and show **MongoDB sharded cluster running *on top of* Kubernetes** (tying Pods ↔ Replica Sets ↔ Shards)?
+
