@@ -1,8 +1,8 @@
- Let’s draw a **diagram of Java Memory Management** and label all the memory areas managed by the JVM.
+ **Java Memory Management** 
 
 ---
 
-# 🔹 Java Memory Management Overview
+## Java Memory Management Overview
 
 ```
           +-----------------------------------+
@@ -41,7 +41,7 @@
 
 ---
 
-# 🔹 Explanation of Each Memory Type
+## Explanation of Each Memory Type
 
 ### 1. **Method Area (MetaSpace in Java 8+)**
 
@@ -57,6 +57,9 @@
 
     * Eden Space: New objects are created here.
     * Survivor Spaces (S0, S1): Objects that survive GC move here.
+    * Initially Empty , on run of **Minor GC** the surviving object are moved to S0
+    * On next run **Minor GC** next set of surviving objects are moved to S1
+    * Ping pong survivor spaces S0 <-> S1
   * **Old Generation (Tenured)**
 
     * Long-lived objects move here after surviving multiple GCs.
@@ -157,6 +160,34 @@ flowchart TD
     O2 --> C2
 ```
 
+## GC
+```mermaid
+flowchart TD
+    subgraph Young Generation
+        Eden[ Eden ]
+        S1[ Survivor Space 1 From ]
+        S2[ Survivor Space 2 To ]
+    end
+
+    Old[ Old Generation ]
+
+    %% Initial allocation
+    App[New Objects Allocated] --> Eden
+
+    %% First Minor GC
+    Eden -->|Minor GC: Live objects copied| S2
+    S1 -->|Minor GC: Live objects copied| S2
+    Eden -->|Dead objects removed| GC1[ Garbage Collection ]
+    S1 -->|Dead objects removed| GC1
+
+    %% Ping-Pong
+    S2 -->|Next GC becomes From| S1
+    S1 -->|Next GC becomes To| S2
+
+    %% Promotion to Old Generation
+    S1 -->|Survived N GCs| Old
+    S2 -->|Survived N GCs| Old
+```
 ---
 
 ##  Example Walkthrough
@@ -182,14 +213,8 @@ public class Person {
 
 ---
 
-## **step-by-step diagram showing what happens in memory when `main` runs** (loading class → creating object → assigning reference)
----
+## **Step-by-step diagram showing what happens in memory when `main` runs** (loading class → creating object → assigning reference)
 
-
-
----
-
-## 🔹 Example Program
 
 ```java
 public class Person {
@@ -574,7 +599,65 @@ flowchart TD
 
 ---
 
-👉 Do you want me to also extend this explanation to show what happens if `p = null;` (so `Person` and `"Alice"` die early in Eden/Survivor before reaching Old Gen)?
+**Steps of Minor GC and Major (Full) GC** 
+
+---
+
+## **1. Minor GC (Young Generation Collection)**
+
+1. **Trigger:**
+
+   * Occurs when **Eden space is full**.
+
+2. **Steps:**
+
+   1. Stop-the-world pause for the thread(s).
+   2. Identify **live objects** in Eden + From Survivor (S1).
+   3. Copy live objects to **To Survivor (S2)**.
+   4. Dead objects are **discarded**.
+   5. **Swap S1 and S2** (ping-pong).
+   6. Objects surviving **multiple minor GCs** are **promoted to Old Generation**.
+
+3. **Notes:**
+
+   * Fast, frequent, short pause.
+   * Only deals with Young Generation.
+
+---
+
+## **2. Major GC / Full GC (Old Generation Collection)**
+
+1. **Trigger:**
+
+   * Occurs when **Old Generation is full** or during explicit `System.gc()`.
+
+2. **Steps:**
+
+   1. Stop-the-world pause for all threads.
+   2. Identify **live objects** in **Old Generation + Young Generation**.
+   3. Collect unreachable objects.
+   4. Compact remaining objects to reduce fragmentation.
+   5. May also promote survivor objects from Young Gen if they survive enough cycles.
+
+3. **Notes:**
+
+   * Slower, longer pause.
+   * Collects **entire heap** (Young + Old).
+
+---
+
+### 🔹 Quick Comparison
+
+| Feature         | Minor GC                        | Major/Full GC            |
+| --------------- | ------------------------------- | ------------------------ |
+| Region          | Young Generation                | Whole Heap (Young+Old)   |
+| Trigger         | Eden full ( Frequent )                      | Old Gen full / explicit (Less Frequent) |
+| Speed           | Fast, short pause               | Slow, longer pause       |
+| Object Handling | Moves survivors to S2 / promote | Compacts & frees Old Gen |
+
+---
+
+
 
 
 
