@@ -1,4 +1,61 @@
-Ah, now we’re talking about **biased locking** in the JVM! Let’s go step by step.
+
+
+---
+
+## **1. Fair Lock**
+  A lock that grants access to threads **in the order they requested it** (FIFO).
+
+* **Characteristics:**
+
+  * Threads are queued in **arrival order**.
+  * Prevents **starvation** (every thread eventually gets the lock).
+  * **Slower** than unfair locks because it requires queue management.
+
+* **Example in Java:**
+
+```java
+ReentrantLock fairLock = new ReentrantLock(true); // true = fair
+```
+
+* **Use Case:**
+
+  * When fairness is critical, e.g., **thread scheduling fairness in server apps**.
+
+---
+
+## **2. Biased Lock**
+
+ A JVM optimization where a lock is **“biased” toward the first thread that acquires it**, assuming **no contention**.
+
+* **Characteristics:**
+
+  * If the same thread tries to acquire the lock repeatedly, it **avoids expensive atomic operations**.
+  * **No queueing overhead** → much faster than fair locks under low contention.
+  * If another thread tries to acquire the lock → JVM revokes the bias and upgrades to a **normal or lightweight lock**.
+
+* **Use Case:**
+
+  * Optimizes performance for **uncontended locks**, which are extremely common in typical Java apps.
+
+---
+
+
+
+| Feature       | Fair Lock                   | Biased Lock                           |
+| ------------- | --------------------------- | ------------------------------------- |
+| Thread Access | FIFO order, fair            | Biased toward first thread            |
+| Overhead      | Higher (queue management)   | Very low if uncontended               |
+| Contention    | Works well under contention | Must revoke bias if contention occurs |
+| Use Case      | Fair scheduling required    | Optimizing uncontended locks          |
+| Example       | `new ReentrantLock(true)`   | JVM default lock (biased enabled)     |
+
+---
+
+* **Fair Lock = fairness guaranteed, slower**.
+* **Biased Lock = fast for single-threaded access, low overhead, bias revoked under contention**.
+
+
+
 
 ---
 
