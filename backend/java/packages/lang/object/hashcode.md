@@ -346,3 +346,179 @@ flowchart TD
 ---
 
 👉 Do you want me to also show you a **real HotSpot `markOop.hpp` source snippet** (with the exact bit masks for `hash` field, lock bits, etc.) so you see the C++ definitions JVM uses internally?
+
+Good question 👍 Let’s carefully walk through **how `hashCode()` is computed for `java.lang.Object`** in the HotSpot JVM.
+
+---
+
+# 1️⃣ `Object.hashCode()` contract
+
+* Every Java object inherits `hashCode()` from `Object`.
+* By default, it provides a **hash value based on the object’s identity**, not its contents.
+* That means two different objects usually have different hash codes, even if their fields are equal (unless overridden in a class).
+
+---
+
+# 2️⃣ How it works inside the JVM
+
+The `hashCode()` for `Object` is **not written in Java** — it’s a **native method**:
+
+```java
+public native int hashCode();
+```
+
+That means the implementation is in the **JVM (C++ code in HotSpot)**.
+
+---
+
+# 3️⃣ HotSpot JVM implementation
+
+In HotSpot, the identity hash code is stored in the **object header** (specifically in the *mark word*).
+
+* The **first time** you call `hashCode()`, JVM generates a hash value (using various strategies depending on configuration).
+* This value is **stored in the mark word** (or in the monitor object if the object is locked).
+* **Subsequent calls** return the same stored value.
+
+---
+
+# 4️⃣ Hash computation strategies
+
+HotSpot supports multiple strategies for generating the initial identity hash (controlled by the JVM flag `-XX:hashCode`):
+
+* **Thread-based mixing** (default): Mix of memory address bits + thread state + randomization.
+* **Global counter**: Incrementing counter ensures uniqueness.
+* **Random number**: Assigns random 32-bit value.
+* **Object address**: Uses the actual memory address (but this is rare, since objects move under GC).
+
+By default, modern HotSpot uses a **randomized hash** (to avoid predictability).
+
+---
+
+# 5️⃣ C++ implementation (simplified HotSpot code)
+
+In `hotspot/src/share/vm/runtime/objectMonitor.cpp` and `markOop.hpp`, you’ll find logic like this:
+
+```cpp
+uintptr_t mark = obj->mark();
+if (!mark->has_hash()) {
+    // Generate a new identity hash
+    unsigned int hash = os::random();
+    obj->set_mark(mark->copy_set_hash(hash));
+    return hash;
+} else {
+    // Already has a hash
+    return mark->hash();
+}
+```
+
+* `markOop` = object header (mark word).
+* If no hash is set, JVM generates one (randomized).
+* If already set, returns stored value.
+
+---
+
+# 6️⃣ Example in action
+
+```java
+public class TestHash {
+    public static void main(String[] args) {
+        Object o1 = new Object();
+        Object o2 = new Object();
+
+        System.out.println(o1.hashCode()); // e.g. 12345678
+        System.out.println(o1.hashCode()); // same as above
+        System.out.println(o2.hashCode()); // different value
+    }
+}
+```
+
+---
+
+✅ **Key takeaway:**
+
+* The `Object.hashCode()` is an **identity hash code**, generated once and stored in the object’s header.
+* It is **not derived from memory address directly** (since objects move during GC).
+* It remains constant for the lifetime of the object.
+
+---
+
+👉 Do you want me to also show the **exact HotSpot mark word layout with hash bits** (bitwise representation before/after `hashCode()` is computed)?
+
+
+Perfect 👍 let’s dive into the **mark word layout** in HotSpot and see how the **identity hash code** is actually stored.
+
+---
+
+# 🧩 Mark Word (Object Header) in HotSpot
+
+Every object in the JVM has a header.
+One part of that header is the **Mark Word** (used for GC, locking, hash code, etc.).
+
+For a **64-bit JVM (compressed oops, no biasing)**, the Mark Word is 64 bits.
+
+---
+
+## 1️⃣ Mark Word before `hashCode()` is called (unlocked)
+
+```
+  unused (25 bits) | age (4) | biased_lock (1) | lock (2) | unused (32)
+```
+
+* **age** = GC age (how many collections survived).
+* **lock bits** = 01 means unlocked.
+* No hash code yet.
+
+---
+
+## 2️⃣ Mark Word after `hashCode()` is called (unlocked, hash stored)
+
+When the JVM computes a hash, it writes it into the mark word.
+
+```
+  hash (31 bits) | unused (25 bits) | age (4) | biased_lock (1) | lock (2) | 01
+```
+
+* Hash = 31 bits (identity hash code).
+* Stored directly in the mark word.
+* Subsequent calls to `hashCode()` read from here.
+
+---
+
+## 3️⃣ When the object is locked (synchronized)
+
+If you lock the object, the mark word can’t store the hash anymore —
+it’s replaced with a **pointer to the monitor** (lock record).
+
+```
+  monitor address (62 bits) | lock (2 bits = 10)
+```
+
+* The monitor stores both lock metadata and (if needed) the displaced hash code.
+* This way, hash is preserved even while locked.
+
+---
+
+# 📊 Visual Diagram (Mermaid)
+
+```mermaid
+flowchart TD
+    A[Object Header\n(Mark Word)]
+    A --> B[Unlocked\n(No hash yet)]
+    B --> C[Unlocked\nHash stored in 31 bits of mark word]
+    C --> D[Locked\nMark word points to Monitor]
+    D --> E[Monitor stores displaced header + hash]
+```
+
+---
+
+# ✅ Summary
+
+* `hashCode()` of `Object` = **31-bit identity hash code**.
+* Stored in **Mark Word** if object is unlocked.
+* If locked, hash is stored in the **monitor**.
+* Generated once (randomized by default in HotSpot) and constant for object lifetime.
+
+---
+
+👉 Do you also want me to show you the **real C++ HotSpot struct (`markOopDesc`) with the bit masks** that define these hash bits?
+
