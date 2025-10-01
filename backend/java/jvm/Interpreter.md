@@ -16,6 +16,37 @@ Let’s break this down carefully because **Interpreter Mode** and **Just-In-Tim
 
 * Slower performance because every bytecode instruction must be **translated again and again** at runtime.
 
+Example : 
+```text
+Byte Code 
+5: iload_1       // load local var[1] (a=5) onto stack
+6: iload_2       // load local var[2] (b=7) onto stack
+7: iadd          // add top two ints
+8: istore_3      // store result into local var[3] (sum)
+```
+
+| Step | Instruction | Operand Stack (before → after) | Local Vars         |
+| ---- | ----------- | ------------------------------ | ------------------ |
+| 5    | `iload_1`   | `[] → [5]`                     | `a=5, b=7, sum=?`  |
+| 6    | `iload_2`   | `[5] → [5, 7]`                 | `a=5, b=7, sum=?`  |
+| 7    | `iadd`      | `[5, 7] → [12]`                | `a=5, b=7, sum=?`  |
+| 8    | `istore_3`  | `[12] → []`                    | `a=5, b=7, sum=12` |
+
+```mermaid
+flowchart TD
+    A[Bytecode Instruction] --> B[Interpreter Fetch]
+    B --> C[Decode Instruction]
+    C --> D[Execute on Operand Stack]
+
+    subgraph Example_Execution
+        E1[iload_1 → push 5] --> E2[iload_2 → push 7]
+        E2 --> E3[iadd → pop 5,7 → push 12]
+        E3 --> E4[istore_3 → store 12 in sum]
+    end
+
+    D --> Example_Execution
+```
+
 ---
 
 # 🔹 2. Just-In-Time (JIT) Compiler
@@ -32,6 +63,88 @@ Let’s break this down carefully because **Interpreter Mode** and **Just-In-Tim
 
 * Slower startup (compilation overhead).
 * Needs profiling/warm-up before full performance.
+
+Example :
+Yes ✅ — let’s now look at the **JIT compilation path**, where instead of interpreting bytecode line by line, the JVM compiles “hot” bytecode into **native machine code**.
+
+---
+
+## 🔹 Example Java Code
+
+```java
+public class Sum {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+    public static void main(String[] args) {
+        int result = 0;
+        for (int i = 0; i < 1_000_000; i++) {
+            result = add(5, 7);  // Hot method, called many times
+        }
+        System.out.println(result);
+    }
+}
+```
+
+---
+
+## 🔹 Bytecode for `add` method
+
+```text
+0: iload_0      // load a
+1: iload_1      // load b
+2: iadd         // a + b
+3: ireturn      // return result
+```
+
+---
+
+## 🔹 JIT Compilation Flow
+
+1. **Interpretation Phase**
+
+   * At first, JVM executes `add(int,int)` by interpreting bytecode (`iload_0, iload_1, iadd, ireturn`).
+
+2. **Hot Spot Detection**
+
+   * The JVM notices `add` is called **1M times** → marks it as a **hot method**.
+
+3. **JIT Compilation**
+
+   * The JIT compiler translates bytecode into **native CPU instructions**.
+
+   Example (x86 simplified):
+
+   ```asm
+   mov eax, edi   ; move first arg (a) into register eax
+   add eax, esi   ; add second arg (b)
+   ret            ; return result in eax
+   ```
+
+   🔹 Instead of pushing/popping from a stack, the JIT uses **CPU registers** directly (much faster).
+
+4. **Execution**
+
+   * Subsequent calls to `add` use this **compiled machine code** directly, bypassing interpretation.
+
+
+```mermaid
+flowchart TD
+    A[Bytecode] --> B[JVM Interpreter]
+    B -->|Executed Many Times| C[Hotspot Detected]
+    C --> D[JIT Compiler - Translate to Native Code]
+    D --> E[Machine Code Execution - CPU Registers]
+```
+
+---
+
+✅ **Summary:**
+
+* Interpreter: executes bytecode step by step → slower.
+* JIT Compiler: converts frequently used bytecode into native machine code → faster execution.
+
+
+
 
 ---
 
