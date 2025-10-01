@@ -396,3 +396,80 @@ If you want, I can make a **diagram comparing G1 vs ZGC vs Shenandoah default su
 
 Do you want me to do that?
 
+
+Absolutely! While **G1** is the general-purpose default GC for most Java applications, other garbage collectors—**ZGC, Shenandoah, Serial GC, and Parallel GC**—can be better suited for specific types of applications depending on **heap size, latency requirements, and throughput priorities**. Here’s a structured breakdown:
+
+---
+
+## **1️⃣ ZGC – Ultra-low-latency applications**
+
+| Application Type              | Why ZGC is Suitable                              | Example Use Cases                                                               |
+| ----------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------- |
+| Large heap, latency-sensitive | Pause times <10 ms even for multi-terabyte heaps | High-frequency trading systems, real-time analytics, financial risk calculation |
+| Real-time microservices       | Low-latency processing                           | Real-time recommendation engines, online gaming backends                        |
+| Large datasets                | Efficient concurrent compaction                  | AI/ML model serving with large memory footprints                                |
+
+**Notes:** ZGC is designed for applications where **even tens of milliseconds of pause can be unacceptable**.
+
+---
+
+## **2️⃣ Shenandoah GC – Low-pause, large heaps**
+
+| Application Type        | Why Shenandoah is Suitable                           | Example Use Cases                                                                    |
+| ----------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Low-latency, large heap | Concurrent compaction keeps pause times low (few ms) | Search engines (OpenSearch custom setups), telemetry processing, large-scale caching |
+| Multi-threaded servers  | Avoids long stop-the-world events                    | Message brokers, streaming analytics (Kafka consumers)                               |
+
+**Notes:** Shenandoah is similar to ZGC but generally easier to tune on large, low-latency heaps in enterprise workloads.
+
+---
+
+## **3️⃣ Parallel GC – Throughput-focused applications**
+
+| Application Type      | Why Parallel GC is Suitable            | Example Use Cases                    |
+| --------------------- | -------------------------------------- | ------------------------------------ |
+| Batch processing      | Maximizes throughput, short-lived jobs | Hadoop MapReduce, Spark batch jobs   |
+| Compute-intensive     | Parallel threads reduce GC time        | Scientific computing, data pipelines |
+| Not latency-sensitive | Can tolerate longer pause times        | ETL pipelines, nightly batch jobs    |
+
+**Notes:** Parallel GC uses multiple threads for **minor and major collections**, improving throughput at the expense of pause predictability.
+
+---
+
+## **4️⃣ Serial GC – Small heap, single-threaded apps**
+
+| Application Type       | Why Serial GC is Suitable          | Example Use Cases                       |
+| ---------------------- | ---------------------------------- | --------------------------------------- |
+| Small memory footprint | Simple and minimal overhead        | Embedded devices, IoT Java applications |
+| Single-threaded        | Works well with low concurrency    | Simple desktop apps, small utilities    |
+| Deterministic          | Consistent behavior on small heaps | Microcontrollers running Java ME        |
+
+**Notes:** Serial GC is extremely lightweight but **not suitable for large, multi-threaded servers**.
+
+---
+
+## **5️⃣ Summary Table**
+
+| GC Type         | Best Suited For                             | Key Advantage                       |
+| --------------- | ------------------------------------------- | ----------------------------------- |
+| **G1**          | General-purpose, mid-large heaps            | Balanced pause time + throughput    |
+| **ZGC**         | Ultra-low-latency, huge heaps (>100GB)      | <10 ms pause, fully concurrent      |
+| **Shenandoah**  | Low-latency, large heaps (tens of GBs)      | Few ms pause, concurrent compaction |
+| **Parallel GC** | Batch processing, throughput-focused apps   | High throughput, multi-threaded     |
+| **Serial GC**   | Small heaps, single-threaded, embedded apps | Low overhead, deterministic         |
+
+---
+
+💡 **Rule of Thumb:**
+
+* **Low latency** → ZGC / Shenandoah
+* **High throughput** → Parallel GC
+* **Small/simple apps** → Serial GC
+* **Most mid-large server apps** → G1
+
+---
+
+If you want, I can make a **visual diagram showing which GC to choose based on heap size, latency requirement, and throughput**, so it’s easy to decide for any Java application.
+
+Do you want me to do that?
+
