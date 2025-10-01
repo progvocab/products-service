@@ -46,6 +46,24 @@ Bootstrap
 
 ---
 
+Lets say you have 2 different Java Spring boot applications running on same machine , each will have its own classloader 
+```mermaid
+graph TD
+    subgraph App1
+        A1[Bootstrap ClassLoader] --> B1[Platform ClassLoader]
+        B1 --> C1[App ClassLoader]
+        C1 --> D1[Spring Boot LaunchedClassLoader - App1]
+        D1 --> E1[App1 Classes & Libs]
+    end
+
+    subgraph App2
+        A2[Bootstrap ClassLoader] --> B2[Platform ClassLoader]
+        B2 --> C2[App ClassLoader]
+        C2 --> D2[Spring Boot LaunchedClassLoader - App2]
+        D2 --> E2[App2 Classes & Libs]
+    end
+```
+
 ### **4. Embedded Tomcat ClassLoader Behavior**
 
 Tomcat, when embedded in Spring Boot:
@@ -81,11 +99,8 @@ Tomcat, when embedded in Spring Boot:
 
 ---
 
-Would you like a visual diagram of the classloader hierarchy for Spring Boot vs standalone Tomcat?
 
-Great question! The **Java ClassLoader system** — especially in Spring Boot and Tomcat — embodies several classic **design patterns**.
-
-Here's a breakdown of the **design patterns** used:
+The **design patterns** used:
 
 ---
 
@@ -161,7 +176,7 @@ Some frameworks or container plugins may use proxy classloaders to **intercept o
 
 ---
 
-### TL;DR — Design Patterns Involved
+###  Design Patterns Involved
 
 | Pattern                 | Applied To                        | Purpose |
 |--------------------------|------------------------------------|---------|
@@ -174,5 +189,4 @@ Some frameworks or container plugins may use proxy classloaders to **intercept o
 
 ---
 
-Would you like a class diagram or flowchart of how these patterns interact during class loading in Spring Boot?
 
