@@ -201,5 +201,64 @@ graph TD
 * **Agent Layer:** Provides the *in-JVM registry* (MBeanServer) + services.
 * **Distributed Layer:** Allows *remote management* (via connectors/adapters).
 
+
 ---
 
+##   Design Patterns in JMX
+
+| Pattern               | Where It Appears in JMX                           | Purpose                                                                              |
+| --------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| **Observer Pattern**  | `NotificationBroadcaster`, `NotificationListener` | Allows MBeans to notify listeners of events (e.g., memory threshold exceeded).       |
+| **Proxy Pattern**     | `MBeanServerInvocationHandler.newProxyInstance()` | Creates dynamic proxies so you can call MBean methods as if they were local objects. |
+| **Factory Pattern**   | `MBeanServerFactory.createMBeanServer()`          | Used to create instances of MBean servers.                                           |
+| **Adapter Pattern**   | `StandardMBean`                                   | Adapts a plain Java class to expose it as an MBean with management interfaces.       |
+| **Decorator Pattern** | `ModelMBean`                                      | Adds configurable metadata and descriptors on top of MBeans.                         |
+| **Facade Pattern**    | `MBeanServer`                                     | Provides a unified interface to manage, register, and interact with MBeans.          |
+
+---
+
+ 
+
+```mermaid
+graph TD
+    subgraph JMX Core
+        A[MBeanServer - Facade] --> B[Register/Unregister MBeans]
+        A --> C[Invoke Operations]
+        A --> D[Send Notifications]
+    end
+
+    subgraph MBeans
+        E[StandardMBean - Adapter]
+        F[ModelMBean - Decorator]
+        G[DynamicMBean]
+    end
+
+    subgraph Communication
+        H[NotificationBroadcaster - Observer]
+        I[NotificationListener - Observer]
+    end
+
+    subgraph Proxies
+        J[Proxy - Client Side Stub]
+    end
+
+    A --> E
+    A --> F
+    A --> G
+    E --> H
+    H --> I
+    A --> J
+```
+
+---
+
+###   How it all ties together:
+
+1. **Observer**: When an MBean broadcasts a notification, all registered listeners get updates.
+2. **Proxy**: Clients use proxies to interact with MBeans without knowing the transport details (local/remote).
+3. **Adapter**: Wraps your POJO into a manageable `StandardMBean`.
+4. **Decorator**: `ModelMBean` can add extra metadata (like descriptions, thresholds).
+5. **Facade**: `MBeanServer` hides complexity and offers a single API.
+
+---
+ 
