@@ -4,6 +4,7 @@ Great question 🚀 Let’s go deep into **Z Garbage Collector (ZGC)**, how it w
 
 # 1. **ZGC Overview**
 
+- “Z” stands for “Zero” pause
 * **Option**: `-XX:+UseZGC`
 * **Goal**: Ultra-low latency → GC pauses are typically **< 1ms**, even for heaps up to **multi-terabytes**.
 * **Key properties**:
