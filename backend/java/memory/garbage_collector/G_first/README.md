@@ -325,3 +325,74 @@ If an object > **50% of a region size**, it’s stored in **Humongous regions**.
 ---
 
 👉 Do you want me to now **compare G1 GC’s region-based compaction with CMS’s fragmentation issue** using a side-by-side diagram?
+
+Ah, this is an important question! The reason **Shenandoah GC or ZGC aren’t the default GC** in Java, despite their impressive low-pause behavior, comes down to **trade-offs, stability, ecosystem compatibility, and workload patterns**. Let me break it down carefully:
+
+---
+
+## **1️⃣ G1 Is the Default for a Reason**
+
+* **G1** has been the default since **Java 9**.
+* It is a **well-balanced GC** that works for the **majority of applications**: medium-to-large heaps, moderate latency needs.
+* It offers **predictable behavior**, reasonable throughput, and moderate pause times.
+* **Mature and battle-tested** across a wide variety of applications, frameworks, and JVM workloads.
+
+---
+
+## **2️⃣ ZGC and Shenandoah Are Specialized**
+
+| Feature      | ZGC                           | Shenandoah                     |
+| ------------ | ----------------------------- | ------------------------------ |
+| Primary Goal | Ultra-low latency (<10 ms)    | Low pause times (few ms)       |
+| Heap Size    | Multi-terabyte                | Large heaps, but less than ZGC |
+| Tuning Needs | Minimal                       | Minimal                        |
+| Maturity     | Introduced in Java 11         | Introduced in Java 12          |
+| Use Case     | Latency-sensitive, huge heaps | Latency-sensitive, large heaps |
+
+**Key point:** They are **not optimized for the “average” Java workload**, which may not need such aggressive low-pause behavior.
+
+---
+
+## **3️⃣ Performance Trade-offs**
+
+* **Throughput vs Pause Time**
+
+  * G1 is optimized for **throughput and balanced performance**.
+  * ZGC and Shenandoah may incur slightly **higher CPU overhead** for concurrent tracking, coloring, and compaction.
+  * For apps where millisecond pauses aren’t critical, G1 can actually be more efficient overall.
+
+* **Memory Overhead**
+
+  * ZGC and Shenandoah use **extra metadata and colored pointers** to track object references.
+  * This adds **slight memory overhead** compared to G1, which may be unnecessary for standard workloads.
+
+---
+
+## **4️⃣ Ecosystem & Stability**
+
+* G1 has been **production-default for years**, and the Java ecosystem (frameworks, monitoring tools, profilers) is tuned to work with it.
+* ZGC and Shenandoah are newer and **not as battle-tested across all workloads**.
+* Some libraries or JVM options may behave slightly differently under ZGC/Shenandoah (e.g., very large heaps, exotic memory patterns).
+
+---
+
+## **5️⃣ Adoption Strategy**
+
+* Oracle and OpenJDK prefer a **conservative default**: G1.
+* They **encourage developers to test ZGC or Shenandoah** for specialized workloads.
+* This avoids **unexpected behavior or regressions** in the majority of enterprise applications.
+
+---
+
+### **6️⃣ TL;DR**
+
+* **G1** → default because it’s **stable, predictable, good for most apps, balanced pause/throughput**.
+* **ZGC / Shenandoah** → excellent for **latency-critical, large-heap apps**, but slightly higher overhead and newer, so not the default.
+* Essentially: **“default = works well for most; specialized GCs = use when you need extreme low-latency or huge heaps.”**
+
+---
+
+If you want, I can make a **diagram comparing G1 vs ZGC vs Shenandoah default suitability**, showing **heap size, pause time, CPU overhead, and recommended workloads**, which makes the trade-offs crystal clear.
+
+Do you want me to do that?
+
