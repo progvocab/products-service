@@ -249,3 +249,93 @@ flowchart TD
 I can also prepare a **diagram showing exactly where the hashCode sits in the mark word for this object** using the offsets from JOL. This combines the previous C++ explanation with a real Java object layout.
 
 Do you want me to do that?
+
+
+Sure! Let’s carefully decode a **mark word value** like `0x0000000000000001` in HotSpot JVM.
+
+---
+
+# 1️⃣ Basics of the Mark Word
+
+* On a **64-bit HotSpot JVM (with compressed oops)**, an object’s mark word stores:
+
+  * **Lock state** (2 bits)
+  * **Biased lock flag** (1 bit)
+  * **Thread ID** (if biased)
+  * **Hash code** (if computed)
+  * **GC age / flags**
+
+The exact layout depends on **lock state** (unlocked, biased, lightweight, or heavyweight).
+
+---
+
+# 2️⃣ Lock Bits
+
+| Lock State         | Lock Bits (2) | Biased Flag (1) |
+| ------------------ | ------------- | --------------- |
+| Unlocked (no bias) | 01            | 0               |
+| Biased lock        | 01            | 1               |
+| Lightweight lock   | 00            | 0               |
+| Heavyweight lock   | 10            | 0               |
+
+* The **last 2 bits** of the mark word represent the **lock state**.
+* The **biased lock flag** is usually the **bit just before lock bits**.
+
+---
+
+# 3️⃣ Value `0x0000000000000001`
+
+Let’s write it in **binary (64-bit)**:
+
+```
+0x0000000000000001 = 0000...0001 (63 zeros + 1)
+```
+
+* **Least significant bit (LSB)** = 1
+* **Other 63 bits** = 0
+
+---
+
+# 4️⃣ Interpret the Bits
+
+* **Lock bits (last 2 bits)** = `01` → **unlocked state**. ✅
+* **Biased flag** = 0 → not biased. ❌
+* **Hash code** = not set (all zeros) → no hash computed yet. ❌
+* **Thread ID / GC age** = zero → default / unused.
+
+So `0x1` corresponds to:
+
+* **Unlocked object**
+* **No biased lock**
+* **No identity hash code computed**
+* **Default GC age / flags = 0**
+
+> This is the **typical mark word value for a newly allocated object** in HotSpot.
+
+---
+
+# 5️⃣ Visual Layout (simplified)
+
+```
+63                 2  1 0
+|      0s          | 0 |01|
+          ^        ^   ^
+          |        |   Lock bits (01 = unlocked)
+          |        Biased lock flag = 0
+          Thread ID / hash / GC = 0
+```
+
+* Only the **least significant bit of the lock bits** is set → `01` → unlocked.
+
+---
+
+✅ **Key takeaway:**
+
+* `0x0000000000000001` = default mark word for a fresh, unlocked object.
+* No hash code, no bias, no GC info is set yet.
+
+---
+
+If you want, I can also **draw a diagram showing the mark word bit layout with lock bits, biased flag, and hash code**, which makes it super visual.
+
+Do you want me to do that?
