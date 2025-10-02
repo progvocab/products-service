@@ -1,5 +1,3 @@
----
-
 ## 1. **What is "state" in DP?**
 
 In **Dynamic Programming (DP)**, a **state** is a way to represent a **subproblem** you’re solving.
