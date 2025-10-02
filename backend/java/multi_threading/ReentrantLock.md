@@ -339,3 +339,111 @@ Think of it like this:
 👉 Would you like me to also **visualize this difference with a diagram (Mermaid)** showing **1 wait set vs multiple condition queues**? That way, it’s super clear why ReentrantLock is better in certain cases.
 
 
+Great question 👍 — yes, we can absolutely implement the **Producer–Consumer (Bounded Buffer)** problem using a **Semaphore**. In fact, semaphore-based solutions are a **classic** way to demonstrate synchronization in operating systems courses.
+
+---
+
+## 🔑 Idea with Semaphores
+
+We use **three things**:
+
+1. `Semaphore empty` → counts how many empty slots are available in the buffer (initial = capacity).
+2. `Semaphore full` → counts how many items are available to consume (initial = 0).
+3. A **mutex (lock)** → ensures only one thread modifies the buffer at a time.
+
+---
+
+## 📝 Example Code (Java, using `Semaphore`)
+
+```java
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.Semaphore;
+
+class BoundedBufferSemaphore<T> {
+    private final Queue<T> buffer = new LinkedList<>();
+    private final int capacity;
+
+    private final Semaphore empty; // available slots
+    private final Semaphore full;  // available items
+    private final Semaphore mutex = new Semaphore(1); // mutual exclusion
+
+    public BoundedBufferSemaphore(int capacity) {
+        this.capacity = capacity;
+        this.empty = new Semaphore(capacity); // initially all slots empty
+        this.full = new Semaphore(0);         // initially no items
+    }
+
+    public void put(T item) throws InterruptedException {
+        empty.acquire();   // wait if no empty slot
+        mutex.acquire();   // lock buffer
+        buffer.add(item);
+        System.out.println("Produced: " + item);
+        mutex.release();   // unlock buffer
+        full.release();    // signal an item is available
+    }
+
+    public T take() throws InterruptedException {
+        full.acquire();    // wait if no item
+        mutex.acquire();   // lock buffer
+        T item = buffer.poll();
+        System.out.println("Consumed: " + item);
+        mutex.release();   // unlock buffer
+        empty.release();   // signal a slot is free
+        return item;
+    }
+}
+
+public class ProducerConsumerSemaphoreDemo {
+    public static void main(String[] args) {
+        BoundedBufferSemaphore<Integer> buffer = new BoundedBufferSemaphore<>(3);
+
+        // Producer
+        new Thread(() -> {
+            try {
+                for (int i = 1; i <= 5; i++) {
+                    buffer.put(i);
+                    Thread.sleep(200);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+
+        // Consumer
+        new Thread(() -> {
+            try {
+                for (int i = 1; i <= 5; i++) {
+                    buffer.take();
+                    Thread.sleep(500);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+    }
+}
+```
+
+---
+
+## ⚖️ Comparison: `Semaphore` vs `synchronized` / `ReentrantLock`
+
+| Feature              | `Semaphore`                                     | `synchronized` / `ReentrantLock`            |
+| -------------------- | ----------------------------------------------- | ------------------------------------------- |
+| **Primary use**      | Signaling and counting resources                | Mutual exclusion (locks)                    |
+| **Multiple permits** | Yes (can allow multiple threads at once)        | No (1 thread only)                          |
+| **Fairness option**  | Yes (`new Semaphore(permits, true)`)            | Yes (`new ReentrantLock(true)`)             |
+| **Buffer slots**     | Naturally modeled with permits (`empty`/`full`) | Requires explicit wait/notify or Conditions |
+| **Complexity**       | Clear for producer-consumer                     | Can get verbose with wait/notify            |
+| **Interruptible**    | Yes (`acquire()` is interruptible)              | Yes with `lockInterruptibly()`              |
+
+---
+
+✅ So, using a **Semaphore** is often the **cleanest and most intuitive** way to solve bounded buffer problems, because the permits directly map to **slots/items**.
+
+---
+
+👉 Do you want me to also **draw a Mermaid diagram** showing how **empty/full/mutex semaphores interact** between producers and consumers?
+
+
