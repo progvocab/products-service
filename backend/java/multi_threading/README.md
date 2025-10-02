@@ -109,7 +109,7 @@
 
 ---
 
-✅ **Summary**:
+ **Summary**:
 
 * **Basic locking** → `synchronized` (object monitors).
 * **Advanced locking** → `ReentrantLock`, `ReadWriteLock`, `StampedLock`.
@@ -118,7 +118,95 @@
 
 ---
 
-👉 Do you want me to also make a **comparison table (when to use which lock)** for quick reference?
+Great question 👍
+When you start a plain Java application (say you just run `java MyApp` with a simple `main` method), the JVM itself creates **a set of system threads** even before your code runs. So you’ll usually see **much more than just your `main` thread**.
+
+---
+
+### 🔹 Typical default threads in a fresh JVM
+
+At startup, you will generally see:
+
+1. **Main thread**
+
+   * Runs your `public static void main(String[] args)` method.
+
+2. **Reference Handler**
+
+   * Cleans up references like `PhantomReference`, `WeakReference`, `SoftReference`.
+
+3. **Finalizer**
+
+   * Runs finalizers on objects that are about to be garbage-collected (deprecated in recent JDKs, but still present in some versions).
+
+4. **Signal Dispatcher**
+
+   * Handles signals sent to the JVM process (e.g., CTRL+C, or OS signals).
+
+5. **GC threads**
+
+   * Depends on the garbage collector chosen by the JVM.
+   * For example:
+
+     * **G1GC** (default since JDK 9) → multiple GC worker threads + concurrent marking threads.
+     * **Parallel GC** → several GC threads.
+     * **Serial GC** → just one GC thread.
+
+6. **JIT compiler threads**
+
+   * The JVM’s Just-In-Time compiler (C2, Tiered compilation, Graal) spins up background threads to compile bytecode into machine code.
+
+7. **Attach Listener**
+
+   * Used when tools (like VisualVM, JConsole, profilers) connect to the JVM.
+
+---
+
+### 🔹 How many exactly?
+
+It **depends on:**
+
+* **JVM version** (Java 8, 11, 17, 21… may differ).
+* **GC algorithm** in use.
+* **JVM options** (`-XX:+UseParallelGC`, `-XX:CICompilerCount=2`, etc.).
+* **OS & hardware** (more CPUs → more GC/JIT threads).
+
+👉 But on a typical **Java 11+ with default G1GC**, you’ll often see around **10–20 threads** immediately at startup.
+
+---
+
+### 🔹 Quick check yourself
+
+You can print all threads at JVM startup with:
+
+```java
+public class ThreadCheck {
+    public static void main(String[] args) {
+        Thread.getAllStackTraces().keySet()
+              .forEach(t -> System.out.println(t.getName()));
+    }
+}
+```
+
+On a simple run, you’ll usually see something like:
+
+```
+main
+Reference Handler
+Finalizer
+Signal Dispatcher
+Common-Cleaner
+Attach Listener
+GC Thread#0
+GC Thread#1
+...
+C2 CompilerThread0
+C2 CompilerThread1
+```
+
+---
+
+**Summary:**
+By default, a Java application **starts with ~10–20 threads** (not just `main`), depending on the JVM and GC.
 
 
-👉 Do you want me to also make a **thread lifecycle diagram** (showing transitions between states) so it’s easier to visualize?
