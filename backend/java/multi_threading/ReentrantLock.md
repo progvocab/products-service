@@ -121,3 +121,221 @@ ReentrantLock unfairLock = new ReentrantLock();    // default unfair
 
 ---
 
+ReentrantLock is often introduced as “a replacement for `synchronized`”, but its real strength comes out in situations where **you need finer control over locking**.
+
+Here’s a **simple but important use case**:
+
+---
+
+## **Use Case: Bounded Buffer (Producer-Consumer Problem)**
+
+Imagine a **bounded buffer** (like a queue with limited capacity). Multiple **producer threads** put items in, and multiple **consumer threads** take items out.
+We need to ensure:
+
+* Only one thread can modify the buffer at a time.
+* Producers wait if the buffer is full.
+* Consumers wait if the buffer is empty.
+
+This is where **ReentrantLock + Condition variables** shine, because they give us **fine-grained control** beyond what `synchronized` can do.
+
+---
+
+### **Code Example**
+
+```java
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.LinkedList;
+import java.util.Queue;
+
+class BoundedBuffer<T> {
+    private final Queue<T> buffer = new LinkedList<>();
+    private final int capacity;
+
+    private final Lock lock = new ReentrantLock();
+    private final Condition notFull = lock.newCondition();
+    private final Condition notEmpty = lock.newCondition();
+
+    public BoundedBuffer(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public void put(T item) throws InterruptedException {
+        lock.lock();
+        try {
+            while (buffer.size() == capacity) {
+                notFull.await(); // wait if buffer is full
+            }
+            buffer.add(item);
+            System.out.println("Produced: " + item);
+            notEmpty.signal(); // signal consumer
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public T take() throws InterruptedException {
+        lock.lock();
+        try {
+            while (buffer.isEmpty()) {
+                notEmpty.await(); // wait if buffer is empty
+            }
+            T item = buffer.poll();
+            System.out.println("Consumed: " + item);
+            notFull.signal(); // signal producer
+            return item;
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+
+public class ProducerConsumerDemo {
+    public static void main(String[] args) {
+        BoundedBuffer<Integer> buffer = new BoundedBuffer<>(3);
+
+        // Producer
+        new Thread(() -> {
+            try {
+                for (int i = 1; i <= 5; i++) {
+                    buffer.put(i);
+                    Thread.sleep(200);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+
+        // Consumer
+        new Thread(() -> {
+            try {
+                for (int i = 1; i <= 5; i++) {
+                    buffer.take();
+                    Thread.sleep(500);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+    }
+}
+```
+
+---
+
+### **Why ReentrantLock is Important Here**
+
+* **Conditions** (`notFull`, `notEmpty`) allow us to explicitly control *when* threads wait and *who* gets signaled.
+* `synchronized` + `wait/notify` could do something similar, but `Condition` variables give **multiple waiting queues**, which makes logic much cleaner.
+* `ReentrantLock` allows **timeout locks**, `tryLock()`, and fair ordering (`new ReentrantLock(true)`), which `synchronized` doesn’t provide.
+
+---
+
+✅ This use case is **simple** (bounded buffer) but **important**, because it demonstrates why `ReentrantLock` is more powerful than `synchronized` in concurrency-heavy systems like message queues, job schedulers, and thread pools.
+
+---
+
+Would you like me to also show a **real-world enterprise scenario** (like logging systems or database connection pools) where ReentrantLock is used in production?
+
+
+Excellent follow-up! 👌 Yes, we **can implement the same bounded buffer (producer-consumer)** using `synchronized`, `wait()`, and `notifyAll()`. But there are **important differences** compared to using `ReentrantLock + Condition`.
+
+---
+
+## **1️⃣ Example with `synchronized + wait/notifyAll`**
+
+```java
+import java.util.LinkedList;
+import java.util.Queue;
+
+class BoundedBufferSync<T> {
+    private final Queue<T> buffer = new LinkedList<>();
+    private final int capacity;
+
+    public BoundedBufferSync(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public synchronized void put(T item) throws InterruptedException {
+        while (buffer.size() == capacity) {
+            wait(); // wait if buffer is full
+        }
+        buffer.add(item);
+        System.out.println("Produced: " + item);
+        notifyAll(); // wake up waiting consumers
+    }
+
+    public synchronized T take() throws InterruptedException {
+        while (buffer.isEmpty()) {
+            wait(); // wait if buffer is empty
+        }
+        T item = buffer.poll();
+        System.out.println("Consumed: " + item);
+        notifyAll(); // wake up waiting producers
+        return item;
+    }
+}
+
+public class ProducerConsumerSyncDemo {
+    public static void main(String[] args) {
+        BoundedBufferSync<Integer> buffer = new BoundedBufferSync<>(3);
+
+        // Producer
+        new Thread(() -> {
+            try {
+                for (int i = 1; i <= 5; i++) {
+                    buffer.put(i);
+                    Thread.sleep(200);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+
+        // Consumer
+        new Thread(() -> {
+            try {
+                for (int i = 1; i <= 5; i++) {
+                    buffer.take();
+                    Thread.sleep(500);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+    }
+}
+```
+
+---
+
+## **2️⃣ Differences Between `synchronized` and `ReentrantLock`**
+
+| Feature                          | `synchronized + wait/notify`                    | `ReentrantLock + Condition`                                  |
+| -------------------------------- | ----------------------------------------------- | ------------------------------------------------------------ |
+| **Lock Type**                    | Implicit, JVM-managed monitor lock              | Explicit, programmer-controlled                              |
+| **Fairness**                     | No fairness guarantee                           | Can create *fair locks* (`new ReentrantLock(true)`)          |
+| **Multiple Condition Queues**    | Only **one wait set per object**                | Multiple `Condition` objects allowed (`notFull`, `notEmpty`) |
+| **Interruptible Locking**        | No (once waiting, only notify can wake)         | Yes (`lock.lockInterruptibly()`)                             |
+| **Try Lock with Timeout**        | Not possible                                    | `tryLock()` and `tryLock(timeout)` available                 |
+| **Readability in Complex Cases** | Harder to manage (lots of `wait()/notifyAll()`) | Cleaner with multiple `Condition`s                           |
+| **Performance**                  | Simpler, less overhead                          | Slightly more overhead, but more flexible                    |
+
+---
+
+## **3️⃣ Key Takeaway**
+
+* For **simple cases** like a basic producer-consumer buffer, `synchronized + wait/notifyAll` works fine.
+* For **complex concurrency control** (e.g., multiple conditions, fairness, timed locks, or interruption), **`ReentrantLock + Condition` is much more powerful**.
+
+Think of it like this:
+
+* `synchronized` = **basic lock with 1 waiting room**.
+* `ReentrantLock + Conditions` = **advanced lock with multiple waiting rooms, timeouts, fairness, and emergency exits**.
+
+---
+
+👉 Would you like me to also **visualize this difference with a diagram (Mermaid)** showing **1 wait set vs multiple condition queues**? That way, it’s super clear why ReentrantLock is better in certain cases.
+
+
