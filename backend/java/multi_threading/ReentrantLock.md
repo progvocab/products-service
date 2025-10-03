@@ -1,7 +1,6 @@
 
----
 
-##   `ReentrantLock`
+#   `ReentrantLock`
 
 * A **mutual exclusion lock** provided in `java.util.concurrent.locks`.
 * "Reentrant" means **a thread holding the lock can acquire it again without deadlocking**.
@@ -12,21 +11,18 @@
   * Supports **lockInterruptibly()**
   * Requires **explicit unlock()**.
 
----
 
-##  Key Methods
+###  Key Methods
 
 1. `lock()` → Acquires the lock (waits if unavailable).
-2. `unlock()` → Releases the lock (must be called in `finally`).
 3. `tryLock()` → Tries to acquire lock **without waiting**.
 4. `tryLock(long time, TimeUnit unit)` → Waits for a max time before giving up.
 5. `lockInterruptibly()` → Acquires lock but allows interruption while waiting.
 6. `isLocked()` → Checks if lock is held.
 7. `isHeldByCurrentThread()` → Checks if the current thread holds it.
+8. `unlock()` → Releases the lock (must be called in `finally`).
 
----
-
-##  Basic Example
+### `lock()`
 
 ```java
 import java.util.concurrent.locks.Lock;
@@ -63,9 +59,7 @@ public class SharedResource {
 * Ensures **only one thread increments at a time**.
 * Without `lock()`, both threads could modify `counter` simultaneously (race condition).
 
----
-
-## Example with `tryLock()`
+### `tryLock()`
 
 ```java
 import java.util.concurrent.locks.ReentrantLock;
@@ -98,8 +92,6 @@ public class TryLockExample {
 }
 ```
 
----
-
 ##  Fair vs Unfair Lock
 
 ```java
@@ -109,23 +101,16 @@ ReentrantLock unfairLock = new ReentrantLock();    // default unfair
 
 * **Fair lock** → Longest waiting thread gets the lock first (like a queue).
 * **Unfair lock** (default) → Can allow lock stealing → higher throughput but less fairness.
-
 ---
-
-##  When to Use `ReentrantLock`
+##  Use Cases
 
 * Need **tryLock()** or **lockInterruptibly()**.
 * Want **fair locking**.
 * Complex locking scenarios (multiple conditions, reentrant behavior).
 * Explicit control over lock acquisition/release.
 
----
-
 ReentrantLock is often introduced as “a replacement for `synchronized`”, but its real strength comes out in situations where **you need finer control over locking**.
 
-Here’s a **simple but important use case**:
-
----
 
 ## **Use Case: Bounded Buffer (Producer-Consumer Problem)**
 
@@ -138,9 +123,6 @@ We need to ensure:
 
 This is where **ReentrantLock + Condition variables** shine, because they give us **fine-grained control** beyond what `synchronized` can do.
 
----
-
-### **Code Example**
 
 ```java
 import java.util.concurrent.locks.Condition;
@@ -222,7 +204,6 @@ public class ProducerConsumerDemo {
 }
 ```
 
----
 
 ### **Why ReentrantLock is Important Here**
 
@@ -230,18 +211,9 @@ public class ProducerConsumerDemo {
 * `synchronized` + `wait/notify` could do something similar, but `Condition` variables give **multiple waiting queues**, which makes logic much cleaner.
 * `ReentrantLock` allows **timeout locks**, `tryLock()`, and fair ordering (`new ReentrantLock(true)`), which `synchronized` doesn’t provide.
 
----
-
-✅ This use case is **simple** (bounded buffer) but **important**, because it demonstrates why `ReentrantLock` is more powerful than `synchronized` in concurrency-heavy systems like message queues, job schedulers, and thread pools.
-
----
-
-Would you like me to also show a **real-world enterprise scenario** (like logging systems or database connection pools) where ReentrantLock is used in production?
+This use case is **simple** (bounded buffer) but **important**, because it demonstrates why `ReentrantLock` is more powerful than `synchronized` in concurrency-heavy systems like message queues, job schedulers, and thread pools.
 
 
-Excellent follow-up! 👌 Yes, we **can implement the same bounded buffer (producer-consumer)** using `synchronized`, `wait()`, and `notifyAll()`. But there are **important differences** compared to using `ReentrantLock + Condition`.
-
----
 
 ## **1️⃣ Example with `synchronized + wait/notifyAll`**
 
