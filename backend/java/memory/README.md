@@ -1,8 +1,6 @@
- **Java Memory Management** 
 
----
 
-## Java Memory Management Overview
+# Java Memory Management 
 
 ```
           +-----------------------------------+
@@ -39,10 +37,6 @@
   +-------------------------------------------------------+
 ```
 
----
-
-## Explanation of Each Memory Type
-
 ### 1. **Method Area (MetaSpace in Java 8+)**
 
 * Stores class metadata, method info, runtime constant pool, and static variables.
@@ -51,7 +45,7 @@
 ### 2. **Heap**
 
 * Main area managed by **Garbage Collector (GC)**.
-* Divided into:
+* Division if using Garbage First , Parallel GC :
 
   * **Young Generation**
 
@@ -63,7 +57,9 @@
   * **Old Generation (Tenured)**
 
     * Long-lived objects move here after surviving multiple GCs.
-* the age is stored in the mark word , it is incremented by 1 if the object survives GC , on crossings the threshold object is moved to old generation and the references in thread stack is updated.
+    * the age of an object is stored in the mark word , it is incremented by 1 if the object survives GC , on crossings the threshold object is moved to old generation and the references in thread stack is updated.
+  * Permanent Generation ( before Java 8 )
+    * Prior to Java 8 ,  class metadata, method info, runtime constant pool, and static variables were stored within the Heap's Permanent Generation , which is now moved out of Heap and stored in Metaspace. 
 * Also includes **String Pool** (interned strings).
 
 ### 3. **JVM Stack**
@@ -84,42 +80,12 @@
 
 * Supports execution of native (non-Java) methods.
 * Used when calling code through JNI (Java Native Interface).
+* **Code Cache**: Stores compiled machine code from JIT.
+* **Direct Memory**: For NIO buffers (off-heap).
+ 
 
 ---
-
-📌 **Summary**:
-
-* **Heap & Method Area** → Shared by all threads.
-* **Stack, PC Register, Native Method Stack** → Created per-thread.
-
----
-### Memory usage in **simple Java application**
----
-
-##  Memory Areas in JVM
-
-1. **Heap (shared across all threads)**
-
-   * Stores **objects** (instances of classes).
-   * Also contains runtime data like String pool, arrays, and static fields.
-
-2. **Thread Stack (per thread)**
-
-   * Stores **method call frames** (local variables, references, partial results).
-   * Each thread has its own stack.
-
-3. **Metaspace (shared, native memory)**
-
-   * Stores **class metadata** (class structure, methods, bytecode).
-   * Outside the Java heap.
-
-4. **Other Native Areas**
-
-   * **Code Cache**: Stores compiled machine code from JIT.
-   * **Direct Memory**: For NIO buffers (off-heap).
-
----
-### Flow 
+### Memory usage in a **Simple Java application**
 
 ```mermaid
 flowchart TD
