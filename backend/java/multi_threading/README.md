@@ -1,8 +1,8 @@
 
 
----
 
-# Key Multithreading Concepts in Java
+
+# Multithreading in Java
 
 | Concept                            | Explanation                                                                                                   |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -27,29 +27,25 @@
 | **CompletableFuture**              | Asynchronous, non-blocking computations with chaining (`thenApply`, `thenCombine`).                           |
 | **Concurrency Utilities**          | Classes in `java.util.concurrent`: `CountDownLatch`, `CyclicBarrier`, `Semaphore`, `BlockingQueue`.           |
 
----
 
-#  Quick Notes
+
 
 * **Thread Safety**: Avoid race conditions using synchronization, locks, atomics.
 * **Executors**: Prefer over manual `Thread` creation for better scalability.
 * **Avoid Deadlocks**: Use consistent lock ordering, timeouts, or try-lock.
 * **Best Practice**: Use high-level concurrency utilities (Executor, CompletableFuture) instead of low-level `wait/notify`.
 
----
 
 
-# **List of Locking mechanism**:
 
----
-
-## 🔑 Ways to Lock in Java
+## **Locking mechanism**: 🔒 
+ 
 
 1. **Object Monitor (Intrinsic Lock)**
 
    * Obtained via `synchronized` methods or blocks.
    * Every object has a built-in monitor lock.
-   * Example:
+   
 
      ```java
      synchronized (obj) { ... }
@@ -59,12 +55,15 @@
 
    * More flexible than `synchronized`.
    * Allows **tryLock()**, **lockInterruptibly()**, and **fair locking**.
-   * Example:
+   * Fair Lock allows the longest waiting Thread to acquire Lock
+   * An unfair lock allows a thread to potentially acquire the lock even if other threads have been waiting longer, if the lock becomes available at the exact moment the thread attempts to acquire it. This can lead to higher throughput in some scenarios but risks thread starvation.
 
      ```java
-     Lock lock = new ReentrantLock();
+     Lock lock = new ReentrantLock(); //unfair
      lock.lock();
      try { ... } finally { lock.unlock(); }
+
+     Lock fair = new ReentrantLock(true); //fair lock
      ```
 
 3. **ReentrantReadWriteLock**
@@ -118,14 +117,15 @@
 
 ---
 
-Great question 👍
-When you start a plain Java application (say you just run `java MyApp` with a simple `main` method), the JVM itself creates **a set of system threads** even before your code runs. So you’ll usually see **much more than just your `main` thread**.
 
----
+##  Default Threads 🧵 in a fresh JVM 
 
-### 🔹 Typical default threads in a fresh JVM
+Threads at startup, **depends on:**
 
-At startup, you will generally see:
+* **JVM version** (Java 8, 11, 17, 21… may differ).
+* **GC algorithm** in use.
+* **JVM options** (`-XX:+UseParallelGC`, `-XX:CICompilerCount=2`, etc.).
+* **OS & hardware** (more CPUs → more GC/JIT threads).:
 
 1. **Main thread**
 
@@ -160,22 +160,6 @@ At startup, you will generally see:
 
    * Used when tools (like VisualVM, JConsole, profilers) connect to the JVM.
 
----
-
-### 🔹 How many exactly?
-
-It **depends on:**
-
-* **JVM version** (Java 8, 11, 17, 21… may differ).
-* **GC algorithm** in use.
-* **JVM options** (`-XX:+UseParallelGC`, `-XX:CICompilerCount=2`, etc.).
-* **OS & hardware** (more CPUs → more GC/JIT threads).
-
-👉 But on a typical **Java 11+ with default G1GC**, you’ll often see around **10–20 threads** immediately at startup.
-
----
-
-### 🔹 Quick check yourself
 
 You can print all threads at JVM startup with:
 
@@ -204,9 +188,6 @@ C2 CompilerThread0
 C2 CompilerThread1
 ```
 
----
 
-**Summary:**
-By default, a Java application **starts with ~10–20 threads** (not just `main`), depending on the JVM and GC.
 
 
