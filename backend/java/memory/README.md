@@ -63,6 +63,7 @@
   * **Old Generation (Tenured)**
 
     * Long-lived objects move here after surviving multiple GCs.
+* the age is stored in the mark word , it is incremented by 1 if the object survives GC , on crossings the threshold object is moved to old generation and the references in thread stack is updated.
 * Also includes **String Pool** (interned strings).
 
 ### 3. **JVM Stack**
@@ -556,6 +557,16 @@ flowchart TD
 ---
 
 ## 🔹 Step 3: Survive More GC Cycles → Promotion to Old Gen
+
+What is “Age” in GC?
+
+Age = number of GC cycles the object has survived in Young Generation.
+
+Initially: age = 0.
+
+Every time the object survives a minor GC, age++.
+
+When age exceeds a threshold (default ~15, controlled by -XX:MaxTenuringThreshold), the object is promoted to Old Generation.
 
 * After several GCs (depending on JVM thresholds, e.g., 15 by default but configurable), surviving objects are **promoted to Old Generation**.
 * Now `"Hello World"` and `Person` may move into **Old Gen**.
