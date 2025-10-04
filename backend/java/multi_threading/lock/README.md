@@ -1,3 +1,120 @@
+
+Excellent question 👏 — and it touches the **core of how synchronization works in the JVM**.
+
+Let’s go step by step carefully 👇
+
+---
+
+## 🧩 1. Short Answer
+
+> ❌ **No**, a *non-synchronized* method does **not** acquire or associate with a monitor lock when it runs.
+
+Only **synchronized** methods (or synchronized blocks) use an object’s **monitor** (lock) mechanism.
+
+---
+
+## ⚙️ 2. What is a Monitor?
+
+A **monitor** is a synchronization construct used by the JVM to enforce *mutual exclusion* and *coordination* between threads.
+
+Every Java object has:
+
+* a **monitor** (used by `synchronized`)
+* and a **Mark Word** in its object header (which can store lock state, identity hash, age, etc.)
+
+---
+
+## 🧠 3. What Happens in a Synchronized vs Non-Synchronized Method
+
+### 🔹 Non-synchronized method
+
+```java
+class Example {
+    void print() { // Not synchronized
+        System.out.println("Non-synchronized");
+    }
+}
+```
+
+* Any thread can call `print()` at any time.
+* The JVM **does not** attempt to acquire or release the object’s monitor.
+* The **Mark Word** of the object stays in the **unlocked** state (or possibly biased state if enabled).
+* There’s **no blocking**, **no ownership**, and **no waiting queue**.
+
+---
+
+### 🔹 Synchronized instance method
+
+```java
+class Example {
+    synchronized void print() {
+        System.out.println("Synchronized method");
+    }
+}
+```
+
+* The JVM implicitly executes something like:
+
+```java
+monitorenter(this);
+try {
+    // method body
+} finally {
+    monitorexit(this);
+}
+```
+
+* The executing thread must **acquire the object’s monitor** before entering.
+* Other threads attempting to call any other synchronized method on the same object will block until the monitor is released.
+* The **Mark Word** of the object is updated to indicate the lock state.
+
+---
+
+## 🔬 4. Mark Word States (Object Header View)
+
+The **Mark Word** in a 64-bit JVM typically looks like this (simplified):
+
+| Lock State           | Mark Word bits (simplified) | Description |                                      |                                                         |
+| -------------------- | --------------------------- | ----------- | ------------------------------------ | ------------------------------------------------------- |
+| **Unlocked**         | `[hashcode                  | age         | 01]`                                 | Default state, no synchronization                       |
+| **Biased Lock**      | `[thread id                 | epoch       | 01]`                                 | Optimized for one thread repeatedly locking same object |
+| **Lightweight Lock** | `[ptr to lock record        | 00]`        | When thread contends for the monitor |                                                         |
+| **Heavyweight Lock** | `[ptr to monitor            | 10]`        | When contention escalates            |                                                         |
+| **Marked for GC**    | `[forwarding ptr]`          | During GC   |                                      |                                                         |
+
+➡️ **Non-synchronized methods** leave the mark word in *Unlocked* or *Biased* state.
+➡️ **Synchronized methods** cause the mark word to temporarily change to *Lightweight* or *Heavyweight*.
+
+---
+
+## 🧩 5. Summary Table
+
+| Aspect                   | Non-synchronized method             | Synchronized method                        |
+| ------------------------ | ----------------------------------- | ------------------------------------------ |
+| Acquires monitor?        | ❌ No                                | ✅ Yes                                      |
+| Affects Mark Word?       | ❌ No                                | ✅ Yes (lock bits change)                   |
+| Can block other threads? | ❌ No                                | ✅ Yes                                      |
+| Allows wait/notify?      | ❌ No (IllegalMonitorStateException) | ✅ Yes (only when owning monitor)           |
+| Typical use case         | Non-critical sections               | Critical sections needing mutual exclusion |
+
+---
+
+## 🚨 Important
+
+You **cannot call `wait()`, `notify()`, or `notifyAll()`** inside a non-synchronized method on the same object —
+because those methods require ownership of the monitor.
+
+Otherwise, you’ll get:
+
+```
+java.lang.IllegalMonitorStateException
+```
+
+---
+
+Would you like me to show a **diagram of Mark Word transitions** during synchronization 
+
+
 Great question! Let’s carefully break down the **difference between lightweight and heavyweight locks in Java (HotSpot JVM)**.
 
 ---
