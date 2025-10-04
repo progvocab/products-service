@@ -1,19 +1,10 @@
-
-Excellent question 👏 — and it touches the **core of how synchronization works in the JVM**.
-
-Let’s go step by step carefully 👇
-
----
-
-## 🧩 1. Short Answer
-
-> ❌ **No**, a *non-synchronized* method does **not** acquire or associate with a monitor lock when it runs.
+*non-synchronized* method does **not** acquire or associate with a monitor lock when it runs.
 
 Only **synchronized** methods (or synchronized blocks) use an object’s **monitor** (lock) mechanism.
 
 ---
 
-## ⚙️ 2. What is a Monitor?
+## What is a Monitor?
 
 A **monitor** is a synchronization construct used by the JVM to enforce *mutual exclusion* and *coordination* between threads.
 
@@ -24,9 +15,9 @@ Every Java object has:
 
 ---
 
-## 🧠 3. What Happens in a Synchronized vs Non-Synchronized Method
+## What Happens in a Synchronized vs Non-Synchronized Method
 
-### 🔹 Non-synchronized method
+### Non-synchronized method
 
 ```java
 class Example {
@@ -43,7 +34,7 @@ class Example {
 
 ---
 
-### 🔹 Synchronized instance method
+### Synchronized instance method
 
 ```java
 class Example {
@@ -112,14 +103,11 @@ java.lang.IllegalMonitorStateException
 
 ---
 
-Would you like me to show a **diagram of Mark Word transitions** during synchronization 
-
-
-Great question! Let’s carefully break down the **difference between lightweight and heavyweight locks in Java (HotSpot JVM)**.
+**difference between lightweight and heavyweight locks in Java (HotSpot JVM)**.
 
 ---
 
-# 1️⃣ Background: Java Locks
+### Java Locks
 
 * Every Java object has a **mark word** in its header.
 * The **lock state of the object** is encoded in the mark word (2 bits typically).
@@ -132,7 +120,7 @@ Great question! Let’s carefully break down the **difference between lightweigh
 
 ---
 
-# 2️⃣ Lightweight Lock (Thin Lock)
+## Lightweight Lock (Thin Lock)
 
 * Used when **no contention exists** (only one thread trying to lock the object).
 * Implemented via **CAS (Compare-And-Swap) on the mark word**.
@@ -155,9 +143,9 @@ Great question! Let’s carefully break down the **difference between lightweigh
 
 * If **another thread attempts to acquire the lock simultaneously**, it must **inflate the lock** into a heavyweight lock.
 
----
 
-# 3️⃣ Heavyweight Lock (Fat Lock / Monitor)
+
+## Heavyweight Lock (Fat Lock / Monitor)
 
 * Used when **multiple threads contend** for the same lock.
 * Implemented using **OS-level mutex / monitor**.
@@ -179,9 +167,9 @@ Great question! Let’s carefully break down the **difference between lightweigh
 * Slower than lightweight lock due to kernel involvement.
 * Memory overhead for monitor object.
 
----
 
-# 4️⃣ JVM Lock Transition
+
+## JVM Lock Transition
 
 Java uses a **lock escalation strategy**:
 
@@ -193,9 +181,9 @@ Biased Lock (optional) --> Lightweight Lock --> Heavyweight Lock
 * **Lightweight lock** → fast path for uncontended locks.
 * **Heavyweight lock** → fallback for contention.
 
----
 
-# 5️⃣ Mark Word Representation
+
+## Mark Word Representation
 
 | Lock Type   | Mark Word (64-bit)                                                  |
 | ----------- | ------------------------------------------------------------------- |
@@ -204,9 +192,7 @@ Biased Lock (optional) --> Lightweight Lock --> Heavyweight Lock
 | Heavyweight | Mark word points to **monitor object**, lock bits = 10              |
 | Biased      | Thread ID encoded in mark word, lock bits = 01 (biased bit set)     |
 
----
 
-# 6️⃣ Summary Table
 
 | Feature         | Lightweight Lock                        | Heavyweight Lock                     |
 | --------------- | --------------------------------------- | ------------------------------------ |
