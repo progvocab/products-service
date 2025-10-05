@@ -8,7 +8,7 @@ Below are two detailed **Mermaid diagrams** showing both operations clearly.
 
 ```mermaid
 graph TD
-  A[HashMap Object] --> B[table[] Array of Buckets]
+  A[HashMap Object] --> "B[table[] Array of Buckets]"
   B --> C1[Bucket 0]
   B --> C2[Bucket 1]
   B --> C3[Bucket n]
