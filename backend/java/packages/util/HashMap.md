@@ -8,7 +8,7 @@ Below are two detailed **Mermaid diagrams** showing both operations clearly.
 
 ```mermaid
 graph TD
-  A[HashMap Object] --> B[table[] (Array of Buckets)]
+  A[HashMap Object] --> B[table[] Array of Buckets]
   B --> C1[Bucket 0]
   B --> C2[Bucket 1]
   B --> C3[Bucket n]
@@ -17,7 +17,7 @@ graph TD
   C3 --> D3[null or LinkedList/Tree of Nodes]
   D2 --> E1[Node<K,V> - key1, value1, hash, next]
   D2 --> E2[Node<K,V> - key2, value2, hash, next]
-  E2 --> E3[Red-Black Tree Node<K,V> (if treeified)]
+  E2 --> E3[Red-Black Tree Node<K,V> if treeified]
 ```
 
 **Explanation:**
