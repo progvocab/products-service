@@ -137,3 +137,61 @@ the client still validates from **leaf → intermediate → root**.
 ---
 
 Would you like me to show this with a **Mermaid chain-of-trust diagram** showing how the client validates each certificate using public keys and signatures?
+
+
+Perfect ✅ — here’s a **Mermaid diagram** that visually explains the **certificate chain of trust** during a TLS handshake, showing how the client verifies each certificate the server sends.
+
+---
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+    participant IntermediateCA
+    participant RootCA
+
+    Note over Client,Server: 🔐 TLS Handshake Phase
+
+    Client->>Server: 1️⃣ ClientHello<br/>(Says "I support TLS 1.3, send me your cert")
+    Server->>Client: 2️⃣ ServerHello + Certificate Chain<br/>(Leaf + Intermediate(s))
+
+    Note over Server: Sends:<br/>[1] Server cert (example.com)<br/>[2] Intermediate CA cert
+
+    Client->>Server: Receives chain:<br/>example.com → Let's Encrypt R3
+    Client->>IntermediateCA: Verify signature on Server Cert<br/>using Intermediate’s public key ✅
+    Client->>RootCA: Verify signature on Intermediate Cert<br/>using Root’s public key ✅
+    Client->>Client: Check if RootCA is trusted (in /etc/ssl/cert.pem) ✅
+
+    Note over Client: 
+        If all signatures + validity + domain checks pass →<br/>
+        🔒 Trust established → Continue key exchange
+
+    Server->>Client: 3️⃣ Finished<br/>(Encrypted traffic begins)
+    Client->>Server: 4️⃣ Finished<br/>(Secure session established)
+```
+
+---
+
+## 🧠 Explanation of the Flow
+
+| Step                                    | Description                                                                                                    |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **1️⃣ ClientHello**                     | Client initiates TLS and offers supported cipher suites, versions, etc.                                        |
+| **2️⃣ ServerHello + Certificate Chain** | Server responds with chosen parameters and sends its **certificate chain** (without the root).                 |
+| **Verification Process**                | Client verifies each certificate in the chain by checking its digital signature using the issuer’s public key. |
+| **Root Validation**                     | The final root CA is checked against the client’s **trusted root store** (like `/etc/ssl/cert.pem`).           |
+| **Key Exchange**                        | After trust is established, they perform Diffie–Hellman or RSA key exchange to set up encryption.              |
+
+---
+
+## 🧩 Summary Table
+
+| Certificate Type    | Who Owns It      | Signed By       | Purpose                            |
+| ------------------- | ---------------- | --------------- | ---------------------------------- |
+| **Leaf (Server)**   | example.com      | Intermediate CA | Proves server identity             |
+| **Intermediate CA** | Let's Encrypt R3 | Root CA         | Acts as link between root and leaf |
+| **Root CA**         | ISRG Root X1     | Self-signed     | Trusted by OS/browser              |
+
+---
+
+Would you like me to extend this diagram to show **how public keys and signatures** are used at each verification step (i.e., how the client mathematically confirms authenticity)?
