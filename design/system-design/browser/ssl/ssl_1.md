@@ -325,3 +325,84 @@ It laid the groundwork that evolved into **SSL 3.0 and TLS 1.x**, which fixed:
 
 Would you like a **Mermaid architecture diagram** showing how all these SSL 1.0 components interact — from client hello → record → change cipher spec → encrypted data flow?
 
+
+Perfect 🔐 — here’s a **Mermaid architecture diagram** showing the **system design and interaction flow** of all **SSL 1.0 components**, from handshake setup to encrypted communication.
+
+---
+
+### 🧭 **SSL 1.0 Architecture & Flow**
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant SSL_Record
+    participant Handshake_Protocol
+    participant ChangeCipherSpec
+    participant Alert_Protocol
+    participant Server
+
+    Note over Client,Server: TCP connection established
+
+    Client->>Handshake_Protocol: ClientHello<br/>(SSL version, cipher list, random)
+    Handshake_Protocol->>Server: Transmit ClientHello
+
+    Server->>Handshake_Protocol: ServerHello<br/>(chosen cipher, certificate)
+    Handshake_Protocol->>Client: Transmit ServerHello
+
+    Client->>Handshake_Protocol: KeyExchange<br/>(⚠ plaintext session key)
+    Handshake_Protocol->>Server: Deliver key (unencrypted!)
+
+    Server->>Handshake_Protocol: Acknowledge parameters
+    Handshake_Protocol->>ChangeCipherSpec: Signal switch to encryption
+    ChangeCipherSpec->>SSL_Record: Activate negotiated keys
+
+    SSL_Record->>SSL_Record: Encrypt application data<br/>+ weak checksum
+    SSL_Record->>Server: Encrypted Data Packet
+
+    Note right of Server: Server decrypts and verifies (weak integrity check)
+
+    alt Error or Failure
+        SSL_Record->>Alert_Protocol: Trigger Alert
+        Alert_Protocol->>Client: Send alert message
+    end
+```
+
+---
+
+### 🧩 **How the Components Interact**
+
+| Layer / Component      | Role                                                                 | Notes                                           |
+| ---------------------- | -------------------------------------------------------------------- | ----------------------------------------------- |
+| **Handshake Protocol** | Negotiates cipher suite, exchanges certificates, and generates keys. | Major weakness: key could be sent in plaintext. |
+| **Change Cipher Spec** | Signals the switch from plaintext to encrypted communication.        | 1-byte message; concept still used in TLS.      |
+| **SSL Record Layer**   | Encrypts (weakly) and fragments application data into records.       | Used simple checksum for integrity, not HMAC.   |
+| **Alert Protocol**     | Handles warnings and fatal errors (e.g., bad certificate).           | Poorly standardized in SSL 1.0.                 |
+
+---
+
+### 🔐 **Data Flow Summary**
+
+```
+Application Data
+      ↓
+  Handshake Layer ──▶ Negotiates keys, ciphers
+      ↓
+  Change Cipher Spec ──▶ Enables encryption mode
+      ↓
+  SSL Record Layer ──▶ Encrypt + add checksum
+      ↓
+  TCP Layer ──▶ Transmit to Server
+```
+
+---
+
+✅ **In essence:**
+
+* SSL 1.0 defined the modular design that future SSL/TLS kept.
+* Each layer had a clear role (negotiation, encryption, alerts).
+* But poor cryptographic decisions (plaintext keys, weak MAC) made it insecure.
+
+---
+
+Would you like a follow-up **diagram comparing SSL 1.0 vs SSL 3.0** (showing how each layer evolved into modern TLS concepts like HMAC, session resumption, and secure key exchange)?
+
