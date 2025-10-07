@@ -195,3 +195,112 @@ sequenceDiagram
 ---
 
 Would you like me to extend this diagram to show **how public keys and signatures** are used at each verification step (i.e., how the client mathematically confirms authenticity)?
+
+
+Excellent ✅ — let’s now **deep dive into how the client mathematically verifies each certificate** in the **certificate chain**, using **public key cryptography** and **digital signatures**.
+
+Here’s the full **Mermaid sequence + trust chain diagram** that shows:
+🔹 how each certificate is signed,
+🔹 how the client verifies the chain, and
+🔹 how it results in a trusted, encrypted TLS session.
+
+---
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+    participant IntermediateCA
+    participant RootCA
+
+    Note over Client,Server: 🔐 TLS Handshake (Certificate Verification Phase)
+
+    Client->>Server: 1️⃣ ClientHello<br/>(Request secure connection)
+    Server->>Client: 2️⃣ ServerHello + Certificate Chain<br/>(Leaf + Intermediate)
+
+    Note over Server: Sends:<br/>[A] example.com cert<br/>[B] Let's Encrypt R3 (Intermediate CA)
+
+    Client->>Client: Extract public key from IntermediateCA cert<br/>Public Key = Kpub(Intermediate)
+    Client->>Client: Verify Signature(ServerCert.Signature)<br/>using Kpub(Intermediate)
+    Note over Client: If signature matches → ✅ example.com cert is authentic
+
+    Client->>Client: Extract public key from RootCA cert<br/>Public Key = Kpub(Root)
+    Client->>Client: Verify Signature(IntermediateCert.Signature)<br/>using Kpub(Root)
+    Note over Client: If signature matches → ✅ Intermediate CA is authentic
+
+    Client->>Client: Check if RootCA fingerprint exists in /etc/ssl/cert.pem
+    Note over Client: Root is trusted locally → Chain validated 🔒
+
+    Client->>Server: 3️⃣ Proceed with Key Exchange<br/>(ECDHE / RSA)
+    Server->>Client: 4️⃣ Server Finished
+    Client->>Server: 5️⃣ Client Finished
+    Note over Client,Server: Encrypted session established
+```
+
+---
+
+## 🧠 How Each Step Works Cryptographically
+
+| Step                                       | Description                                                                                                  | Mathematical / Crypto View                                                           |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| **1️⃣ Server sends cert chain**            | The chain includes: `Server Cert` → `Intermediate CA` → `Root CA`                                            | Each certificate has: `Subject`, `Issuer`, `Public Key`, and a **Digital Signature** |
+| **2️⃣ Verify Server Certificate**          | Client verifies the **server certificate’s signature** using the **public key** from the **intermediate CA** | `verify(Signature_server, Hash(ServerCert), Kpub(Intermediate))`                     |
+| **3️⃣ Verify Intermediate CA Certificate** | Client verifies intermediate’s signature using **Root CA’s public key**                                      | `verify(Signature_intermediate, Hash(IntermediateCert), Kpub(Root))`                 |
+| **4️⃣ Validate Root CA**                   | Root CA is **self-signed** and stored in the client’s **trusted CA store** (`/etc/ssl/cert.pem`)             | Trusted implicitly (no verification needed beyond local fingerprint check)           |
+| **5️⃣ Domain Check (SAN/CN)**              | Client ensures the **domain name (CN or SAN)** matches the host being connected to                           | Prevents certificate misuse                                                          |
+| **6️⃣ Key Exchange**                       | Once verified, client & server perform ECDHE or RSA to establish shared secret                               | Derived key → session encryption                                                     |
+
+---
+
+## 🔏 Simplified Example of the Signature Logic
+
+Each certificate is signed like this by its issuer:
+
+```
+Signature = Sign(Hash(CertificateData), Kpriv(Issuer))
+```
+
+Verification (on client side):
+
+```
+Verify(Signature, Hash(CertificateData), Kpub(Issuer)) == true
+```
+
+If this holds true for each link in the chain →
+✅ The chain of trust is verified up to the trusted root.
+
+---
+
+## 🧩 Visualization of the Trust Chain
+
+```mermaid
+graph TD
+    A[Server Certificate<br/>(example.com)] --> B[Intermediate CA<br/>(Let's Encrypt R3)]
+    B --> C[Root CA<br/>(ISRG Root X1)]
+    C:::trusted
+
+    classDef trusted fill:#a5f3fc,stroke:#0369a1,stroke-width:2px;
+```
+
+### How the client verifies:
+
+* `A` signed by `B` → uses `B`’s public key
+* `B` signed by `C` → uses `C`’s public key
+* `C` trusted by system → root of trust ✅
+
+---
+
+## 📘 Key Takeaways
+
+| Concept               | Description                                                                             |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| **Digital Signature** | A hash of the certificate signed by the issuer’s private key                            |
+| **Public Key**        | Used by the client to verify that signature                                             |
+| **Chain of Trust**    | Each certificate is validated by the public key of the next authority                   |
+| **Root CA**           | Self-signed, pre-trusted by OS/browser                                                  |
+| **Result**            | Client can prove mathematically that the server’s identity and public key are authentic |
+
+---
+
+Would you like me to extend this one more step — showing how the **verified server public key** is then used in the **key exchange (ECDHE/RSA)** to create the shared session key for encryption?
+
