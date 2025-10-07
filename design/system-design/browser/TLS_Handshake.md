@@ -1,6 +1,89 @@
+
+
+
+
 # TLS handshake 
 
 TLS handshake is a **multi-step process** that establishes a secure, encrypted session between a client (browser) and a server (like Google).
+
+
+ the **TCP handshake happens before the TLS handshake**. 
+
+---
+
+### 🧠 Concept Overview
+
+TLS (Transport Layer Security) sits **on top of TCP** in the network stack.
+That means — before any encrypted communication starts, there must first be a **reliable TCP connection**.
+
+---
+
+
+#### 1. **TCP Handshake (3-way)**
+
+Before TLS can begin, the client and server must establish a TCP connection.
+
+| Step | Message                      | Purpose                                      |
+| ---- | ---------------------------- | -------------------------------------------- |
+| 1️⃣  | **Client → Server:** SYN     | Client says: “I want to start a connection.” |
+| 2️⃣  | **Server → Client:** SYN-ACK | Server acknowledges and agrees to connect.   |
+| 3️⃣  | **Client → Server:** ACK     | Client confirms — connection established.    |
+
+✅ Now a **TCP socket connection** exists — reliable, ordered, and bidirectional.
+
+---
+
+#### 2. **TLS Handshake**
+
+Once TCP is established, the TLS layer begins negotiating encryption parameters.
+
+| Phase | Message               | Purpose                                                        |
+| ----- | --------------------- | -------------------------------------------------------------- |
+| 🔐 1  | **ClientHello**       | Client proposes cipher suites, TLS version, random nonce, etc. |
+| 🔐 2  | **ServerHello**       | Server selects cipher, sends its certificate (public key).     |
+| 🔐 3  | **Key Exchange**      | Both sides derive session keys (using RSA, DH, ECDHE).         |
+| 🔐 4  | **Finished Messages** | Both verify handshake integrity and switch to encryption.      |
+
+✅ Now the connection is encrypted and ready for secure HTTP (HTTPS) traffic.
+
+---
+
+### 🔸 Why TCP First?
+
+* TLS needs a **reliable transport** — every message in the handshake must arrive intact and in order.
+* UDP (unreliable) cannot guarantee that — which is why **DTLS** (Datagram TLS) was created separately for UDP-based systems.
+
+---
+
+### ⚙️ Example (Timeline)
+
+```
+Client                   Server
+  | ---- SYN ----------> |
+  | <--- SYN/ACK ------- |
+  | ---- ACK ----------> |     ← TCP handshake done
+  | ---- ClientHello --> |
+  | <--- ServerHello --- |
+  | <--- Certificate --- |
+  | ---- KeyExchange --> |
+  | <--- Finished ------ |
+  | ---- Finished -----> |     ← TLS handshake done
+  | ---- Encrypted Data →|
+```
+
+---
+
+### 🧩 Summary
+
+| Layer | Handshake Type          | Purpose                       |
+| ----- | ----------------------- | ----------------------------- |
+| TCP   | 3-way handshake         | Establish reliable connection |
+| TLS   | Cryptographic handshake | Secure the channel over TCP   |
+
+---
+
+
+
 
 the **TLS 1.2 full handshake** (TLS 1.3 is shorter ):
 
