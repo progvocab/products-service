@@ -1,5 +1,203 @@
-Perfect — let’s go deeper and walk through a **technical, real-data example** of how a modern cipher suite (say,
-👉 **`TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384`**) actually works in a **TLS 1.2 handshake**, including the *real cryptographic numbers* exchanged and how each of the four operations occurs internally.
+**public-key cryptography** 
+
+---
+
+## 🧩 The Core Idea
+
+In **asymmetric cryptography**, there are two keys:
+
+* **Public key (Kₚᵤᵦ)** — shared openly.
+* **Private key (Kₚᵣᵢᵥ)** — kept secret.
+
+They are **mathematically linked**, but in a **one-way** way:
+
+> If you encrypt something with the public key,
+> only the private key can decrypt it —
+> and vice versa.
+
+---
+
+## ⚙️ Let’s take RSA as an example
+
+RSA encryption works on modular arithmetic and exponentiation:
+
+[
+\text{Ciphertext } c = m^e \bmod n
+]
+[
+\text{Plaintext } m = c^d \bmod n
+]
+
+Where:
+
+| Symbol             | Meaning                              |
+| ------------------ | ------------------------------------ |
+| ( n = p \times q ) | Product of two large primes (public) |
+| ( e )              | Public exponent (public key part)    |
+| ( d )              | Private exponent (private key part)  |
+| ( m )              | Message (as a number)                |
+| ( c )              | Ciphertext                           |
+
+---
+
+### 🔐 The math link
+
+The public and private keys are related by:
+
+[
+e \cdot d \equiv 1 \pmod{φ(n)}
+]
+where ( φ(n) = (p-1)(q-1) )
+
+That means ( d ) is the **modular inverse** of ( e ).
+Computing ( d ) from ( e ) and ( n ) requires knowing ( φ(n) ), which needs ( p ) and ( q ).
+Since factoring ( n ) into ( p ) and ( q ) is extremely hard for large numbers — this is what keeps RSA secure.
+
+---
+
+## 🧠 Why You Can’t Decrypt with the Public Key
+
+Let’s go through what happens.
+
+---
+
+### 🔹 Encryption with the Public Key
+
+When someone encrypts:
+[
+c = m^e \bmod n
+]
+they are using the public exponent ( e ).
+
+To decrypt, one must compute:
+[
+m = c^d \bmod n
+]
+
+This works because:
+[
+m^{e \cdot d} \equiv m \pmod{n}
+]
+
+But **you need ( d )** for that — and ( d ) is **not derivable** from ( e ) and ( n ) unless you can factor ( n ) into ( p, q ), which is computationally infeasible for large keys (2048+ bits).
+
+---
+
+### 🔹 Why not reverse it?
+
+If you try to “decrypt” with the public key:
+[
+m' = c^e \bmod n
+]
+that just gives you gibberish, because ( e ) doesn’t satisfy the modular inverse condition needed to reverse the encryption.
+
+Only ( d ) does — mathematically, ( e ) and ( d ) aren’t symmetric in the modular sense.
+They’re paired such that ( d ) *undoes* what ( e ) does, not the other way around.
+
+---
+
+## 🧮 Example with Real Numbers (small-scale RSA)
+
+Let’s take tiny primes just to see it work.
+
+* ( p = 11 )
+* ( q = 17 )
+* ( n = 187 )
+* ( φ(n) = (11-1)(17-1) = 160 )
+* Choose ( e = 7 )
+* Compute ( d = 23 ) since ( (7×23) mod 160 = 161 ≡ 1 )
+
+So:
+
+| Key         | Value         |
+| ----------- | ------------- |
+| Public key  | (e=7, n=187)  |
+| Private key | (d=23, n=187) |
+
+---
+
+### Encrypt
+
+[
+m = 88
+]
+[
+c = m^e \bmod n = 88^7 \bmod 187 = 11
+]
+
+### Decrypt
+
+[
+m = c^d \bmod n = 11^{23} \bmod 187 = 88
+]
+✅ Back to the original message!
+
+---
+
+Now if you try to use the **public key** again to “decrypt”:
+
+[
+11^7 \bmod 187 = 57
+]
+❌ Not the original plaintext.
+
+The operation ( x^e \bmod n ) is not invertible unless you have the **right exponent ( d )**.
+
+---
+
+## 🧩 Why It’s One-Way (Mathematically)
+
+Because:
+
+* Exponentiation modulo a large ( n ) is **easy** (forward direction).
+* But finding the correct root (i.e., undoing exponentiation modulo ( n )) is **hard** without the secret ( d ).
+* That’s the **trapdoor**: the math works both ways only if you know a hidden secret (the private key).
+
+---
+
+## 🧠 Quick Analogy
+
+Think of:
+
+* **Public key** = a **padlock** that everyone can use to lock a box.
+* **Private key** = the **key** that opens that padlock.
+
+Everyone can lock a box (encrypt data) with your public padlock.
+But **only you**, who hold the private key, can open it.
+
+The padlock’s design (mathematically) allows anyone to close it — but not to open it without the matching key.
+
+---
+
+## 🔄 Reverse Use: Digital Signatures
+
+Interestingly, the process *can* be reversed conceptually in **digital signatures**:
+
+* You “encrypt” (sign) a hash with your **private key**.
+* Others “decrypt” (verify) it with your **public key**.
+
+That’s possible because the math is symmetric **in structure**, but **not in secrecy**:
+
+* Anyone can check the signature (public).
+* Only the owner can create it (private).
+
+---
+
+## ✅ Summary
+
+| Concept          | Uses                | Who Can Do It             | Mathematical Operation |
+| ---------------- | ------------------- | ------------------------- | ---------------------- |
+| **Encryption**   | Keep message secret | Anyone (using public key) | ( c = m^e \bmod n )    |
+| **Decryption**   | Read the secret     | Only private key holder   | ( m = c^d \bmod n )    |
+| **Signature**    | Prove identity      | Only private key holder   | ( s = h^d \bmod n )    |
+| **Verification** | Check signature     | Anyone (using public key) | ( h' = s^e \bmod n )   |
+
+---
+
+
+
+
+
 
 ---
 
