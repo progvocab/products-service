@@ -167,7 +167,7 @@ Absolutely! Let’s go **step by step** and separate the different types of priv
 * **Purpose:** To authenticate the server to the client and optionally sign ephemeral parameters.
 * **How it’s created:**
 
-  1. Generated once when creating a **public-private key pair** (e.g., RSA 2048-bit or ECDSA P-256).
+  1. Generated once when creating a **public-private key pair** (e.g., RSA 2048-bit or ECDSA P-256) by Server administrator during initial setup of HTTPS/ TLS.
   2. The public key is sent to a **Certificate Authority (CA)** for signing, resulting in a certificate.
 * **When it’s used in TLS handshake:**
 
