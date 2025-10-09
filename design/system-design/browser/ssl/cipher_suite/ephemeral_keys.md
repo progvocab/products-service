@@ -80,3 +80,115 @@ Both sides now share **S**, which is used to derive **session keys** for encrypt
 If you want, I can **draw a complete TLS handshake diagram highlighting ephemeral key generation and exchange**, which makes this much easier to visualize.
 
 Do you want me to do that?
+
+
+Sure! Let’s carefully go through the **step where the server signs its ephemeral public key using its long-term private key** in the TLS handshake. This is a **critical step for authentication**, especially in **DHE/ECDHE key exchanges**, which provide **perfect forward secrecy**.
+
+---
+
+## **1. Why the Server Signs the Ephemeral Key**
+
+* In **DHE/ECDHE**, both server and client generate **ephemeral key pairs** for this session only.
+* However, **ephemeral keys alone do not prove the server’s identity**.
+* To authenticate itself, the server **signs the ephemeral public key** using its **long-term private key** from its certificate.
+* The client can then **verify the signature** using the server’s public key (from the certificate) to ensure it’s talking to the **legitimate server**.
+
+---
+
+## **2. Step-by-Step Process**
+
+### **Step A: Server Generates Ephemeral Key Pair**
+
+1. **Private key**: (d_{server}) (random, temporary for this session)
+2. **Public key**: (Q_{server} = d_{server} \cdot G) (for ECDHE)
+
+---
+
+### **Step B: Prepare Data to Sign**
+
+* The server creates a **message to sign** which includes:
+
+  * Ephemeral public key ((Q_{server}))
+  * ServerHello random values (nonce)
+  * ClientHello random values (nonce)
+
+> These random values ensure that the signature is **tied to this specific session**, preventing replay attacks.
+
+---
+
+### **Step C: Sign Using Long-Term Private Key**
+
+* The server uses its **long-term private key** ((K_{server}^{private})) to generate a **digital signature** over the prepared data:
+
+[
+\text{signature} = \text{Sign}*{K*{server}^{private}}(\text{ephemeral key + nonces})
+]
+
+* This is usually done with:
+
+  * RSA: `RSASSA-PSS` or `PKCS#1 v1.5` signature
+  * ECDSA: `ECDSA` signature
+
+---
+
+### **Step D: Send Signed Data**
+
+* The server sends a **`ServerKeyExchange` message** containing:
+
+  * Ephemeral public key ((Q_{server}))
+  * Signature (proof it came from the legitimate server)
+
+---
+
+### **Step E: Client Verification**
+
+* The client extracts the server certificate to get the **server’s public key** (K_{server}^{public}).
+* It verifies the signature:
+
+[
+\text{Verify}*{K*{server}^{public}}(\text{signature}) \stackrel{?}{=} \text{ephemeral key + nonces}
+]
+
+* If verification succeeds, the client trusts:
+
+  1. The server’s identity (authenticated)
+  2. The ephemeral key is safe to use for **shared secret computation**
+
+---
+
+## **3. Why This Step is Important**
+
+1. **Authenticates ephemeral keys**: Prevents man-in-the-middle attacks.
+2. **Supports Perfect Forward Secrecy**: Even if the server’s long-term private key is compromised later, past session keys cannot be derived.
+3. **Ties session to server certificate**: Ensures only the legitimate server can produce a valid signature.
+
+---
+
+### **4. Quick TLS Handshake Context**
+
+```
+ClientHello  ------------------------>
+                                   (negotiates cipher suite)
+
+ServerHello  <------------------------
+ServerCertificate  <-----------------  (contains server long-term public key)
+ServerKeyExchange <-----------------  (ephemeral public key + signature)
+CertificateRequest (optional)
+ServerHelloDone  <------------------
+
+ClientKeyExchange ------------------>
+    (client ephemeral public key)
+
+[Both compute shared secret using ephemeral keys]
+
+Finished <-------------------------->
+Finished --------------------------->
+```
+
+* The **signature in ServerKeyExchange** is the only step where the **server’s long-term private key** interacts with the ephemeral keys.
+
+---
+
+If you want, I can make a **diagram specifically showing the signing of the ephemeral public key and verification by the client**, which makes this very easy to visualize.
+
+Do you want me to make that diagram?
