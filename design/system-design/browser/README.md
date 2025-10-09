@@ -157,11 +157,18 @@ flowchart TD
 2. **TCP Connection**
 
    * Browser establishes a TCP connection (3-way handshake) to the server.
+- Client SYN 
+- Server SYN + ACK
+- Client ACK
 
 3. **TLS/SSL Handshake**
 
    * Browser and server negotiate encryption (HTTPS).
-
+- Client Hello : sharing cipher suites , protocol 
+- Server Hello : selecting cipher suite , protocol,  sharing certificate 
+- Client: Validating Left Certificate-> Intermediatory Certificate -> Root Certificate using client's CA file 
+- validating the domain name is owned by server host
+- Server : creating ephemeral key pair random , signing the ephemeral public key using long term private key
 4. **HTTP Request**
 
    * Browser sends GET request to fetch homepage.
