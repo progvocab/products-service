@@ -165,10 +165,12 @@ flowchart TD
 
    * Browser and server negotiate encryption (HTTPS).
 - Client Hello : sharing cipher suites , protocol 
-- Server Hello : selecting cipher suite , protocol,  sharing certificate 
+- Server Hello : selecting cipher suite , protocol,  sharing certificate , confirming the elliptic curve to use ( TLS1.3)
 - Client: Validating Left Certificate-> Intermediatory Certificate -> Root Certificate using client's CA file 
 - validating the domain name is owned by server host
+- Generate the common points on the elliptic curve and creating a shared secret by both server and client.
 - Server : creating ephemeral key pair random , signing the ephemeral public key using long term private key
+
 4. **HTTP Request**
 
    * Browser sends GET request to fetch homepage.
