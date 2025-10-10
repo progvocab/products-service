@@ -339,3 +339,210 @@ So `0x1` corresponds to:
 If you want, I can also **draw a diagram showing the mark word bit layout with lock bits, biased flag, and hash code**, which makes it super visual.
 
 Do you want me to do that?
+
+
+
+Great question — this dives into the **low-level mechanics of the JVM object header** and how **the garbage collector (GC)** handles **object movement** and **hash codes** stored in the **Mark Word**.
+
+Let’s unpack this carefully.
+
+---
+
+## 🧩 1. Object Header Structure (Mark Word Overview)
+
+In HotSpot JVM (for 64-bit, compressed oops disabled), the **object header** typically contains:
+
+| Field             | Bits    | Purpose                                                    |
+| ----------------- | ------- | ---------------------------------------------------------- |
+| **Mark Word**     | 64 bits | Stores runtime metadata like hash code, GC age, lock state |
+| **Klass Pointer** | 64 bits | Points to the class metadata                               |
+
+### The **Mark Word** contents vary depending on state:
+
+| State             | Mark Word Content                                                    |
+| ----------------- | -------------------------------------------------------------------- |
+| Normal (unlocked) | HashCode, GC age, object flags                                       |
+| Locked            | Lock information (lightweight or heavyweight)                        |
+| Biased            | Thread ID + epoch + bias bit                                         |
+| Moved (by GC)     | Depends on GC algorithm (may contain forwarding pointer temporarily) |
+
+---
+
+## ⚙️ 2. When the Object Moves (in Copying or Compacting GC)
+
+If the GC **moves** an object (e.g., from Eden → Survivor, or Survivor → Old Generation), the **memory address** changes.
+
+However, the **hash code value stored in the Mark Word does not depend on the object’s address** directly once it’s been computed.
+
+---
+
+## 🔍 3. Two Key Scenarios
+
+### **Case 1: hashCode() has NOT been called**
+
+* Before `hashCode()` is ever called, the Mark Word doesn’t contain a hash value.
+* If GC moves the object, the Mark Word may be overwritten (e.g., temporarily containing a *forwarding pointer*), but since no hash was ever computed, there’s nothing to preserve.
+* When `hashCode()` is later called, JVM computes it (often derived from the new object address or a pseudo-random seed) and stores it in the Mark Word.
+
+### **Case 2: hashCode() has ALREADY been called**
+
+* Once a hash is generated, it is stored in the Mark Word.
+* When GC compacts or copies the object:
+
+  * The **Mark Word is copied** along with the object.
+  * So the **hash code remains unchanged**, even though the object’s memory address has changed.
+  * This ensures that `hashCode()` remains **stable** per the Java contract.
+
+---
+
+## 🧠 4. What Happens During Object Movement Internally
+
+Here’s what happens during a *copying GC* (e.g., G1 or Parallel Scavenge):
+
+1. GC identifies a live object.
+2. It allocates new space in the destination region.
+3. It **copies the entire object header and fields**, including the Mark Word.
+4. It places a **forwarding pointer** in the old location temporarily.
+5. When all references are updated to the new address, the forwarding pointer is discarded.
+
+➡️ Since the **Mark Word** (and therefore the hashCode bits) are copied verbatim, the `hashCode()` value is preserved.
+
+---
+
+## ⚡ 5. Key Detail — Why It Matters
+
+* If the JVM recomputed the hashCode after moving, it would violate Java’s rule:
+
+  > "An object’s hashCode must remain constant during its lifetime."
+
+* So instead, HotSpot **decouples** the hash from the actual memory address once computed.
+
+---
+
+## ✅ 6. Summary Table
+
+| Step | Event                    | What Happens to Mark Word                   | hashCode Impact    |
+| ---- | ------------------------ | ------------------------------------------- | ------------------ |
+| 1    | Object created           | Mark Word initialized with bias/age bits    | No hash yet        |
+| 2    | `hashCode()` called      | Hash value computed and stored in Mark Word | Fixed forever      |
+| 3    | GC moves object          | Mark Word copied to new memory              | hashCode unchanged |
+| 4    | Object accessed after GC | Mark Word same as before                    | hashCode stable    |
+
+---
+
+## 🧩 7. In Short
+
+* The **Mark Word** holds the hash code once computed.
+* When GC **moves** an object, it **copies the Mark Word** unchanged.
+* Thus, even if the **memory address changes**, the **hashCode value stays the same**.
+
+---
+
+Would you like me to draw a **memory diagram (Mermaid)** showing the object before and after GC compaction — including the Mark Word fields and how the hashCode remains stable?
+
+
+
+Excellent — this is a subtle but really important point in how the JVM’s **object reference model** and **garbage collection** work.
+
+Let’s break it down very carefully:
+
+---
+
+## 🧩 1. Key idea — “The hashCode and memory address are independent”
+
+When an object moves, its **memory address changes**, but **Java references do not store the physical address directly** the way C pointers do.
+
+Instead, the JVM uses **handles** or **direct references**, and the GC updates those references when objects move.
+
+---
+
+## 🧠 2. Two models JVMs use for locating objects
+
+### **Model 1: Handle-based**
+
+* A reference points to a **handle** (in a handle table).
+* The handle table entry holds:
+
+  * The **object’s actual address** in the heap
+  * A pointer to the **class metadata**
+
+**When the object moves:**
+
+* Only the handle table entry’s object address is updated.
+* The reference itself (which points to the handle) doesn’t change.
+
+```
+Reference → Handle → Object (moved by GC)
+```
+
+So Java code using the reference doesn’t see any difference.
+
+> ☑️ Advantage: Object moves don’t require updating all references.
+>
+> ❌ Disadvantage: Extra indirection → slower access.
+
+---
+
+### **Model 2: Direct reference (used by HotSpot JVM)**
+
+* The reference directly holds the **memory address of the object** in the heap.
+* When GC compacts or copies the object:
+
+  * It **copies the object (including Mark Word)** to the new region.
+  * Then it **updates all references** that pointed to the old address → now point to the new one.
+  * The GC tracks references from stack frames, registers, and other objects (the *root set*).
+
+This is done automatically by the **GC’s pointer update phase** using **object graphs**.
+
+> ☑️ Advantage: Faster access (no indirection)
+> ❌ Disadvantage: GC must update every reference when objects move
+
+---
+
+## 🔍 3. So, when object moves:
+
+| Aspect                  | Before Move           | After Move                            |
+| ----------------------- | --------------------- | ------------------------------------- |
+| Object address          | Old region address    | New region address                    |
+| hashCode (Mark Word)    | Same bits             | Same bits                             |
+| Java reference variable | Points to old address | GC updates it to point to new address |
+
+---
+
+## ⚙️ 4. How the GC updates references
+
+* The GC maintains metadata for each live object.
+* When copying objects:
+
+  1. It records a **forwarding pointer** in the old object’s location.
+  2. Any thread or reference encountering that old address will follow the forwarding pointer to the new address.
+  3. Once all references are updated, the forwarding pointers are removed.
+
+This ensures all variables, stack frames, and object fields now point to the new location.
+
+---
+
+## 🧩 5. Summary
+
+| Concept              | Description                                                |
+| -------------------- | ---------------------------------------------------------- |
+| **Mark Word**        | Contains hashCode, age, bias, lock bits — copied unchanged |
+| **Object move**      | GC copies the entire object to new heap location           |
+| **References**       | GC updates all references to point to the new location     |
+| **hashCode**         | Independent of address — stays the same                    |
+| **Lookup mechanism** | Direct pointer (HotSpot) or handle table (older JVMs)      |
+
+---
+
+### 🧠 Intuition
+
+So the JVM does **not** use the hash code or any “lookup variable” to find the object.
+Instead:
+
+* The **GC rewrites all references** to the object’s new address.
+* After that, all Java references still point to the correct (new) location — automatically.
+
+---
+
+Would you like me to show a **Mermaid diagram** comparing both memory models (Handle-based vs Direct-reference) and how references are updated when GC moves an object?
+
