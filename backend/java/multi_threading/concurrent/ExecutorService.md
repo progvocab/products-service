@@ -1,5 +1,106 @@
-Excellent — this is a core Java concurrency topic 🔥
-Let’s dive deep into **ExecutorService** — one of the most important abstractions in the `java.util.concurrent` package.
+# Executor Service 
+
+- **Problem** : Creating a new Thread is costly.
+- **Solution** : Resuse Threads using Executor Service.
+
+Lets say you a number of tasks to be executed concurrently,  Instead of creating a new for each task , maintain a pool of Threads , and reuse them. This can be done using Executor Service.
+
+### Why Thread creation is costly 
+
+
+
+
+
+
+
+
+---
+
+## 1️⃣ What happens when you create a new Thread
+
+When you do:
+
+```java
+Thread t = new Thread(() -> {
+    // some work
+});
+t.start();
+```
+
+The JVM has to:
+
+1. **Allocate memory** for:
+
+   * Thread object (Java object in heap)
+   * Native thread stack (typically 512 KB to 1 MB per thread by default)
+   * Thread-local storage, JVM thread control structures
+2. **Register the thread** with the OS (each Java thread maps to a native OS thread in HotSpot).
+3. **Schedule the thread** with the OS kernel.
+4. **Start execution** (context switches, CPU scheduling).
+
+All these steps are **much heavier than simply reusing an existing thread** from a thread pool.
+
+---
+
+## 2️⃣ Why creating threads is costly
+
+| Cost        | Reason                                                                                             |
+| ----------- | -------------------------------------------------------------------------------------------------- |
+| Memory      | Each thread needs a **stack**, JVM structures, and thread-local memory                             |
+| CPU         | OS has to schedule the thread, context-switch between threads                                      |
+| Latency     | Startup time is noticeable if creating threads frequently (~100–500 µs per thread, sometimes more) |
+| Scalability | Thousands of threads can exhaust memory and degrade system performance                             |
+
+**Example:**
+Creating 10,000 new threads simultaneously can easily **consume multiple GB of RAM** just for stacks, and cause thrashing due to excessive context switching.
+
+---
+
+## 3️⃣ Why thread pools help
+
+Instead of creating a new thread per task:
+
+* Threads are **created once** and reused.
+* Idle threads **wait** for new tasks.
+* Reduces:
+
+  * Memory allocation overhead
+  * OS scheduling overhead
+  * GC pressure from frequent thread objects
+
+---
+
+## 4️⃣ Empirical numbers (approximate)
+
+| Operation                             | Time / Cost                       |
+| ------------------------------------- | --------------------------------- |
+| Creating new thread                   | 100–500 µs (or more)              |
+| Starting task on existing thread pool | 1–10 µs                           |
+| Context switch between threads        | ~1–10 µs                          |
+| Thread stack memory                   | 512 KB–1 MB per thread by default |
+
+> So using a thread pool can be **10x–100x faster per task** in high-throughput workloads.
+
+---
+
+## 5️⃣ Recommendations
+
+1. **Use thread pools (`ExecutorService`)** instead of new `Thread()` for tasks.
+2. **Use CachedThreadPool** for bursty loads — threads get reused, idle threads die after 60s.
+3. **Use FixedThreadPool** when you want predictable concurrency and memory usage.
+4. **Avoid creating threads in tight loops** or per-request in high-traffic servers.
+
+---
+
+✅ **Bottom line:**
+Creating a new thread is **expensive in both memory and CPU**, and can limit scalability. **Thread pools exist specifically to avoid this overhead by reusing threads.**
+
+---
+
+If you want, I can also **show a side-by-side timing comparison of new Thread vs ThreadPool execution** with Java code — it’s a very practical demonstration of why pools are better.
+
+Do you want me to show that?
+
 
 ---
 
