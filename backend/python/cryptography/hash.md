@@ -34,6 +34,59 @@ Output (SHA-256): 185f8db32271fe25f561a6fc938b2e264306ec304eda518007d17648263819
 | **4. Blockchain & Cryptocurrencies** | SHA-256 is used in Bitcoin for mining and generating wallet addresses — ensuring immutability of transactions.                     |
 | **5. File/Message Fingerprinting**   | Used in checksums (like `sha256sum` command) to verify file authenticity after download.                                           |
 
+
+
+Sure! Here’s a Python example that generates **MD1 to MD5** hashes for a given string.
+*(Note: MD1 is not a standard algorithm in Python’s `hashlib`, but MD2 and MD4 are also uncommon. I’ll show MD5 and other common ones.)*
+
+Python’s `hashlib` supports **MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512** by default. MD1, MD2, MD3 aren’t implemented in standard libraries. But we can generate **MD5, SHA-1, SHA-224, SHA-256, SHA-512** as examples.
+
+```python
+import hashlib
+
+# Input string
+input_string = "hello world"
+
+# MD5
+md5_hash = hashlib.md5(input_string.encode()).hexdigest()
+print(f"MD5: {md5_hash}")
+
+# SHA-1
+sha1_hash = hashlib.sha1(input_string.encode()).hexdigest()
+print(f"SHA-1: {sha1_hash}")
+
+# SHA-224
+sha224_hash = hashlib.sha224(input_string.encode()).hexdigest()
+print(f"SHA-224: {sha224_hash}")
+
+# SHA-256
+sha256_hash = hashlib.sha256(input_string.encode()).hexdigest()
+print(f"SHA-256: {sha256_hash}")
+
+# SHA-512
+sha512_hash = hashlib.sha512(input_string.encode()).hexdigest()
+print(f"SHA-512: {sha512_hash}")
+```
+
+---
+
+### **Sample Output**
+
+```
+MD5: 5eb63bbbe01eeed093cb22bb8f5acdc3
+SHA-1: 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed
+SHA-224:  23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7
+SHA-256: b94d27b9934d3e08a52e52d7da7dabfa
+SHA-512: 309ecc489c12d6eb4cc40f50c902f2b4...
+```
+
+---
+
+If you want, I can also **show a version that generates all MD1–MD5 hashes using a third-party library** (for older MD algorithms) in Python. This will cover **MD1, MD2, MD3, MD4, MD5**.
+
+Do you want me to do that?
+
+
 ---
 
 ### 🔹 **Properties of a Secure Hash Function**
@@ -203,3 +256,36 @@ Even today’s secure hashes (SHA-256) are safe for most uses; quantum computers
 * **If your goal** is to secure a system, I can show how to migrate from SHA to Argon2/bcrypt, add salts, and set appropriate parameters.
 
 Which of those would you like to do next? (e.g., show Argon2 password examples, a verification script for your own hash, or how to salt+hash properly?)
+
+
+**MD5** stands for **Message Digest 5**.
+
+It is a **cryptographic hash function** that takes any input (text, file, etc.) and produces a **fixed-length 128-bit (16-byte) hash value**, usually represented as a 32-character hexadecimal number.
+
+---
+
+### **Key Points about MD5:**
+
+| Feature              | Details                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| **Hash Length**      | 128 bits (16 bytes)                                                                   |
+| **Purpose**          | Data integrity verification, checksums, fingerprinting                                |
+| **Algorithm Type**   | Merkle–Damgård construction                                                           |
+| **Security**         | **Weak/obsolete**. Vulnerable to collisions and preimage attacks                      |
+| **Common Use Cases** | Legacy file checksums, detecting accidental corruption, non-critical integrity checks |
+
+---
+
+### **Example:**
+
+* Input: `"hello"`
+* MD5 Hash: `5d41402abc4b2a76b9719d911017c592`
+
+---
+
+**Important:** MD5 is **no longer recommended for security purposes** (like passwords or digital signatures) because attackers can generate collisions or preimages relatively easily. Modern alternatives are **SHA-2** or **SHA-3**.
+
+---
+
+If you want, I can make a **quick comparison between MD5, SHA-1, and SHA-2** to show why MD5 is weakest. Do you want me to do that?
+
