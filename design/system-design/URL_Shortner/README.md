@@ -21,7 +21,7 @@ A URL shortener takes a long URL, generates a short key (hash/ID), stores the ma
 * **Analytics Service**: Logs clicks, geolocation, device info.
 * **Optional**: CDN for fast delivery.
 
-![System Design](/assets/design_bitly_1.png)
+![System Design](/assets/design_bitly_4.png)
 
 
 
