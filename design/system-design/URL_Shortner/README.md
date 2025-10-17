@@ -4,7 +4,7 @@ A URL shortener takes a long URL, generates a short key (hash/ID), stores the ma
 
 ---
 
-## 🔹 Key Components
+###  Key Components
 
 * **Client**: User inputs long URL, clicks shorten.
 * **API Gateway / Load Balancer**: Handles requests, distributes to services.
@@ -21,9 +21,9 @@ A URL shortener takes a long URL, generates a short key (hash/ID), stores the ma
 * **Analytics Service**: Logs clicks, geolocation, device info.
 * **Optional**: CDN for fast delivery.
 
----
+![System Design](/assets/design_bitly_1.png)
 
-## 🔹 Mermaid Diagram
+
 
 ```mermaid
 flowchart TD
@@ -62,9 +62,9 @@ flowchart TD
     M --> Client
 ```
 
----
 
-## 🔹 Flow Explanation
+
+###  Flow
 
 1. **Shortening a URL**
 
@@ -84,6 +84,3 @@ flowchart TD
 
    * Every click is logged for reporting.
 
----
-
-👉 Do you want me to also extend this into a **distributed system design** (with sharded databases, consistent hashing, rate limiting, fault tolerance) like in system design interviews?
