@@ -234,3 +234,136 @@ Think of PostgreSQL like a layered operating system:
 ---
 
 Would you like me to show a **Mermaid sequence diagram** of this entire “SELECT path” — from client query → buffer manager → disk → back to client — to visualize how these components interact?
+
+
+Perfect — this is one of the best ways to understand **PostgreSQL’s internal architecture** and how data is organized and read.
+Let’s visualize the **hierarchical structure** of storage and how components like **WAL**, **Heap**, and **Indexes** relate.
+
+---
+
+## 🧠 Overview: PostgreSQL Internal Storage & Read Path
+
+Below is a **hierarchical diagram** (text-based) showing relationships between all major storage structures:
+
+```
+                        +----------------------------------+
+                        |        PostgreSQL Instance       |
+                        +----------------------------------+
+                                      |
+         +----------------------------+-----------------------------+
+         |                                                          |
++-----------------------+                               +-----------------------+
+|      Shared Buffers   |                               |   Write-Ahead Log     |
+| (In-memory Cache Area)|                               |        (WAL)          |
++-----------------------+                               +-----------------------+
+         |                                                          |
+         |                                                          |
+         V                                                          V
++--------------------------------------------------------------------------+
+|                              Data Directory                              |
+|                (e.g., /var/lib/postgresql/data/base/)                    |
++--------------------------------------------------------------------------+
+   |                          
+   +--> Database (e.g., mydb/)
+          |
+          +--> Table (e.g., employees)
+                 |
+                 +--> Table File (Heap) — stores actual rows
+                 |        |
+                 |        +--> Pages (8 KB blocks)
+                 |               |
+                 |               +--> Tuples (rows / row versions)
+                 |                        |
+                 |                        +--> Each tuple has xmin/xmax (MVCC)
+                 |
+                 +--> Free Space Map (FSM) — tracks free space in pages
+                 |
+                 +--> Visibility Map (VM) — tracks all-visible/all-frozen pages
+                 |
+                 +--> Index File(s)
+                          |
+                          +--> B-Tree / GIN / GiST etc.
+                          |        |
+                          |        +--> Index Pages (8 KB)
+                          |                 |
+                          |                 +--> Index Entries (key + TID pointer)
+                          |
+                          +--> TID (Tuple ID) → Points to specific row in Heap
+```
+
+---
+
+## ⚙️ Step-by-Step: What Happens on `SELECT * FROM employees WHERE id = 10`
+
+Let’s go through the **read path**:
+
+1. **SQL Parser & Planner**
+
+   * The query goes through the **parser**, then the **planner/optimizer** determines:
+
+     * Which **index** (if any) to use.
+     * Which **access path** (sequential scan, index scan, bitmap scan) is best.
+
+2. **Executor Begins Scan**
+
+   * The **executor** requests pages from the table or index.
+   * If an **index** is used:
+
+     * The **index file** (e.g., B-Tree) is read first.
+     * Index entry points to the heap tuple using a **TID (block#, offset)**.
+
+3. **Buffer Manager / Shared Buffers**
+
+   * PostgreSQL checks if the required page (heap or index) is already in **shared buffers**.
+
+     * ✅ If yes → use it (cache hit)
+     * ❌ If no → load from disk using **OS read()**
+
+4. **Heap Page Read**
+
+   * The page (8 KB block) from the heap is fetched.
+   * Within the page, PostgreSQL finds the tuple using **TID** (e.g., block 12, offset 5).
+
+5. **MVCC Visibility Check**
+
+   * PostgreSQL checks tuple’s **xmin/xmax** fields:
+
+     * Is this version visible to the current transaction snapshot?
+     * If not visible (e.g., deleted or updated), check previous/next versions.
+
+6. **Return Visible Tuple**
+
+   * The visible tuple’s data is read from the heap and passed back to the executor.
+
+7. **Executor Produces Result**
+
+   * The executor returns the resulting rows to the client.
+
+---
+
+## 🧩 Relation to WAL (Write-Ahead Log)
+
+Even during reads, the **WAL** plays an indirect role:
+
+* It ensures all prior writes that affect the visible data are **durably stored**.
+* When PostgreSQL restarts, it replays WAL to restore the heap and indexes to a consistent state.
+
+---
+
+## 📦 Summary Table
+
+| Component                | Description                               | Size                      | Role                           |
+| ------------------------ | ----------------------------------------- | ------------------------- | ------------------------------ |
+| **Heap**                 | Main table file storing tuples            | 8 KB pages                | Stores actual data             |
+| **Index**                | Secondary structure mapping key → TID     | 8 KB pages                | Accelerates lookup             |
+| **FSM (Free Space Map)** | Tracks free space in heap pages           | —                         | Helps find space for inserts   |
+| **VM (Visibility Map)**  | Tracks pages where all tuples are visible | —                         | Helps VACUUM skip pages        |
+| **WAL**                  | Write-ahead log of all changes            | —                         | Ensures durability             |
+| **Shared Buffers**       | Memory cache of pages                     | Configurable (e.g., 1 GB) | Reduces disk I/O               |
+| **Tuple xmin/xmax**      | Transaction IDs                           | —                         | Enable MVCC visibility control |
+
+---
+
+Would you like me to add a **diagram showing how MVCC row versions are chained inside a heap page** (i.e., how updates create new tuples and maintain visibility)?
+It would perfectly complement this structure.
+
