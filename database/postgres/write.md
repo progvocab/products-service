@@ -224,3 +224,181 @@ Partition Key: 101, Column: name, Value: 'Alice'
 
 Would you like a **benchmark comparison** of PostgreSQL vs. Cassandra for **insert and read performance**?
 
+
+Perfect — this is a deep and very interesting question 👏
+Let’s walk through **what happens internally in PostgreSQL** when you execute an `INSERT` statement — and how all the **storage layers coordinate**.
+
+We’ll represent it step by step with **text diagrams** showing the key internal components.
+
+---
+
+## 🧠 Overview of Internal Layers
+
+When you run:
+
+```sql
+INSERT INTO employees (id, name, dept) VALUES (1, 'Alice', 'HR');
+```
+
+PostgreSQL’s internal components coordinate like this 👇
+
+```
+Client
+  │
+  ▼
+PostgreSQL Backend Process (per connection)
+  │
+  ├─ SQL Parser
+  ├─ Planner/Executor
+  ├─ Storage Manager (SMGR)
+  ├─ Buffer Manager
+  ├─ WAL (Write Ahead Log)
+  └─ Checkpointer / Background Writer
+```
+
+---
+
+## 🧩 Step-by-Step Insert Path (Text Diagram)
+
+### ① Client → SQL Parser
+
+```
+Client sends INSERT command
+        │
+        ▼
+Parser converts SQL → parse tree
+        │
+        ▼
+Planner/Executor prepares an execution plan
+```
+
+---
+
+### ② Executor → Storage Manager
+
+```
+Executor executes the plan:
+    INSERT INTO employees VALUES (1, 'Alice', 'HR')
+        │
+        ▼
+Storage Manager (SMGR) locates the correct table file on disk
+   (employees = base/<db_oid>/<relfilenode>)
+```
+
+---
+
+### ③ Storage Manager → Buffer Manager
+
+```
+Storage Manager asks Buffer Manager:
+    "Give me a page (block) where I can insert a tuple"
+
+Buffer Manager checks Shared Buffers:
+    - If a page has free space → load into memory (if not already)
+    - If no free page → extend table file with a new page
+```
+
+---
+
+### ④ Buffer Manager → WAL (Write Ahead Log)
+
+```
+Before modifying the data page in memory:
+    1️⃣ Create a WAL record describing the insert
+    2️⃣ Append the WAL record to pg_wal/ (in memory)
+    3️⃣ Flush WAL record to disk (fsync) BEFORE data page write
+
+Why?
+   - Ensures durability (crash recovery can replay WAL)
+```
+
+Diagram:
+
+```
+               ┌──────────────────┐
+               │ WAL Buffer (RAM) │
+               └───────┬──────────┘
+                       │ flush
+                       ▼
+               ┌──────────────────┐
+               │  pg_wal/ files   │
+               └──────────────────┘
+```
+
+---
+
+### ⑤ Buffer Manager → Shared Buffers
+
+```
+Now the tuple is actually inserted into the in-memory page:
+   - Page Header updated (free space, tuple count)
+   - Heap Tuple created (id, name, dept)
+   - Visibility info (xmin = current transaction ID)
+```
+
+Diagram:
+
+```
+Shared Buffers (in RAM)
+┌──────────────────────────────┐
+│ Page 123:                    │
+│   ├─ Tuple#1: (id=1, Alice)  │
+│   ├─ Tuple#2: (id=2, Bob)    │
+│   └─ Tuple#3: (id=3, Carol)  │
+└──────────────────────────────┘
+```
+
+---
+
+### ⑥ Background Writer & Checkpointer
+
+```
+Later (not immediately):
+    - Background Writer flushes dirty pages from Shared Buffers → Disk
+    - Checkpointer ensures all WAL before checkpoint LSN is durable
+```
+
+So on disk, it goes into:
+
+```
+base/<db_oid>/<relfilenode>  ← Heap file
+pg_wal/                      ← WAL log for crash recovery
+pg_xact/                     ← Transaction status (commit/abort)
+pg_clog/                     ← Commit log metadata
+```
+
+---
+
+### ✅ Final Diagram — “Coordination on INSERT”
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      PostgreSQL Internals                   │
+├─────────────────────────────────────────────────────────────┤
+│ SQL Parser & Planner   → builds execution plan              │
+│ Executor               → sends tuple to Storage Manager     │
+│ Storage Manager (SMGR) → finds/allocates table page         │
+│ Buffer Manager         → holds page in Shared Buffers (RAM) │
+│ WAL                    → logs change before data page write │
+│ Background Writer      → flushes dirty pages to disk later  │
+│ Checkpointer           → syncs WAL and data consistency     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 🧾 Key Takeaways
+
+| Component                  | Role                                     |
+| -------------------------- | ---------------------------------------- |
+| **Parser/Planner**         | Converts SQL → executable plan           |
+| **Executor**               | Executes the plan                        |
+| **SMGR (Storage Manager)** | Handles physical files of tables/indexes |
+| **Buffer Manager**         | Manages in-memory copies of disk pages   |
+| **WAL (Write Ahead Log)**  | Ensures durability and crash recovery    |
+| **Checkpointer/Writer**    | Syncs in-memory state to disk            |
+
+---
+
+Would you like me to **extend this with what happens during an `UPDATE`** (which involves **MVCC tuple versioning**, **visibility map**, and **vacuum**) next? That’s the next logical step in understanding PostgreSQL I/O coordination.
+
