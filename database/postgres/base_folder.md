@@ -269,3 +269,163 @@ File naming example:
 
 Would you like me to show a **diagram of one heap file** showing its pages, tuple layout, and how FSM and VM summarize those pages? It’s very helpful to visualize the physical storage.
 
+Excellent — you’re now exploring the **complete physical layout of a PostgreSQL database cluster on disk**, which is a crucial part of understanding how PostgreSQL stores and manages data internally.
+
+Let’s go through this in a structured way 👇
+
+---
+
+## 🗂️ 1. Overview — What’s Inside the Data Directory
+
+PostgreSQL’s **data directory** (e.g., `/var/lib/postgresql/data` or `/opt/homebrew/var/postgres`) holds *everything* the cluster needs:
+
+* Databases
+* Tables, indexes, metadata
+* Configuration files
+* Transaction logs
+* Caches and status data
+
+It looks like this (simplified):
+
+```
+/var/lib/postgresql/data/
+├── base/                     ← actual database data (per-database directories)
+├── global/                   ← cluster-wide metadata tables
+├── pg_xact/                  ← transaction commit status
+├── pg_multixact/             ← shared-row lock management
+├── pg_wal/                   ← Write-Ahead Log (WAL)
+├── pg_stat/                  ← runtime stats
+├── pg_subtrans/              ← subtransaction tracking
+├── pg_tblspc/                ← tablespace symlinks
+├── pg_twophase/              ← 2PC transaction files
+├── pg_commit_ts/             ← optional commit timestamps
+├── pg_replslot/              ← replication slots
+├── pg_logical/               ← logical replication data
+├── pg_dynshmem/              ← dynamic shared memory files
+├── pg_notify/                ← LISTEN/NOTIFY queues
+├── pg_serial/                ← serializable transaction info
+├── pg_snapshots/             ← exported snapshots (for long txns)
+├── postgresql.conf
+├── pg_hba.conf
+├── pg_ident.conf
+└── pg_control                 ← cluster control file
+```
+
+Let’s break these down.
+
+---
+
+## 🧱 2. Important Directories and Their Roles
+
+| Directory         | Purpose                                                 | Key Contents                                                                                                      |
+| ----------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **base/**         | Holds all per-database directories.                     | Each subdirectory corresponds to one database (`oid` in `pg_database`), containing that DB’s table & index files. |
+| **global/**       | Cluster-wide system catalogs (shared across all DBs).   | Files for `pg_authid`, `pg_database`, etc.                                                                        |
+| **pg_xact/**      | Transaction commit status log (CLOG).                   | Keeps track of whether transactions are committed, aborted, or in progress.                                       |
+| **pg_multixact/** | Multi-transaction data for shared-row locks.            | Used when multiple transactions hold shared locks on same row.                                                    |
+| **pg_wal/**       | Write-Ahead Logs.                                       | The redo logs written before data pages are changed. Critical for crash recovery.                                 |
+| **pg_subtrans/**  | Subtransaction parent tracking.                         | Used for nested transactions.                                                                                     |
+| **pg_tblspc/**    | Symlinks to other filesystem locations for tablespaces. | Each link points to a directory elsewhere.                                                                        |
+| **pg_twophase/**  | Files for prepared 2PC transactions.                    | Each file holds state of a prepared transaction.                                                                  |
+| **pg_commit_ts/** | Optional commit timestamps (if enabled).                | Used to record exact commit times.                                                                                |
+| **pg_dynshmem/**  | Dynamic shared memory segments.                         | Used for shared memory between background workers.                                                                |
+| **pg_notify/**    | LISTEN/NOTIFY message queues.                           | Handles asynchronous notifications.                                                                               |
+| **pg_logical/**   | Logical replication data.                               | Slot information, temporary changesets, etc.                                                                      |
+| **pg_replslot/**  | Replication slot state files.                           | Keep replication slot metadata for logical/physical replication.                                                  |
+| **pg_stat/**      | Runtime statistics collector.                           | Holds statistical counters (resets at restart).                                                                   |
+| **pg_serial/**    | Serializable transaction tracking.                      | Supports serializable isolation level.                                                                            |
+| **pg_snapshots/** | Exported snapshot files.                                | Used by long-running read-only transactions.                                                                      |
+| **pg_control**    | Single binary file describing cluster control data.     | Includes LSN position, checkpoint, system ID, etc.                                                                |
+
+---
+
+## 📦 3. Inside `base/<database_oid>/`
+
+That’s where your **actual table and index data lives**.
+
+Example:
+
+```
+/var/lib/postgresql/data/base/16384/
+├── 2613         ← pg_class (heap file)
+├── 2613_fsm     ← Free Space Map for pg_class
+├── 2613_vm      ← Visibility Map for pg_class
+├── 16385        ← user table (heap)
+├── 16385_fsm
+├── 16385_vm
+├── 16386        ← index on that table
+├── 16386_fsm
+└── 16386_vm
+```
+
+So each table or index in that database corresponds to one or more files here.
+
+---
+
+## 🧩 4. Summary of File Types Inside `base/<db_oid>/`
+
+| File Name                     | Type                        | Meaning                                              |
+| ----------------------------- | --------------------------- | ---------------------------------------------------- |
+| `<relfilenode>`               | **Heap or index main file** | Actual data (8KB pages)                              |
+| `<relfilenode>_fsm`           | **Free Space Map**          | Tracks available free space in heap/index pages      |
+| `<relfilenode>_vm`            | **Visibility Map**          | Tracks which pages have only visible (frozen) tuples |
+| `<relfilenode>.1`, `.2`, etc. | **Segmented extensions**    | Large tables split after 1GB                         |
+| `<relfilenode>_init`          | **Init fork**               | Template for unlogged tables                         |
+| `<relfilenode>_toast`         | **TOAST table**             | Stores oversized row data                            |
+| `<relfilenode>_toast_index`   | **TOAST index**             | Index on TOAST table                                 |
+
+---
+
+## ⚙️ 5. Supporting System Directories (Brief)
+
+| Directory      | Function                                     |
+| -------------- | -------------------------------------------- |
+| `pg_xact`      | Tracks commit/abort status of transactions   |
+| `pg_subtrans`  | Tracks parent-child subtransaction mapping   |
+| `pg_multixact` | Shared-row lock participants                 |
+| `pg_wal`       | WAL log files (crash recovery + replication) |
+| `pg_twophase`  | 2PC prepared transaction state               |
+| `pg_replslot`  | Replication slot persistence                 |
+| `pg_stat_tmp`  | Temporary runtime stats                      |
+| `pg_logical`   | Logical decoding and replication support     |
+
+---
+
+## 🧠 6. Conceptual Diagram
+
+```
+Cluster Directory (PGDATA)
+│
+├── base/
+│    ├── <db_oid1>/
+│    │     ├── <relfilenode>        ← Heap/Table file
+│    │     ├── <relfilenode>_fsm    ← Free Space Map
+│    │     ├── <relfilenode>_vm     ← Visibility Map
+│    │     ├── <relfilenode>.1      ← Segmented part
+│    │     └── <relfilenode>_toast  ← TOAST table
+│    └── <db_oid2>/                 ← Another database
+│
+├── global/                         ← Shared catalogs
+├── pg_xact/                        ← Transaction commit log
+├── pg_wal/                         ← Write-ahead logs
+├── pg_multixact/                   ← Multi-transaction locks
+├── pg_twophase/                    ← 2PC prepared states
+└── ...                             ← Other system directories
+```
+
+---
+
+## ✅ TL;DR
+
+| Category                       | Component                                               | Purpose                                               |
+| ------------------------------ | ------------------------------------------------------- | ----------------------------------------------------- |
+| **User data**                  | `heap`, `index`, `_fsm`, `_vm`, `TOAST`                 | Actual table/index data                               |
+| **Transaction control**        | `pg_xact`, `pg_subtrans`, `pg_multixact`, `pg_twophase` | Tracks commits, subtransactions, shared locks         |
+| **Logging / recovery**         | `pg_wal`                                                | Write-ahead logs for durability                       |
+| **Cluster metadata**           | `global/`, `pg_control`                                 | Cluster-wide catalogs and control info                |
+| **Runtime / replication**      | `pg_stat`, `pg_notify`, `pg_replslot`, `pg_logical`     | Stats, notify queues, replication data                |
+| **Tablespace / snapshot mgmt** | `pg_tblspc`, `pg_snapshots`, `pg_serial`                | Alternate storage paths, snapshots, serializable txns |
+
+---
+
+Would you like me to show a **visual map of how all these directories relate to one another and to the in-memory components** (shared buffers, WAL buffers, background writer, etc.)? That’s the next layer of understanding the full PostgreSQL architecture.
