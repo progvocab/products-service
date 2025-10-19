@@ -405,3 +405,155 @@ This guarantees: "WAL before data" → crash recovery possible.
 Would you like me to add **one more layer showing WAL Replay (Crash Recovery path)** — i.e., how PostgreSQL restores consistency by reapplying WAL during startup?
 It completes the lifecycle (write → persist → recover).
 
+Excellent question — this goes into the **heart of PostgreSQL’s storage I/O internals**, where it interacts directly with the **OS kernel** using **system calls (OS APIs)** for reading and writing files.
+
+Let’s unpack this carefully and clearly:
+
+---
+
+## 🧩 **Overview**
+
+PostgreSQL **does not access disks directly**.
+Instead, it relies entirely on the **Operating System’s file system layer**, using **standard POSIX file I/O APIs** — mainly **`open()`, `read()`, `write()`, `lseek()`, `fsync()`, and `fdatasync()`** — to perform physical I/O.
+
+All PostgreSQL data (tables, indexes, WAL logs, etc.) are stored as **ordinary files** in the file system, under the `PGDATA/base/` and `pg_wal/` directories.
+
+---
+
+## 🧠 **Main OS APIs Used by PostgreSQL for Read/Write**
+
+| Purpose            | OS API Used                 | PostgreSQL Function Wrapping It     | Description                                 |
+| ------------------ | --------------------------- | ----------------------------------- | ------------------------------------------- |
+| Open a file        | `open()`                    | `FileOpen()` / `PathNameOpenFile()` | Opens a relation file descriptor            |
+| Read from file     | `pread()` or `read()`       | `FileRead()`                        | Reads bytes from a file (by offset)         |
+| Write to file      | `pwrite()` or `write()`     | `FileWrite()`                       | Writes bytes to a file (by offset)          |
+| Move file offset   | `lseek()`                   | `FileSeek()`                        | Moves read/write pointer inside a file      |
+| Flush data to disk | `fsync()` / `fdatasync()`   | `pg_fsync()`                        | Ensures durability (forces data to storage) |
+| Close file         | `close()`                   | `FileClose()`                       | Closes file descriptor                      |
+| Extend file        | `write()` (appending zeros) | `smgrextend()`                      | Used when new pages are added               |
+| Check existence    | `stat()` / `fstat()`        | `FileStat()`                        | Checks file metadata                        |
+| Delete file        | `unlink()`                  | `FileUnlink()`                      | Deletes file (e.g., dropped table)          |
+
+---
+
+## 🧰 **File Read Path in PostgreSQL**
+
+Let’s trace what happens when PostgreSQL **reads a page** from disk:
+
+```
+SELECT * FROM employees WHERE id = 1;
+
+↓ Executor
+↓ Buffer Manager (shared_buffers)
+
+  if (page not in buffer cache)
+      ↓
+      Storage Manager (smgr)
+      ↓
+      Relation Fork (base/<db_oid>/<relfilenode>)
+      ↓
+      File Descriptor (opened via open())
+      ↓
+      OS-level read (pread()/read())
+```
+
+---
+
+### 🔧 **Actual C Code Path (Simplified)**
+
+When PostgreSQL needs to read a page (usually 8 KB) from disk:
+
+```c
+/* src/backend/storage/file/fd.c */
+int FileRead(File file, char *buffer, int amount, off_t offset)
+{
+    int nbytes = pread(FileDescs[file].fd, buffer, amount, offset);
+    if (nbytes != amount)
+        ereport(ERROR, (errmsg("could not read block")));
+    return nbytes;
+}
+```
+
+👉 PostgreSQL calls `pread()` (if available), or `lseek()` + `read()` as a fallback.
+`pread()` is **atomic** — it reads from a given offset without changing the file pointer, which is important in a multi-threaded/multi-process context.
+
+---
+
+### 🧠 **How the OS Reads from Disk**
+
+The OS (Linux, macOS, BSD, etc.) performs these steps internally:
+
+```
+1. PostgreSQL calls pread(fd, buffer, size, offset)
+2. OS checks its page cache (in kernel memory)
+   └── If data is cached → copy to PostgreSQL buffer → return
+3. If not cached:
+   └── OS issues a block read to the disk via the device driver
+       ↓
+       Disk controller reads the sector into kernel page cache
+       ↓
+       Data copied from kernel cache → PostgreSQL buffer
+4. PostgreSQL now has the 8 KB page in shared_buffers
+```
+
+So, the **PostgreSQL buffer cache (shared_buffers)** sits **above** the **OS page cache**, and both may cache the same data — a “double buffering” scenario.
+
+---
+
+## 💡 **Related Configuration Options**
+
+| Parameter                  | Description                                                        |
+| -------------------------- | ------------------------------------------------------------------ |
+| `shared_buffers`           | PostgreSQL’s own cache size (in memory)                            |
+| `effective_io_concurrency` | How many parallel I/O requests to issue                            |
+| `synchronous_commit`       | Whether to wait for WAL fsync before commit                        |
+| `wal_sync_method`          | Which fsync variant to use (fsync, fdatasync, open_datasync, etc.) |
+| `data_directory`           | Where files live (base, pg_wal, global, etc.)                      |
+
+---
+
+## ⚙️ **Important Internal Functions (C Layer)**
+
+| Layer                     | Function                      | Description                          |
+| ------------------------- | ----------------------------- | ------------------------------------ |
+| **Buffer Manager**        | `ReadBuffer_common()`         | Requests a page; may load from disk  |
+| **Storage Manager**       | `smgrread()` / `smgrextend()` | Reads or extends file via fd.c       |
+| **File Descriptor Layer** | `FileRead()` / `FileWrite()`  | Wraps system calls like pread/pwrite |
+| **OS Kernel**             | `pread()` / `pwrite()`        | Actual I/O system calls              |
+| **Disk Driver**           | (Hardware-level DMA)          | Transfers data from disk to memory   |
+
+---
+
+## 🔍 **Example Flow (Reading One Page)**
+
+```
+SQL SELECT →
+ Executor →
+ Buffer Manager →
+   → Page not in buffer →
+     Storage Manager (smgrread) →
+       File Descriptor Layer (FileRead) →
+         OS pread() →
+           Kernel Page Cache →
+             Disk (if not cached) →
+               Kernel Buffer →
+                 PostgreSQL Buffer →
+                   Executor →
+                     Client
+```
+
+---
+
+## 🧱 **Summary**
+
+| Layer                      | Role                        | API                            |
+| -------------------------- | --------------------------- | ------------------------------ |
+| PostgreSQL Storage Manager | Manages relation files      | `FileRead()`, `FileWrite()`    |
+| PostgreSQL FD Layer        | Abstracts OS file I/O       | `pread()`, `pwrite()`          |
+| OS Kernel                  | Handles caching, scheduling | `read()`, `write()`, `fsync()` |
+| Disk                       | Provides persistent storage | Sector/block reads             |
+
+---
+
+Would you like me to show a **text diagram of this end-to-end I/O call flow**, showing PostgreSQL function → OS system call → kernel action → disk block read?
+
