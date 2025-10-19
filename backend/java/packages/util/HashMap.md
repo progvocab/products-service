@@ -1,14 +1,72 @@
-Excellent 👏 — this is one of the best ways to visualize **Java’s HashMap internal structure** — especially how `put()` and `get()` interact with components like **array, buckets, nodes, linked lists, and red-black trees**.
 
-Below are two detailed **Mermaid diagrams** showing both operations clearly.
 
----
+# HashMap
 
-## 🧱 1. HashMap Internal Structure Overview
+### UML 
+```mermaid
+classDiagram
+    class HashMap~K,V~ {
+        -int size
+        -int threshold
+        -float loadFactor
+        -int modCount
+        -Node~K,V~[] table
+        -Set~Map.Entry~<K,V>~> entrySet
+        +HashMap()
+        +HashMap(int initialCapacity)
+        +HashMap(int initialCapacity, float loadFactor)
+        +V get(Object key)
+        +V put(K key, V value)
+        +V remove(Object key)
+        +void clear()
+        +boolean containsKey(Object key)
+        +boolean containsValue(Object value)
+        +int size()
+        +Set~K~ keySet()
+        +Collection~V~ values()
+        +Set~Map.Entry~<K,V>~> entrySet()
+        -int hash(Object key)
+        -Node~K,V~ getNode(int hash, Object key)
+        -V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict)
+    }
+
+    class Node~K,V~ {
+        +int hash
+        +K key
+        +V value
+        +Node~K,V~ next
+        +K getKey()
+        +V getValue()
+        +V setValue(V value)
+        +boolean equals(Object o)
+        +int hashCode()
+    }
+
+    class EntrySet {
+        +Iterator~Map.Entry~<K,V>~> iterator()
+        +int size()
+        +void clear()
+    }
+
+    HashMap "1" --> "*" Node : contains
+    HashMap "1" --> "1" EntrySet : provides
+    Node <|-- TreeNode : subclass (for Tree bins)
+
+    class TreeNode~K,V~ {
+        +TreeNode~K,V~ parent
+        +TreeNode~K,V~ left
+        +TreeNode~K,V~ right
+        +boolean red
+        +TreeNode~K,V~ getTreeNode(int hash, Object key)
+    }
+
+```
+
+###  HashMap Internal Structure Overview
 
 ```mermaid
 graph TD
-  A[HashMap Object] --> "B[table[] Array of Buckets]"
+  A[HashMap Object] --> B[table Array of Buckets]
   B --> C1[Bucket 0]
   B --> C2[Bucket 1]
   B --> C3[Bucket n]
@@ -28,7 +86,7 @@ graph TD
 
 ---
 
-## ⚙️ 2. `put(K, V)` Operation — Step by Step
+## `put(K, V)` Operation 
 
 ```mermaid
 sequenceDiagram
@@ -78,7 +136,7 @@ sequenceDiagram
 
 ---
 
-## 🔍 3. `get(K)` Operation — Step by Step
+## `get(K)` Operation 
 
 ```mermaid
 sequenceDiagram
@@ -112,9 +170,8 @@ sequenceDiagram
 * Each lookup is O(1) average, O(log n) worst (if treeified).
 * **No structural modification**, so no resizing.
 
----
 
-## 🧮 4. Summary Table
+##  Summary 
 
 | Component          | Description                                 | Used in               |
 | :----------------- | :------------------------------------------ | :-------------------- |
@@ -126,22 +183,19 @@ sequenceDiagram
 | **hash()**         | Mixes bits of key’s hashCode                | For even distribution |
 | **resize()**       | Expands capacity when threshold exceeded    | After insertions      |
 
----
 
-## 🌳 5. Visualization — HashMap Bucket Evolution
+##  Visualization — HashMap Bucket Evolution
 
 ```mermaid
 graph TD
-  A[Bucket[i]] --> B1[Node1 (k1,v1)]
-  B1 --> B2[Node2 (k2,v2)]
-  B2 --> B3[Node3 (k3,v3)]
-  B3 --> B4[Node4 (k4,v4)]
+  A[Bucket i] --> B1[Node1 ]
+  B1 --> B2[Node2 ]
+  B2 --> B3[Node3 ]
+  B3 --> B4[Node4 ]
   B4 --> B5[...]
-  B5 --> C[Treeify threshold reached (>8)]
+  B5 --> C[Treeify threshold reached ]
   C --> D[Red-Black Tree Nodes]
 ```
-
----
 
 ✅ **In summary:**
 
