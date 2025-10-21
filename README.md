@@ -15,5 +15,6 @@
 
 ### References :
 - [System Design](https://www.hellointerview.com/learn/system-design/in-a-hurry/introduction)
+- [Design Patterns](https://github.com/iluwatar/java-design-patterns/tree/master)
 - [Leetcode Solutions](https://github.com/MisterBooo/LeetCodeAnimation)
 - [Top Java Repos](https://evanli.github.io/Github-Ranking/Top100/Java.html?utm_source=chatgpt.com)
