@@ -49,13 +49,8 @@ std::cout << lambda(5);  // 10
 ```
 
 #### **(d) Complex Types (e.g., `std::pair`)**
-```cpp
-std::unordered_map<std::string, int> scores = {{"Alice", 90}, {"Bob", 85}};
-for (const auto& entry : scores) {
-    // entry is std::pair<const std::string, int>
-    std::cout << entry.first << ": " << entry.second << std::endl;
-}
-```
+
+
 
 #### **(e) Function Return Type Deduction (C++14)**
 ```cpp
