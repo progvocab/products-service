@@ -155,4 +155,125 @@ class AVLTree(BinarySearchTree):
 ```
 
 
+### Red Black Tree
 
+```python 
+# red_black_tree.py
+from binary_search_tree import BinarySearchTree, Node
+
+class RedBlackTree(BinarySearchTree):
+    def __init__(self):
+        super().__init__()
+        self.TNULL = Node(0, color="BLACK")  # Sentinel node
+        self.root = self.TNULL
+
+    # Left rotate
+    def left_rotate(self, x):
+        y = x.right
+        x.right = y.left
+        if y.left != self.TNULL:
+            y.left.parent = x
+        y.parent = x.parent
+        if x.parent is None:
+            self.root = y
+        elif x == x.parent.left:
+            x.parent.left = y
+        else:
+            x.parent.right = y
+        y.left = x
+        x.parent = y
+
+    # Right rotate
+    def right_rotate(self, y):
+        x = y.left
+        y.left = x.right
+        if x.right != self.TNULL:
+            x.right.parent = y
+        x.parent = y.parent
+        if y.parent is None:
+            self.root = x
+        elif y == y.parent.right:
+            y.parent.right = x
+        else:
+            y.parent.left = x
+        x.right = y
+        y.parent = x
+
+    # Fix violations after insertion
+    def fix_insert(self, k):
+        while k.parent and k.parent.color == "RED":
+            if k.parent == k.parent.parent.left:
+                u = k.parent.parent.right
+                if u and u.color == "RED":
+                    # Case 1: Uncle is RED
+                    u.color = "BLACK"
+                    k.parent.color = "BLACK"
+                    k.parent.parent.color = "RED"
+                    k = k.parent.parent
+                else:
+                    # Case 2/3: Uncle is BLACK
+                    if k == k.parent.right:
+                        k = k.parent
+                        self.left_rotate(k)
+                    k.parent.color = "BLACK"
+                    k.parent.parent.color = "RED"
+                    self.right_rotate(k.parent.parent)
+            else:
+                u = k.parent.parent.left
+                if u and u.color == "RED":
+                    u.color = "BLACK"
+                    k.parent.color = "BLACK"
+                    k.parent.parent.color = "RED"
+                    k = k.parent.parent
+                else:
+                    if k == k.parent.left:
+                        k = k.parent
+                        self.right_rotate(k)
+                    k.parent.color = "BLACK"
+                    k.parent.parent.color = "RED"
+                    self.left_rotate(k.parent.parent)
+        self.root.color = "BLACK"
+
+    # Insert node
+    def insert(self, key):
+        node = Node(key, color="RED")
+        node.left = self.TNULL
+        node.right = self.TNULL
+        node.parent = None
+
+        y = None
+        x = self.root
+
+        while x != self.TNULL:
+            y = x
+            if node.key < x.key:
+                x = x.left
+            else:
+                x = x.right
+
+        node.parent = y
+        if y is None:
+            self.root = node
+        elif node.key < y.key:
+            y.left = node
+        else:
+            y.right = node
+
+        if node.parent is None:
+            node.color = "BLACK"
+            return
+
+        if node.parent.parent is None:
+            return
+
+        self.fix_insert(node)
+
+    # Inorder traversal
+    def inorder(self, node=None):
+        if node is None:
+            node = self.root
+        if node != self.TNULL:
+            self.inorder(node.left)
+            print(f"{node.key}({node.color})", end=" ")
+            self.inorder(node.right)
+```
