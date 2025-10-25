@@ -38,6 +38,84 @@
     - Provides persistent storage to containers via integration with cloud providers, NFS, or custom storage solutions.
 
 ---
+# Design 
+ **Kubernetes architecture** — separating **Control Plane (logical)** and **Worker Nodes (physical)** components
+
+---
+
+### 🧩 Kubernetes Architecture — Control Plane and Nodes
+
+```mermaid
+graph TD
+    %% Control Plane Section
+    subgraph ControlPlane["Control Plane (Logical Components)"]
+        API[API Server] --> SCH[Scheduler]
+        API --> CM[Controller Manager]
+        API --> ETCD[etcd (Cluster Data Store)]
+        SCH --> API
+        CM --> API
+    end
+
+    %% Worker Nodes Section
+    subgraph WorkerNodes["Worker Nodes (Physical Components)"]
+        subgraph Node1["Node 1"]
+            Kubelet1[Kubelet]
+            CRI1[Container Runtime (e.g., containerd)]
+            POD1[Pod(s)]
+        end
+
+        subgraph Node2["Node 2"]
+            Kubelet2[Kubelet]
+            CRI2[Container Runtime (e.g., containerd)]
+            POD2[Pod(s)]
+        end
+    end
+
+    %% Connections Between Control Plane and Nodes
+    API <--> Kubelet1
+    API <--> Kubelet2
+    Kubelet1 --> CRI1
+    Kubelet2 --> CRI2
+    CRI1 --> POD1
+    CRI2 --> POD2
+
+    %% External Communication
+    subgraph User["User / kubectl"]
+        CLI[kubectl CLI]
+    end
+
+    CLI --> API
+
+    %% Optional Addons
+    subgraph Addons["Optional Add-ons"]
+        DNS[CoreDNS]
+        Proxy[Kube Proxy]
+        Metrics[Metrics Server]
+    end
+
+    DNS --> POD1
+    DNS --> POD2
+    Proxy --> POD1
+    Proxy --> POD2
+    Metrics --> API
+```
+
+---
+
+### 🧠 Explanation
+
+| Layer                       | Components                                      | Role                                       |
+| --------------------------- | ----------------------------------------------- | ------------------------------------------ |
+| **Control Plane (Logical)** | API Server, etcd, Scheduler, Controller Manager | Manages and orchestrates cluster state     |
+| **Worker Nodes (Physical)** | Kubelet, Container Runtime, Pods                | Run workloads (containers)                 |
+| **Add-ons**                 | CoreDNS, Kube Proxy, Metrics Server             | Provide networking, DNS, and observability |
+| **User**                    | kubectl                                         | Interacts with cluster via API Server      |
+
+---
+
+Would you like me to extend this diagram to also show **network flow** (Service → kube-proxy → Pod → CNI → Node → etcd)? That would illustrate request routing across layers.
+
+
 
 ### **How Kubernetes Works**
 
