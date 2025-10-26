@@ -3,6 +3,8 @@
 Kubelet is a **node agent** in Kubernetes that runs on every **worker node**. It ensures that containers in **Pods** are running and remain healthy.  
 
 ---
+![Kubelet](/assets/Kubelet.png)
+
 
 ## **1. Key Functions of Kubelet**
 | **Function** | **Description** |
