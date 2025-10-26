@@ -43,7 +43,7 @@
 
 ---
 
-### 🧩 Kubernetes Architecture — Control Plane and Nodes
+### Kubernetes Architecture — Control Plane and Nodes
 
 ```mermaid
 graph TD
@@ -51,7 +51,7 @@ graph TD
     subgraph ControlPlane["Control Plane (Logical Components)"]
         API[API Server] --> SCH[Scheduler]
         API --> CM[Controller Manager]
-        API --> ETCD[etcd (Cluster Data Store)]
+        API --> ETCD["etcd (Cluster Data Store)"]
         SCH --> API
         CM --> API
     end
@@ -60,14 +60,14 @@ graph TD
     subgraph WorkerNodes["Worker Nodes (Physical Components)"]
         subgraph Node1["Node 1"]
             Kubelet1[Kubelet]
-            CRI1[Container Runtime (e.g., containerd)]
-            POD1[Pod(s)]
+            CRI1["Container Runtime (e.g., containerd)"]
+            POD1["Pod(s)"]
         end
 
         subgraph Node2["Node 2"]
             Kubelet2[Kubelet]
-            CRI2[Container Runtime (e.g., containerd)]
-            POD2[Pod(s)]
+            CRI2["Container Runtime (e.g., containerd)"]
+            POD2["Pod(s)"]
         end
     end
 
@@ -102,7 +102,7 @@ graph TD
 
 ---
 
-### 🧠 Explanation
+###  Explanation
 
 | Layer                       | Components                                      | Role                                       |
 | --------------------------- | ----------------------------------------------- | ------------------------------------------ |
@@ -113,8 +113,9 @@ graph TD
 
 ---
 
-Would you like me to extend this diagram to also show **network flow** (Service → kube-proxy → Pod → CNI → Node → etcd)? That would illustrate request routing across layers.
+### Architecture
 
+![Architecture](/assets/KubernetesArchitecture.png)
 
 
 ### **How Kubernetes Works**
