@@ -1,13 +1,13 @@
-Here’s a breakdown of the **most common sorting algorithms**, their use cases, and a clean Python implementation of each:
+**Most common sorting algorithms**
 
----
 
-## ✅ 1. **Bubble Sort** (Simple but inefficient)
+
+##  1. **Bubble Sort** (Simple but inefficient)
 
 * Repeatedly swaps adjacent elements if they are in the wrong order.
 * Best for educational purposes.
 
-### 🔧 Python Code
+###   Python Code
 
 ```python
 def bubble_sort(arr):
@@ -147,9 +147,9 @@ arr.sort()  # or sorted(arr)
 ⏱ Time: O(n log n), Best: O(n)
 📦 Space: O(n)
 
----
 
-## 🔚 Summary Table
+
+## Summary 
 
 | Algorithm          | Best       | Average    | Worst      | Space    | Stable | Notes                           |
 | ------------------ | ---------- | ---------- | ---------- | -------- | ------ | ------------------------------- |
@@ -160,6 +160,37 @@ arr.sort()  # or sorted(arr)
 | Quick Sort         | O(n log n) | O(n log n) | O(n²)      | O(log n) | ❌      | Fastest in practice             |
 | Timsort (built-in) | O(n)       | O(n log n) | O(n log n) | O(n)     | ✅      | Used in Python's sort           |
 
----
 
-Would you like to see the **animations**, comparisons, or benchmark graphs for large lists?
+
+### K Way Merge 
+- k-way merge of sorted arrays means merging k sorted arrays into one fully sorted array.
+**Input**
+```python
+arr1 = [1, 4, 7]
+arr2 = [2, 5, 8]
+arr3 = [3, 6, 9]
+```
+**Output**
+```python
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+```
+```python
+import heapq
+
+def merge_k_sorted_arrays(arrays):
+    heap = []
+    result = []
+
+    # Step 1: Push first element of each array into heap
+    for i, arr in enumerate(arrays):
+        if arr:  # if not empty
+            heapq.heappush(heap, (arr[0], i, 0))  # (value, array_index, element_index)
+
+    # Step 2: Extract min and push next element
+    while heap:
+        val, arr_idx, ele_idx = heapq.heappop(heap)
+        result.append(val)
+
+        # If the array has mor
+```
