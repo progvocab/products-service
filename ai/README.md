@@ -33,14 +33,14 @@
 ### Unsupervised 
 - Unlabelled Data
   
- |   Models | Type | Use |
- | ------ | ------ | ------ |
- | K-Means | Clustering | |
- | Hierarchical | Clustering | |
- | Apriori Algorithm | Association | |
- | Principal Component Analysis (PCA) | Dimensionality Reduction | |
- | Autoencoders | Dimensionality Reduction | |
- | Generative Adversarial Networks (GAN) | Generative Models | |
+ |   Models | Type | Details | Use | 
+ | ------ | ------ | ------ | ------ |
+ | K-Means | Clustering | | |
+ | Hierarchical | Clustering | | |
+ | Apriori Algorithm | Association | | |
+ | Principal Component Analysis (PCA) |  Dimensionality Reduction | | |
+ | Autoencoders | Dimensionality Reduction | | |
+ | Generative Adversarial Networks (GAN) | Generative Models | Consists of 2  Neural Network : Generator and Discriminator <br> competing with each other| Deep Fakes , Image Generator ,AI
  | Variational Autoencoders (VAE) | Generative Models | |
 
 
