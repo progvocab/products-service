@@ -73,6 +73,9 @@ Multi-Label Classification
 Hierarchical Multi-Label Classification
 ```
 
+### Regression 
+[ Read about Regression](machine_learning/Regression/)
+
 Each step generalizes the previous one:
 
 * Binary → only 2 labels
