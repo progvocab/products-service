@@ -119,6 +119,12 @@ Each step generalizes the previous one:
 * Parallelized convolution on GPU hardware.
 * ReLU activation → faster convergence than sigmoid/tanh.
 
+### Deep Belief Networks 
+
+A **Deep Belief Network (DBN)** is a type of **generative deep learning model** composed of multiple layers of **Restricted Boltzmann Machines (RBMs)** stacked on top of each other. Each RBM learns to represent statistical dependencies between visible and hidden features in an unsupervised manner, and the layers are trained **greedily one at a time**, with each layer learning higher-level abstractions of the data. The lower layers capture simple patterns (like edges or textures), while deeper layers capture more complex structures (like shapes or semantic concepts). After this unsupervised pre-training, the entire network can be fine-tuned using supervised learning techniques such as backpropagation. DBNs were among the first architectures to successfully train **deep neural networks** before GPUs and modern activation functions made deep learning mainstream. They solved the **vanishing gradient problem** prevalent in deep networks at the time by using layer-wise unsupervised initialization. However, they became **less common** after 2012, when models like **deep feedforward networks, CNNs, and autoencoders** achieved better performance and scalability with simpler end-to-end training.
+
+
+
 **Shortcomings:**
 
 * CNNs had local receptive fields → poor understanding of **global context**.
