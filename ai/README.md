@@ -3,11 +3,11 @@
 
 
 
----
+
 
 ## AI Evolution  (2010–2025)
 
----
+
 
 ### **2010–2012 | Deep Learning Revival**
 
@@ -17,6 +17,16 @@
 
 * Traditional ML (SVM, decision trees) plateaued on complex data like images, speech.
 * Shallow neural networks couldn’t model hierarchical patterns.
+
+**Efficiency gain:**
+
+* **GPUs** and **ReLU activations** drastically improved convergence and reduced vanishing gradient problems.
+* Deep Belief Networks (unsupervised layer-wise pretraining) reduced the need for manual feature engineering.
+
+**Shortcoming:**
+
+* Training still data-hungry and computationally expensive.
+* Networks unstable for deeper layers → needed architectural innovations (ResNet, BatchNorm).
 
 
 ---
@@ -51,9 +61,9 @@
 | **Common model architecture**                    | Single sigmoid neuron                                                    | Softmax dense layer                                                        | Multi-sigmoid output layer                                                                          | Multi-sigmoid + constraint propagation network                                                                  |
 | **Evaluation difficulty**                        | Simple                                                                   | Moderate                                                                   | Hard (multi-dimensional)                                                                            | Very hard (hierarchical structure, dependency penalties)                                                        |
 
----
 
-### ⚙️ Conceptual Relationship
+
+
 
 ```
 Binary Classification
@@ -65,8 +75,7 @@ Multi-Label Classification
 Hierarchical Multi-Label Classification
 ```
 
-### Regression 
-[ Read about Regression](machine_learning/Regression)
+
 
 Each step generalizes the previous one:
 
@@ -75,9 +84,7 @@ Each step generalizes the previous one:
 * Multi-label → multiple independent labels
 * Hierarchical → multiple dependent labels (tree/DAG relationships)
 
----
 
-### Real-World Analogy
 
 | Scenario                          | Classification Type      | Example                       |
 | --------------------------------- | ------------------------ | ----------------------------- |
@@ -86,21 +93,15 @@ Each step generalizes the previous one:
 | Song: Rock + Jazz + Blues         | Multi-Label              | Music genre tagging           |
 | News: World → Politics → Election | Hierarchical Multi-Label | Taxonomy-based classification |
 
+### Regression 
+[ Read about Regression](machine_learning/Regression)
 ---
 
 
 
 
 
-**Efficiency gain:**
 
-* **GPUs** and **ReLU activations** drastically improved convergence and reduced vanishing gradient problems.
-* Deep Belief Networks (unsupervised layer-wise pretraining) reduced the need for manual feature engineering.
-
-**Shortcoming:**
-
-* Training still data-hungry and computationally expensive.
-* Networks unstable for deeper layers → needed architectural innovations (ResNet, BatchNorm).
 
 ---
 
@@ -119,11 +120,36 @@ Each step generalizes the previous one:
 * Parallelized convolution on GPU hardware.
 * ReLU activation → faster convergence than sigmoid/tanh.
 
-### Deep Belief Networks 
+### About Deep Belief Networks 
 
 A **Deep Belief Network (DBN)** is a type of **generative deep learning model** composed of multiple layers of **Restricted Boltzmann Machines (RBMs)** stacked on top of each other. Each RBM learns to represent statistical dependencies between visible and hidden features in an unsupervised manner, and the layers are trained **greedily one at a time**, with each layer learning higher-level abstractions of the data. The lower layers capture simple patterns (like edges or textures), while deeper layers capture more complex structures (like shapes or semantic concepts). After this unsupervised pre-training, the entire network can be fine-tuned using supervised learning techniques such as backpropagation. DBNs were among the first architectures to successfully train **deep neural networks** before GPUs and modern activation functions made deep learning mainstream. They solved the **vanishing gradient problem** prevalent in deep networks at the time by using layer-wise unsupervised initialization. However, they became **less common** after 2012, when models like **deep feedforward networks, CNNs, and autoencoders** achieved better performance and scalability with simpler end-to-end training.
 
 
+
+### About CNN
+
+**Automated feature extraction using Convolutional Neural Networks (CNNs)** is a core innovation in modern deep learning, allowing models to learn meaningful visual patterns directly from raw pixel data without manual feature engineering. Instead of explicitly designing features like edges, corners, or textures, CNNs automatically discover them through **convolutional filters** that slide over input images to capture local spatial patterns. In early layers, CNNs detect low-level features (edges, colors, gradients), while deeper layers progressively learn higher-level abstractions (object parts, shapes, and complete objects). This hierarchical feature learning enables CNNs to handle complex visual recognition tasks with minimal human intervention. The network’s ability to **optimize feature representations during training** via backpropagation makes it far more efficient and scalable than traditional computer vision approaches. As a result, CNN-based automated feature extraction has become foundational in applications such as **image classification, object detection, facial recognition, and medical imaging**, effectively replacing handcrafted feature techniques like SIFT, HOG, and SURF.
+
+As CNNs grew deeper (20, 50, 100+ layers), researchers observed:
+
+Training error started increasing after a certain depth (not just test error).
+
+This wasn’t due to overfitting but because deeper networks were harder to optimize.
+
+Gradients became too small (vanished) during backpropagation, preventing earlier layers from learning effectively.
+
+Even though deeper CNNs should learn more complex representations, in practice, they often performed worse than shallower ones.
+
+### About ResNet 
+
+Residual Network, introduced by He et al. (2015), modifies CNN architecture by adding shortcut (skip) connections that “bypass” one or more layers.
+
+Instead of learning a direct mapping
+
+it learns a residual mapping
+
+In simple terms:
+The network learns the difference (residual) between the input and the desired output — not the output itself.
 
 **Shortcomings:**
 
