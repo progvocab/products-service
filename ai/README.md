@@ -1,19 +1,11 @@
 # Artificial Intelligence
 
-## Timeline
 
-Excellent — this is the **deep technical evolution view** you’d expect from an AI researcher’s perspective.
 
-Let’s go year by year (2010–2025) and **trace the lineage of breakthroughs**:
-for each major AI technology, we’ll cover:
-
-1. **Problem it solved**
-2. **How it improved over the previous generation (efficiency, accuracy, or scalability)**
-3. **Shortcomings that led to the next leap**
 
 ---
 
-## 🧭 AI Evolution with Technical Depth (2010–2025)
+## AI Evolution  (2010–2025)
 
 ---
 
@@ -430,14 +422,30 @@ Each step generalizes the previous one:
 | 2022–2023 | RLHF + ChatGPT      | Human alignment           | Conversational reliability   | Agents                  |
 | 2023–2025 | Multimodal + Agents | LLM autonomy              | Cross-domain intelligence    | Future AI orchestration |
 
----
 
-Would you like me to **extend this into a visual flow diagram** (Mermaid timeline) showing how each generation replaced the previous, with arrows like
-`Word2Vec → BERT → GPT → ChatGPT → Agents → Multi-Agent Systems`?
+
+### Timeline
+
+```txt
+
+Word to Vec → BERT → GPT → ChatGPT → Agents → Multi-Agent Systems
+
+```
 
 
 
 ## Machine Learning 
+
+### Stages
+
+```mermaid 
+flowchart TD
+A[Data Collection] --> B[Data Cleaning]
+B --> C[Feature Engineering]
+C --> D[Model Selection]
+D --> E[Training]
+E --> F[Evaluation]
+```
 
 ### Supervised 
 - Labelled Data
