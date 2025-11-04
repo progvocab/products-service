@@ -1,4 +1,4 @@
-Rrray problems are some of the **most common algorithm interview questions** because arrays are fundamental and allow testing **time complexity, data structures, and problem-solving techniques**.
+Array problems are some of the **most common algorithm interview questions** because arrays are fundamental and allow testing **time complexity, data structures, and problem-solving techniques**.
 
 ---
 ### Concepts 
@@ -58,7 +58,7 @@ Rrray problems are some of the **most common algorithm interview questions** bec
 
 ---
 
-## 4. ✅ Quick Comparison Table
+###  Comparison
 
 | Concept         | Definition                          | Order Preserved? | Contiguous? | Count      |
 | --------------- | ----------------------------------- | ---------------- | ----------- | ---------- |
@@ -66,15 +66,12 @@ Rrray problems are some of the **most common algorithm interview questions** bec
 | **Subsequence** | Remove some elements but keep order | ✅ Yes            | ❌ No        | $2^n$      |
 | **Subarray**    | Continuous block of array           | ✅ Yes            | ✅ Yes       | $n(n+1)/2$ |
 
----
----
-
-Here’s a **curated list of the most common array algorithm questions**, grouped by concept 
 
 ---
-# 🔑 Common Array Algorithms with Python Examples
 
----
+# Algorithms 
+
+
 
 ## 1. **Two Pointers**
 
@@ -359,7 +356,21 @@ def nextGreater(nums):
 
 print(nextGreater([2,1,2,4,3]))  # [4,2,4,-1,-1]
 ```
+### Similar Problems
+### Remove K Digits (Medium-Hard)
+Given a non-negative integer represented as a string num and an integer k, remove k digits from num so that the number formed is the smallest possible.Constraints:The length of num is less than 10⁵k ≤ length of numnum does not have leading zeros except for the number "0" itself
 
+### Online Stock Span (Medium-Hard)
+The span of the stock's price on a given day is defined as the maximum number of consecutive days before the given day, where the stock price was less than or equal to its price on the given day.Design an algorithm that collects daily price quotes for a stock and returns the span of that stock's price for the current day.
+
+### Lexicographically Smallest Subsequence (Hard)
+Given a string s, remove duplicate characters in it so that every character appears only once and in the smallest lexicographical order.
+
+### Largest Rectangle in Histogram (Hard)
+Given an array of integers heights representing the histogram's bar heights where the width of each bar is 1, find the area of the largest rectangle in the histogram.
+
+### Trapping Rain Water (Hard)
+You are given an array height where each element represents the height of a bar at index i. After it rains, water can be trapped between the bars.Calculate the total amount of water that can be trapped after raining.
 ---
 
 ## 11. **Dynamic Programming**
