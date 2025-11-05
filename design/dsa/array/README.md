@@ -371,6 +371,30 @@ Given an array of integers heights representing the histogram's bar heights wher
 
 ### Trapping Rain Water (Hard)
 You are given an array height where each element represents the height of a bar at index i. After it rains, water can be trapped between the bars.Calculate the total amount of water that can be trapped after raining.
+
+```python 
+def trap(height):
+    stack = []
+    water = 0
+    
+    for i, h in enumerate(height):
+        while stack and h > height[stack[-1]]:
+            top = stack.pop()
+            if not stack:
+                break
+            distance = i - stack[-1] - 1
+            bounded_height = min(h, height[stack[-1]]) - height[top]
+            water += distance * bounded_height
+        stack.append(i)
+    
+    return water
+```
+
+```python 
+print(trap([0,1,0,2,1,0,1,3,2,1,2,1]))
+# Output: 6
+```
+
 ---
 
 ## 11. **Dynamic Programming**
