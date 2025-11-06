@@ -13,7 +13,7 @@ def linear_search(arr, target):
 
  **O(n)** — Works on unsorted arrays.
 
----
+ 
 
 ##  2. **Binary Search (Iterative)**
 
@@ -28,9 +28,9 @@ def binary_search(arr, target):
     return -1
 ```
 
-👉 **O(log n)** — Works only on **sorted** arrays.
+  **O(log n)** — Works only on **sorted** arrays.
 
----
+ 
 
 ##  3. **Binary Search (Recursive)**
 
@@ -44,7 +44,39 @@ def binary_search_rec(arr, target, l=0, r=None):
     return binary_search_rec(arr, target, l, mid - 1)
 ```
 
+For Dynamic arrays `Binary Search Tree` gives better performance than `Binary Search` , since adding a new element leads to sorting the entire array O(n)
+<br/>
+
+[Tree](/design/dsa/tree/)
+
+###   **Comparision**
+
+| Operation  | **Sorted Array** | **AVL Tree** | **Red-Black Tree** |
+| ---------- | ---------------- | ------------ | ------------------ |
+| **Search** | O(log n)         | O(log n)     | O(log n)           |
+| **Insert** | O(n)             | O(log n)     | O(log n)           |
+| **Delete** | O(n)             | O(log n)     | O(log n)           |
+
 ---
+
+###   **Details**
+
+| **Operation**          | **Sorted Array**                  | **AVL Tree**                        | **Red-Black Tree**                         | **Explanation**                                                                                     |
+| ---------------------- | --------------------------------- | ----------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| **Search**             | O(log n)                          | O(log n)                            | O(log n)                                   | All support binary search logic; trees maintain balance ensuring logarithmic height.                |
+| **Insert**             | O(n)                              | O(log n)                            | O(log n)                                   | Sorted array needs shifting to maintain order. Trees rebalance but cost stays logarithmic.          |
+| **Delete**             | O(n)                              | O(log n)                            | O(log n)                                   | Deletion in array requires shifting. In trees, balance is restored via rotations.                   |
+| **Balance Strictness** | Always sorted, no structure       | Very strict (height difference ≤ 1) | Less strict (color rules maintain balance) | AVL ensures tighter balance, so faster search but more rebalancing cost.                            |
+| **Rotations Needed**   |   None                            |   Sometimes (1–2 rotations)         |   Sometimes (1 rotation avg)               | Trees rebalance via rotations after insert/delete.                                                  |
+| **Memory Usage**       | Compact (contiguous array)        | Higher (pointers + balance factor)  | Higher (pointers + color bit)              | Trees use extra memory per node.                                                                    |
+| **Cache Locality**     | Excellent                         | Poor                                | Poor                                       | Arrays are contiguous → CPU cache-friendly. Trees are pointer-based → scattered memory.             |
+| **Best Use Case**      | Mostly reads, few inserts/deletes | Lookup-heavy + frequent updates     | Balanced performance for mixed workloads   | Sorted arrays are great for read-heavy, static data. Trees are better when structure changes often. |
+
+
+
+ 
+
+### Other Search Algorithms
 
 ## 4. **Jump Search**
 
