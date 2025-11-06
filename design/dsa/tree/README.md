@@ -1,6 +1,10 @@
 # Tree
 Directed Acyclic Graph
-### Binary Tree
+### [Binary Tree](binary_tree)
+### [Binary Search Tree](binary_search_tree/details.md)
+### [B Tree](b-trees/B-Trees.md)
+
+ 
 
 ```python
 from collections import deque
