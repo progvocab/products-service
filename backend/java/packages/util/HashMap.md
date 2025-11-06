@@ -1,6 +1,29 @@
 
 
 # HashMap
+```mermaid
+graph TD
+    A["HashMap Table (Array of Bins)"] --> B0["Bin 0 (empty)"]
+    A --> B1[Bin 1 → Bucket]
+    A --> B2["Bin 2 (empty)"]
+    A --> B3[Bin 3 → Bucket]
+    A --> B4["Bin 4 (empty)"]
+
+    B1 --> C1["(Node) K1:V1"]
+    C1 --> C2["(Node) K9:V9"]
+
+    B3 --> D1["(Node) K4:V4"]
+    D1 --> D2["(Node) K20:V20"]
+    D2 --> D3["(Node) K36:V36"]
+
+    subgraph Treeified Bucket
+        D1 -. treeify when size > 8 .-> T1[Red-Black Tree Nodes]
+    end
+
+    style B1 fill:#e0f7fa,stroke:#26a69a,stroke-width:2px
+    style B3 fill:#e0f7fa,stroke:#26a69a,stroke-width:2px
+    style T1 fill:#fce4ec,stroke:#ad1457,stroke-width:2px
+```
 
 ### UML 
 ```mermaid
@@ -132,6 +155,66 @@ sequenceDiagram
 * **Index calculation:** `(n - 1) & hash`
 * **Node insertion:** Into linked list or tree
 * **Resize:** If `size > capacity * loadFactor` (default 0.75)
+
+
+ 
+
+A **resize (rehash)** occurs when:
+
+> `size > capacity × loadFactor`
+
+Where:
+
+* **`size`** → Number of key-value pairs currently stored
+* **`capacity`** → Current number of **buckets** (slots in the internal array)
+* **`loadFactor`** → Threshold that controls when to resize (default **0.75**)
+
+When this condition is met, the **HashMap doubles its capacity** and **rehashes** all existing entries.
+
+
+
+##  **Default Values (in Java’s HashMap)**
+
+| Property             | Default Value      |
+| -------------------- | ------------------ |
+| **Size**             | 0                 |
+| **Initial Capacity** | 16                 |
+| **Load Factor**      | 0.75f              |
+| **Resize Threshold** | 16 × 0.75 = **12** |
+
+So:
+
+* When the 13th key-value pair is inserted → **resize occurs**.
+
+ 
+
+##  **How It Changes**
+
+Let’s trace it step-by-step:
+
+| Step                 | Capacity | Load Factor | Threshold (Capacity × LoadFactor) | Size After Insert | Resize?                  |
+| -------------------- | -------- | ----------- | --------------------------------- | ----------------- | ------------------------ |
+| Start                | 16       | 0.75        | 12                                | 0                 | No                       |
+| Insert 1 → 12        | 16       | 0.75        | 12                                | 1 → 12            | No                       |
+| Insert 13th Entry    | 16       | 0.75        | 12                                | 13                |   Yes (Resize Triggered) |
+| After Resize         | **32**   | 0.75        | **24**                            | 13                | No                       |
+| Insert More Up to 24 | 32       | 0.75        | 24                                | 14 → 24           | No                       |
+| Insert 25th Entry    | 32       | 0.75        | 24                                | 25                |  Yes (Resize Triggered) |
+| After Resize         | **64**   | 0.75        | **48**                            | 25                | No                       |
+
+##   **What Happens During Resize**
+
+1. **New Capacity** = `oldCapacity * 2`
+2. **New Threshold** = `newCapacity * loadFactor`
+3. A **new bucket array** is created.
+4. Each entry from the old array is **rehashed** into the new array (based on new indices).
+5. This operation is **O(n)** and happens occasionally.
+
+ 
+ 
+
+
+
 * **Treeify:** When a bucket’s list exceeds threshold (8 nodes)
 
 ---
