@@ -1,14 +1,119 @@
-Great question 👍 — heaps (priority queues) are super useful for **medium-level algorithmic problems** where you need efficient access to the smallest/largest element repeatedly.
+ 
 
-Here are some **classic medium-level problems** solved using heaps, with explanations and Python code.
+##   **Heap**
+
+A **Heap** is a **complete binary tree** (all levels are filled except possibly the last, which is filled left to right) that satisfies the **heap property**:
+
+* **Min-Heap** → The **parent** node is **smaller** than or equal to its children.
+* **Max-Heap** → The **parent** node is **greater** than or equal to its children.
+
+It is commonly implemented as an **array** (not linked nodes).
+ 
+
+##   **Key Points**
+
+| Feature                      | Description                                           |
+| ---------------------------- | ----------------------------------------------------- |
+| **Type**                     | Binary tree (Complete)                                |
+| **Order Property**           | Parent ≤ children (min-heap) or ≥ (max-heap)          |
+| **Shape Property**           | Complete — filled from left to right                  |
+| **Storage**                  | Implemented as an array                               |
+| **Root**                     | Contains the min (min-heap) or max (max-heap) element |
+| **Children Index (0-based)** | Left: `2*i + 1`, Right: `2*i + 2`                     |
+| **Parent Index**             | `(i - 1) // 2`                                        |
+
+ 
+
+##   **Time Complexities**
+
+| Operation                 | Complexity | Description                             |
+| ------------------------- | ---------- | --------------------------------------- |
+| **Insert (push)**         | O(log n)   | May bubble up to maintain heap property |
+| **Extract Min/Max (pop)** | O(log n)   | Remove root and restructure             |
+| **Peek (get min/max)**    | O(1)       | Access root element                     |
+| **Heapify (build heap)**  | O(n)       | Convert list into heap                  |
+
+ 
+
+##   **Python Implementation using `heapq`**
+ 
+
+```python
+import heapq
+
+# Create an empty heap
+heap = []
+
+# Insert elements (push)
+heapq.heappush(heap, 10)
+heapq.heappush(heap, 5)
+heapq.heappush(heap, 30)
+heapq.heappush(heap, 2)
+
+print("Min-Heap:", heap)  # Internally stored as [2, 5, 30, 10]
+
+# Get the smallest element (root)
+print("Smallest element:", heap[0])
+
+# Remove smallest element (pop)
+min_elem = heapq.heappop(heap)
+print("Removed:", min_elem)
+print("Heap after removal:", heap)
+
+# Convert an existing list to a heap (heapify)
+nums = [9, 4, 7, 1, -2, 6, 5]
+heapq.heapify(nums)
+print("Heapified list:", nums)
+
+# Get n smallest/largest elements
+print("3 smallest:", heapq.nsmallest(3, nums))
+print("2 largest:", heapq.nlargest(2, nums))
+```
 
 ---
 
-# 🔥 1. **Kth Largest Element in an Array**
+###   **Output Example**
+
+```
+Min-Heap: [2, 5, 30, 10]
+Smallest element: 2
+Removed: 2
+Heap after removal: [5, 10, 30]
+Heapified list: [-2, 1, 5, 4, 9, 6, 7]
+3 smallest: [-2, 1, 4]
+2 largest: [9, 7]
+```
+
+ 
+
+##   **Applications of Heap**
+
+| Use Case                 | Description                                     |
+| ------------------------ | ----------------------------------------------- |
+| **Priority Queues**      | Tasks/jobs with priorities (OS scheduling).     |
+| **Heap Sort**            | Sorting with O(n log n).                        |
+| **Dijkstra’s Algorithm** | Finding shortest paths (min-heap of distances). |
+| **Median of Stream**     | Maintain two heaps (max and min).               |
+| **Top K elements**       | Efficiently get largest or smallest K elements. |
+
+---
+
+##   **Visualization Example (Min-Heap)**
+
+```
+        2
+      /   \
+     5     30
+    /
+   10
+```
+ 
+
+#   1. **Kth Largest Element in an Array**
 
 **Problem:** Given an unsorted array, find the `k`-th largest element.
 
-👉 Use a **Min-Heap** of size `k`.
+  Use a **Min-Heap** of size `k`.
 
 ```python
 import heapq
@@ -28,11 +133,11 @@ print(kth_largest([3,2,1,5,6,4], 2))  # Output: 5
 
 ---
 
-# 🔥 2. **Top K Frequent Elements**
+#   2. **Top K Frequent Elements**
 
 **Problem:** Given an array of numbers, return the `k` most frequent elements.
 
-👉 Use a **Heap** sorted by frequency.
+  Use a **Heap** sorted by frequency.
 
 ```python
 import heapq
@@ -49,11 +154,11 @@ print(top_k_frequent([1,1,1,2,2,3], 2))  # Output: [1, 2]
 
 ---
 
-# 🔥 3. **Merge K Sorted Lists**
+#   3. **Merge K Sorted Lists**
 
 **Problem:** Merge `k` sorted linked lists into one sorted list.
 
-👉 Use a **Min-Heap** to always pick the smallest head node.
+  Use a **Min-Heap** to always pick the smallest head node.
 
 ```python
 import heapq
@@ -80,11 +185,11 @@ print(merge_k_sorted_lists([[1,4,5],[1,3,4],[2,6]]))
 
 ---
 
-# 🔥 4. **Connect Ropes with Minimum Cost**
+#   4. **Connect Ropes with Minimum Cost**
 
 **Problem:** Given lengths of ropes, connect them into one rope with minimum cost (cost = sum of lengths connected).
 
-👉 Use a **Min-Heap** to always pick two smallest ropes.
+  Use a **Min-Heap** to always pick two smallest ropes.
 
 ```python
 import heapq
@@ -107,11 +212,11 @@ print(min_cost_to_connect([1,2,3,4,5]))  # Output: 33
 
 ---
 
-# 🔥 5. **Sliding Window Maximum**
+#   5. **Sliding Window Maximum**
 
 **Problem:** Find maximum in every sliding window of size `k`.
 
-👉 Use a **Max-Heap** (or monotonic deque for optimal).
+  Use a **Max-Heap** (or monotonic deque for optimal).
 
 ```python
 import heapq
