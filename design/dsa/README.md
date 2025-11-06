@@ -6,6 +6,7 @@
 - [Array](array)
 - [String](string)
 - [Linked List](linked_list)
+- [Heap](heap/algorithms.md)
 - [Tree](tree)
 - [Graph](graph)
 
