@@ -1,4 +1,10 @@
+
+
+
 Array problems are some of the **most common algorithm interview questions** because arrays are fundamental and allow testing **time complexity, data structures, and problem-solving techniques**.
+
+### [Sort](sort)
+### [Search](search)
 
 ---
 ### Concepts 
