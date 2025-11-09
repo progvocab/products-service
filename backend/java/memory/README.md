@@ -121,7 +121,7 @@
 * **Direct Memory**: For NIO buffers (off-heap).
  
 
----
+
 
 ###  JVM Stack Structure
 
@@ -186,6 +186,20 @@ flowchart TD
 
 [More](Reference.md)
 
+## Heuristics 
+
+
+
+1. **GC Trigger Heuristic** – Decides when to start garbage collection based on heap usage.
+2. **Adaptive Sizing Heuristic** – Dynamically resizes memory regions (Eden, Survivor) for optimal GC efficiency.
+3. **Tenuring Threshold Heuristic** – Controls how many GC cycles an object survives before moving to Old Gen.
+4. **GC Algorithm Heuristic** – Selects and tunes GC algorithms based on system resources and workload.
+5. **Heap Expansion/Contraction Heuristic** – Grows or shrinks heap size depending on memory pressure.
+6. **Pause-Time Goal Heuristic** – Balances GC pauses with throughput to meet latency goals.
+7. **Allocation Rate Heuristic** – Adjusts GC frequency based on object allocation speed.
+8. **Ergonomics Heuristic** – Automatically sets default heap sizes, GC type, and thread counts based on hardware.
+
+[More](Heuristics.md)
 
 ## Memory usage in a **Simple Java application**
 
