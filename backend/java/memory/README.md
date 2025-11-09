@@ -176,8 +176,18 @@ flowchart TD
 
 👉 This is why recursion in Java can cause a **StackOverflowError** → too many frames get pushed onto the JVM stack.
  
----
-### Memory usage in a **Simple Java application**
+
+## Reference 
+
+* **Strong Reference:** Default reference; object is **never garbage collected** as long as it’s strongly reachable.
+* **Soft Reference:** Collected **only when memory is low** — useful for caching.
+* **Weak Reference:** Collected **as soon as no strong references** exist — used in maps like `WeakHashMap`.
+* **Phantom Reference:** Collected **after finalization**, used to **track object cleanup** before memory is reclaimed.
+
+[More](reference.md)
+
+
+## Memory usage in a **Simple Java application**
 
 ```mermaid
 flowchart TD
