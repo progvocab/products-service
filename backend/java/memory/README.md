@@ -174,7 +174,7 @@ flowchart TD
 
 
 
-👉 This is why recursion in Java can cause a **StackOverflowError** → too many frames get pushed onto the JVM stack.
+ This is why recursion in Java can cause a **StackOverflowError** → too many frames get pushed onto the JVM stack.
  
 
 ## Reference 
@@ -184,7 +184,7 @@ flowchart TD
 * **Weak Reference:** Collected **as soon as no strong references** exist — used in maps like `WeakHashMap`.
 * **Phantom Reference:** Collected **after finalization**, used to **track object cleanup** before memory is reclaimed.
 
-[More](reference.md)
+[More](Reference.md)
 
 
 ## Memory usage in a **Simple Java application**
