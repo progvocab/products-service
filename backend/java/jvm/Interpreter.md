@@ -136,9 +136,25 @@ flowchart TD
     D --> E[Machine Code Execution - CPU Registers]
 ```
 
+## **Scalar Replacement** 
+
+it is a **JIT (Just-In-Time) optimization** in the JVM that breaks down an object into its **individual fields (scalars)** so they can be stored directly in **CPU registers or on the stack**, instead of allocating the object on the heap.
+
+This reduces **heap allocations** and **GC overhead**.
+
+✅ Example:
+If an object is **created and used only within a method** (it doesn’t “escape”), the JVM can replace the object with its fields — avoiding heap allocation entirely.
+
+🚫 **Not applied** if:
+
+* The object **escapes** the method (e.g., returned or assigned to a global reference).
+* The code is **too complex** for the JIT to prove it’s safe.
+* **Escape analysis** is disabled (`-XX:-DoEscapeAnalysis`).
+
+
 ---
 
-✅ **Summary:**
+ **Summary:**
 
 * Interpreter: executes bytecode step by step → slower.
 * JIT Compiler: converts frequently used bytecode into native machine code → faster execution.
