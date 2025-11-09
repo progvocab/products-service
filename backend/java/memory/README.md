@@ -186,6 +186,19 @@ flowchart TD
 
 [More](Reference.md)
 
+## GC phases 
+
+The main **Garbage Collection (GC) phases** in the JVM are:
+
+1. **Mark** – Identify all live (reachable) objects.
+2. **Sweep** – Reclaim memory occupied by unreachable (dead) objects.
+3. **Compact** – Defragment memory by moving live objects together.
+4. **Evacuate (Copy)** – Move live objects from one region (e.g., Eden) to another (e.g., Survivor/Old).
+5. **Finalize/Reference Processing** – Handle `finalize()` methods and soft/weak/phantom references.
+
+Different collectors (like G1, Parallel, ZGC) may merge or optimize these phases, but all follow the **mark → clean → compact** principle.
+
+
 ## Heuristics 
 
 
