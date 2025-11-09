@@ -4,7 +4,15 @@ Here’s a concise list of **important JVM memory heuristics** (rules/strategies
 
 ### 🧠 **1. GC Trigger Heuristics**
 
-* **What it means:** JVM decides *when* to trigger garbage collection based on heap usage.
+* **What it means:** JVM decides *when* to trigger garbage collection based on heap usage.You can control the **GC Trigger Heuristic** by adjusting **heap size and thresholds**, e.g. using JVM options like:
+
+```bash
+-XX:InitiatingHeapOccupancyPercent=45   # For G1 GC trigger threshold
+-Xms512m -Xmx2g                         # Control overall heap size
+```
+
+These settings influence **when** GC starts based on heap occupancy and memory pressure.
+
 * **Example:**
   If `Eden space` (young generation) fills up to 100%, a **Minor GC** is triggered.
   If **Old Generation** usage exceeds a threshold (e.g., 70–80%), a **Major GC** or **Full GC** may run.
