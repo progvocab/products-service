@@ -2,7 +2,7 @@ Here’s a concise list of **important JVM memory heuristics** (rules/strategies
 
 ---
 
-### 🧠 **1. GC Trigger Heuristics**
+###  **1. GC Trigger Heuristics**
 
 * **What it means:** JVM decides *when* to trigger garbage collection based on heap usage.You can control the **GC Trigger Heuristic** by adjusting **heap size and thresholds**, e.g. using JVM options like:
 
@@ -19,7 +19,7 @@ These settings influence **when** GC starts based on heap occupancy and memory p
 
 ---
 
-### ⚖️ **2. Adaptive Sizing Heuristic**
+###  **2. Adaptive Sizing Heuristic**
 
 * **What it means:** JVM automatically adjusts sizes of memory regions (Eden, Survivor spaces) for optimal GC performance.
 * **Example:**
@@ -27,7 +27,7 @@ These settings influence **when** GC starts based on heap occupancy and memory p
 
 ---
 
-### 🔁 **3. Tenuring Threshold Heuristic**
+###  **3. Tenuring Threshold Heuristic**
 
 * **What it means:** Determines how many GC cycles an object survives before being promoted to the Old Generation.
 * **Example:**
@@ -36,7 +36,7 @@ These settings influence **when** GC starts based on heap occupancy and memory p
 
 ---
 
-### 🧹 **4. GC Algorithm Heuristic**
+###  **4. GC Algorithm Heuristic**
 
 * **What it means:** JVM may change GC behavior or parallelism based on CPU cores and heap size.
 * **Example:**
@@ -45,7 +45,7 @@ These settings influence **when** GC starts based on heap occupancy and memory p
 
 ---
 
-### 💾 **5. Heap Expansion/Contraction Heuristic**
+###  **5. Heap Expansion/Contraction Heuristic**
 
 * **What it means:** JVM grows or shrinks the heap based on GC performance.
 * **Example:**
@@ -54,7 +54,7 @@ These settings influence **when** GC starts based on heap occupancy and memory p
 
 ---
 
-### 📊 **6. Pause-Time Goal Heuristic**
+###  **6. Pause-Time Goal Heuristic**
 
 * **What it means:** GC tries to balance throughput and latency based on user goal.
 * **Example:**
@@ -62,20 +62,22 @@ These settings influence **when** GC starts based on heap occupancy and memory p
 
 ---
 
-### 🧩 **7. Allocation Rate Heuristic**
+###  **7. Allocation Rate Heuristic**
 
 * **What it means:** JVM observes how fast the application allocates objects and adjusts GC scheduling accordingly.
+You control the **Allocation Rate Heuristic** indirectly by tuning object creation patterns and GC settings (e.g. heap size, `-XX:MaxGCPauseMillis`, `-XX:GCTimeRatio`).
+
+There’s **no fixed default** — the JVM **adapts dynamically** based on allocation speed and GC performance to maintain target pause times and throughput.
+
 * **Example:**
   If allocation rate spikes, JVM may trigger GC earlier to prevent sudden heap exhaustion.
 
+
+
 ---
 
-### 🧠 **8. Ergonomics Heuristic**
+###  **8. Ergonomics Heuristic**
 
 * **What it means:** JVM chooses default heap sizes, GC algorithms, and thread counts based on system hardware.
 * **Example:**
-  A server with 8 cores and 16 GB RAM → JVM may select G1GC and allocate `-Xmx` ≈ ¼ of total RAM automatically.
-
----
-
-Would you like me to include a **diagram showing how these heuristics interact during GC cycles** (like a memory lifecycle view)?
+  A server with 8 cores and 16 GB RAM → JVM may select G1GC and allocate `-Xmx` ≈ ¼ of total RAM 
