@@ -1,12 +1,12 @@
-### 🧠 **Assembly Language — Overview**
+###  **Assembly Language — Overview**
 
-**Creator:**
+
 Assembly language wasn’t created by a single person — it **evolved in the early 1950s** as a more human-readable abstraction over machine code.
 However, **Kathleen Booth (1947)** is widely credited with designing the **first assembly language** for the **ARC (Automatic Relay Computer)** at Birkbeck College, London.
 
 ---
 
-### ⚙️ **Concepts**
+### **Concepts**
 
 1. **Low-level abstraction:**
    A thin layer above machine code — uses mnemonics (e.g., `MOV`, `ADD`, `JMP`) instead of binary opcodes.
@@ -21,7 +21,7 @@ However, **Kathleen Booth (1947)** is widely credited with designing the **first
 
 ---
 
-### 🧩 **Main Components**
+###  **Main Components**
 
 | Component                    | Description                                                                  |
 | ---------------------------- | ---------------------------------------------------------------------------- |
@@ -34,7 +34,7 @@ However, **Kathleen Booth (1947)** is widely credited with designing the **first
 
 ---
 
-### 🚀 **Use Cases**
+###  **Use Cases**
 
 1. **Embedded systems programming** (e.g., microcontrollers, firmware).
 2. **Performance-critical routines** (e.g., cryptography, signal processing).
@@ -45,7 +45,7 @@ However, **Kathleen Booth (1947)** is widely credited with designing the **first
 
 ---
 
-### 🧮 **Example (x86 Assembly)**
+###  **Example (x86 Assembly)**
 
 ```asm
 section .text
@@ -102,7 +102,7 @@ Hello, Assembly!
 
 A **linker** is a system tool that **combines one or more object files** (e.g., `hello.o`) into a **single executable program**.
 
-### 🧩 **Key Responsibilities of the Linker**
+###  **Key Responsibilities of the Linker**
 
 | Function                  | Description                                                                         |
 | ------------------------- | ----------------------------------------------------------------------------------- |
@@ -124,12 +124,11 @@ Object File (.o)
 Executable File
    ↓  [Loader]
 Running Program (in memory)
-```
-Excellent historical question 👏 — let’s clarify this with a timeline and explanation.
+
 
 ---
 
-## 🕰️ **Interpreter — Before or After A?**
+## **Interpreter**
 
 The concept of an **interpreter** actually came **before A**.
 
@@ -139,16 +138,11 @@ The concept of an **interpreter** actually came **before A**.
 
 So  **interpreters existed before A** — A’s own early implementations were *interpreted*, not compiled in the modern sense.
 
-
-   
-   
+The interpreter **translated the code into threaded machine instructions** and executed them directly — no separate linker required.
 
 
-3. The interpreter **translated the code into threaded machine instructions** and executed them directly — no separate linker was used.
 
----
 
-### ⚙️ Summary Table
 
 | Language                  | Year   | Execution Type        | Developer(s)            | How It Ran                          |
 | ------------------------- | ------ | --------------------- | ----------------------- | ----------------------------------- |
@@ -168,7 +162,7 @@ Before **C**, there were two predecessors — **B** and **BCPL**, and even befor
 
 ### **Language A (Around 1951–1953)**
 
-#### Overview
+
 
 * **Developed by:** Alick Glennie (at the University of Manchester)
 * **Name:** Simply called **A**
@@ -186,9 +180,9 @@ Before **C**, there were two predecessors — **B** and **BCPL**, and even befor
 
 Excellent question 🔍 — here’s a concise breakdown about the **A programming language** (the early one that influenced B and C):
 
----
 
-## 🧠 **What Was the “A” Programming Language**
+
+## **What Was the “A” Programming Language**
 
 * **Developed by:** **Kenneth E. Iverson** in the **1960s** at Harvard (later evolved into **APL** — *A Programming Language*).
 * It was **mathematical and array-oriented**, designed for **concise mathematical notation** rather than systems programming.
@@ -255,7 +249,7 @@ Would compute element-wise addition of arrays.
 * Simpler and smaller than BCPL.
 * Its compiler produced very compact code for early UNIX.
 
-#### 🧠 Importance
+####  Importance
 
 * **B was the direct predecessor of C.**
 * Dennis Ritchie later extended B with data types and structures, leading to **C (1972)**.
@@ -315,17 +309,15 @@ The original **UNIX kernel** on the PDP-7 was written in **B**, and later rewrit
 Would you like me to show a **comparison table** of B vs. early C (syntax, data types, and compilation model)? It’s a fascinating transition showing how modern programming concepts were born.
 
 
-Perfect 👏 — here’s a detailed **comparison between the B language and early C**, showing how Dennis Ritchie evolved B into C around 1971–1973 at Bell Labs.
 
----
 
-## 🧬 **B vs Early C: The Evolution of a Language**
+##  **B vs Early C: The Evolution of a Language**
 
 Below is a side-by-side breakdown of syntax, features, and design principles:
 
 ---
 
-### 📋 **1. Overview**
+###  **1. Overview**
 
 | Feature             | **B Language (1969)**              | **Early C Language (1972–1973)**                   |
 | ------------------- | ---------------------------------- | -------------------------------------------------- |
@@ -338,7 +330,7 @@ Below is a side-by-side breakdown of syntax, features, and design principles:
 
 ---
 
-### ⚙️ **2. Data Types and Variables**
+###  **2. Data Types and Variables**
 
 | Concept       | **B**                                          | **Early C**                                   |
 | ------------- | ---------------------------------------------- | --------------------------------------------- |
@@ -350,7 +342,7 @@ Below is a side-by-side breakdown of syntax, features, and design principles:
 
 ---
 
-### 🧱 **3. Syntax Example**
+###  **3. Syntax Example**
 
 #### B Language:
 
@@ -377,11 +369,11 @@ int main() {
 }
 ```
 
-> 🧠 Notice the move from `auto` (default storage class) to explicit **typed declarations** and standardized I/O functions.
+>  Notice the move from `auto` (default storage class) to explicit **typed declarations** and standardized I/O functions.
 
 ---
 
-### 🧩 **4. Control Structures**
+###  **4. Control Structures**
 
 | Structure                   | **B**            | **C**                       |
 | --------------------------- | ---------------- | --------------------------- |
@@ -393,7 +385,7 @@ int main() {
 
 ---
 
-### 🧮 **5. Memory Model**
+###  **5. Memory Model**
 
 | Concept            | **B**                           | **C**                                      |
 | ------------------ | ------------------------------- | ------------------------------------------ |
@@ -404,7 +396,7 @@ int main() {
 
 ---
 
-### ⚡ **6. Compilation & Portability**
+### **6. Compilation & Portability**
 
 | Aspect             | **B**                      | **C**                                          |
 | ------------------ | -------------------------- | ---------------------------------------------- |
@@ -414,7 +406,7 @@ int main() {
 
 ---
 
-### 🧠 **7. Philosophical Differences**
+###  **7. Philosophical Differences**
 
 | Design Principle | **B**                                 | **C**                                  |
 | ---------------- | ------------------------------------- | -------------------------------------- |
@@ -437,7 +429,7 @@ graph LR
 
 ---
 
-### 💡 **Summary Insight**
+### **Summary Insight**
 
 | Feature Category        | What Changed from B → C           | Why It Mattered                          |
 | ----------------------- | --------------------------------- | ---------------------------------------- |
@@ -455,6 +447,139 @@ When UNIX was first written in B on the PDP-7, it had to be manually ported to e
 After Dennis Ritchie extended B into **C**, he **rewrote UNIX in C (1973)** — making it **portable for the first time**.
 That single decision is why both **UNIX and C** spread worldwide.
 
+
+
+##  **C Programming Language Overview**
+
+* **Created by:** **Dennis Ritchie** at **Bell Labs** (1972).
+* **Evolved from:** The **B** language.
+* **Type:** Fully **compiled**, *not interpreted*.
+* **Purpose:** System programming — especially for writing the **UNIX operating system**.
+
 ---
 
-Would you like me to extend this into a **timeline showing the evolution from Assembly → A → BCPL → B → C → C++ → Java** (with key milestones and design shifts)?
+##  **How to Run a C Program**
+
+1. **Write the code** (e.g., `hello.c`):
+
+   ```c
+   #include <stdio.h>
+
+   int main() {
+       printf("Hello, C!\n");
+       return 0;
+   }
+   ```
+
+2. **Compile** it using a C compiler (e.g., GCC):
+
+   ```bash
+   gcc hello.c -o hello
+   ```
+
+3. **Run** the executable:
+
+   ```bash
+   ./hello
+   ```
+
+ Output:
+
+```
+Hello, C!
+```
+
+---
+
+## **What Happens Internally**
+
+| Step              | Description                                              |
+| ----------------- | -------------------------------------------------------- |
+| **Preprocessing** | Handles macros, `#include`, and conditional compilation. |
+| **Compilation**   | Converts C code → assembly code.                         |
+| **Assembly**      | Translates assembly → object code (`.o` files).          |
+| **Linking**       | Combines object files + libraries → executable binary.   |
+| **Execution**     | OS loader loads binary into memory and runs it.          |
+
+---
+
+## **Summary**
+
+| Language | Execution Type | Tool           | Typical Command                |
+| -------- | -------------- | -------------- | ------------------------------ |
+| **B**    | Interpreted    | `b`            | `b program.b`                  |
+| **C**    | Compiled       | `gcc`, `clang` | `gcc file.c -o file && ./file` |
+
+
+---
+
+ C and C++ look very similar, but the **build and execution process** differ slightly due to **language features and linking behavior**
+
+
+
+###  **1. Compilation Model**
+
+| Aspect               | **C**                   | **C++**                                              |
+| -------------------- | ----------------------- | ---------------------------------------------------- |
+| **Compiler**         | `gcc`                   | `g++`                                                |
+| **File extension**   | `.c`                    | `.cpp`                                               |
+| **Language type**    | Procedural              | Object-Oriented + Generic                            |
+| **Name mangling**    | No                      | Yes (function overloading requires it)               |
+| **Standard library** | `<stdio.h>`, `<math.h>` | `<iostream>`, `<vector>`, `<string>`                 |
+| **Runtime support**  | Minimal                 | Includes constructors, destructors, RTTI, exceptions |
+
+---
+
+###  **2. Linking Differences**
+
+* **C** linker is **simpler**, since symbols are plain (no mangling).
+* **C++** linker handles **name-mangled symbols**, **templates**, and **operator overloading**.
+* When linking mixed code:
+
+  ```cpp
+  extern "C" { void func(); } 
+  ```
+
+  is used to prevent name mangling for C interoperability.
+
+---
+
+### **3. Running Programs**
+
+| Step        | C                      | C++                      |
+| ----------- | ---------------------- | ------------------------ |
+| **Compile** | `gcc hello.c -o hello` | `g++ hello.cpp -o hello` |
+| **Run**     | `./hello`              | `./hello`                |
+
+The **execution step is identical**, but
+ **C++ binaries** include additional startup code to initialize the **C++ runtime (e.g., global constructors, exception tables)** before `main()` runs.
+
+---
+
+### Example Comparison
+
+**C**
+
+```c
+#include <stdio.h>
+int main() { printf("Hello, C!\n"); }
+```
+
+**C++**
+
+```cpp
+#include <iostream>
+int main() { std::cout << "Hello, C++!\n"; }
+```
+
+---
+
+### **Summary**
+
+* Both C and C++ programs **run the same way at OS level** — as compiled machine code.
+* **C++ adds extra compile-time and runtime features** (OOP, templates, RTTI), requiring a **more complex compiler and runtime initialization**.
+
+Would you like a short diagram showing the **extra runtime steps added by C++ before `main()` executes**?
+
+
+
