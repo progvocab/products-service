@@ -186,6 +186,22 @@ flowchart TD
 
 [More](Reference.md)
 
+## GC Eligibility 
+
+
+An object becoming **unreachable** only makes it **eligible** for garbage collection — it is **not collected immediately**.
+The **actual collection** depends on several factors:
+
+* **GC algorithm and thresholds** — Each GC (like G1, Parallel, ZGC) decides when to run based on **heap usage**, **pause time goals**, and **allocation rate**.
+*  **Heap pressure** — If memory allocation approaches `-Xmx`, the GC runs more aggressively.
+*  **GC heuristics** — The JVM uses internal heuristics to decide *when* to trigger minor or major GCs (e.g., promotion failure, survivor space overflow).
+* 🔧 **Tuning parameters** — Options like `-XX:InitiatingHeapOccupancyPercent` influence when concurrent marking starts.
+
+
+
+> An unreachable object is *only eligible* for GC; the JVM collects it later based on heap pressure, GC algorithm, and tuning heuristics — not immediately when it becomes unreachable.
+
+
 ## GC phases 
 
 The main **Garbage Collection (GC) phases** in the JVM are:
