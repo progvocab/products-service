@@ -24,3 +24,113 @@ Citations:
 [6] Performance ConcurrentHashmap vs HashMap - java https://stackoverflow.com/questions/1378310/performance-concurrenthashmap-vs-hashmap
 [7] Difference Between HashMap and ConcurrentHashMap in ... https://www.youtube.com/shorts/twDt-USkzoA
 [8] Difference Between Hashtable and ConcurrentHashMap in ... https://www.baeldung.com/java-hashtable-vs-concurrenthashmap
+Excellent — here’s a **simplified internal flow** of `ConcurrentHashMap.put(K key, V value)` showing where **CAS (Compare-And-Swap)** comes into play 👇
+
+---
+
+## 🧩 Simplified Pseudocode of `ConcurrentHashMap.put()`
+
+```java
+V put(K key, V value) {
+    int hash = spread(key.hashCode());
+    for (;;) { // retry loop (CAS may fail)
+        Node<K,V>[] tab = table;
+        if (tab == null) tab = initTable();
+
+        int i = (tab.length - 1) & hash;
+        Node<K,V> f = tabAt(tab, i);
+
+        // 1️⃣ Case 1: Empty bucket → try CAS insert
+        if (f == null) {
+            if (casTabAt(tab, i, null, new Node<>(hash, key, value, null))) {
+                // ✅ Successfully inserted without any lock
+                break;
+            }
+            // CAS failed → another thread inserted simultaneously, retry
+            continue;
+        }
+
+        // 2️⃣ Case 2: Special marker node → resize in progress
+        else if (f.hash == MOVED) {
+            tab = helpTransfer(tab, f);
+            continue;
+        }
+
+        // 3️⃣ Case 3: Collision (bucket not empty)
+        else {
+            V oldVal = null;
+            synchronized (f) { // only this bin locked
+                if (tabAt(tab, i) == f) {
+                    if (f.hash >= 0) { // normal linked list
+                        Node<K,V> e = f;
+                        while (true) {
+                            if (e.hash == hash && (e.key.equals(key))) {
+                                oldVal = e.val;
+                                e.val = value;
+                                break;
+                            }
+                            if (e.next == null) {
+                                e.next = new Node<>(hash, key, value, null);
+                                break;
+                            }
+                            e = e.next;
+                        }
+                    } else if (f instanceof TreeBin) {
+                        // handle red-black tree insertion
+                        oldVal = ((TreeBin<K,V>)f).putTreeVal(hash, key, value);
+                    }
+                }
+            }
+            if (oldVal != null)
+                return oldVal;
+            break;
+        }
+    }
+    addCount(1L, hash);
+    return null;
+}
+```
+
+---
+
+## 🔍 Breakdown of Key CAS Steps
+
+| Step  | Method                            | Action                               | Thread Safety Mechanism         |
+| ----- | --------------------------------- | ------------------------------------ | ------------------------------- |
+| **1** | `casTabAt(tab, i, null, newNode)` | Tries to insert node in empty bucket | **CAS (lock-free)**             |
+| **2** | `tabAt(tab, i)`                   | Volatile read of bucket              | **Volatile ensures visibility** |
+| **3** | `helpTransfer()`                  | Assists resizing                     | **CAS + cooperative threads**   |
+| **4** | `addCount()`                      | Atomically increments size           | **CAS loop on counter cells**   |
+
+---
+
+## ⚙️ CAS in Resizing (Simplified)
+
+When resizing begins:
+
+```java
+if (U.compareAndSwapInt(this, SIZECTL, sc, sc - 1))
+    transfer(oldTab, null); // help resizing
+```
+
+This lets **multiple threads** share the resize load — each one transfers a slice of buckets atomically.
+
+---
+
+## ✅ Why CAS is Critical
+
+Without CAS:
+
+* Two threads inserting into an empty bucket could overwrite each other.
+* Resizing could corrupt internal structures.
+* Performance would collapse due to coarse locks.
+
+With CAS:
+
+* Only threads targeting the same bucket contend.
+* Map scales well on multi-core systems.
+* Lock-free behavior in common paths.
+
+---
+
+Would you like me to follow this up with the **pseudocode of `get()` and `resize()` in ConcurrentHashMap**, showing how they remain mostly **lock-free** (and use CAS cooperatively)?
