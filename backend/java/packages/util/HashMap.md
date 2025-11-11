@@ -288,5 +288,7 @@ graph TD
 * Average lookup/insertion time = **O(1)**; worst-case (treeified) = **O(log n)**.
 
 ---
+#### Put operation 
+> When a new key pair is added hashmap takes the hashCode of the key and pass it to hash function with gives the index of this entey in bins arrays,  if there is a bucket already present , that means there Is a hash collision , now hashmap check the type of the bucket,  is it single object,  linked list or red black tree , if it's a single object , hashmap uses equals to check if both keys are same , if yes the value is overwritten,  else single object is converted to linked list and new entry is added at the end , if it is already a linked list then hashmap iterates over the linked list and find the matching key , if key is found value is updated , else new entry added at the end , if the threshold is crossed , meaning linked list has more than 8 elements,  it's converted to red black tree , new element is added and tree is balanced , if it's already a red black tree , hashmap traverses the red black tree , finds the key and overwrite the value , if not found hashmap adds the element to the red black tree and Balances it
 
 Would you like me to extend this diagram to include **ConcurrentHashMap’s segment/stripe structure** — showing how it differs internally from HashMap during `put()` and `get()`?
