@@ -6,7 +6,10 @@ In React, hooks are functions that let you use state and lifecycle features in f
      ```jsx
      const [count, setCount] = useState(0);
      setCount(count + 1);
+
      ```
+
+- Use state returns an array , the first element is the state reference,  and second is the setter function to update the state in a reactive way.
 
 ### 2. **useEffect**  
    - Handles side effects like fetching data, subscriptions, or manually changing the DOM.  
@@ -16,6 +19,8 @@ In React, hooks are functions that let you use state and lifecycle features in f
        console.log("Component mounted or updated");
      }, [count]);  // Runs when `count` changes
      ```
+
+- Use effect is called after every render.
 
 ### 3. **useContext**  
    - Accesses values from React's Context API without prop drilling.  
@@ -32,12 +37,24 @@ In React, hooks are functions that let you use state and lifecycle features in f
      useEffect(() => inputRef.current.focus(), []);
      ```
 
+- Use Ref can be used to keep values which will not reset on Re Render. In the below example the count value is not set back to 0 on Render, unlike other variables. We can use this to track the number of times the component has rendered.
+
+     ```jsx
+     const count = useRef(0);
+     useEffect(() => count.current +=1);
+
+return <p> {count.current} </p>
+     ```
+
+
+
 ### 5. **useMemo**  
    - Optimizes performance by memoizing computed values.  
    - Example:  
      ```jsx
      const expensiveValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
      ```
+ - Use Memo is used to store the computed value of a function call to avoid re-computation , it is however called on every Render.
 
 ### 6. **useCallback**  
    - Memoizes functions to prevent unnecessary re-renders.  
