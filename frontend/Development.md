@@ -4,6 +4,6 @@
  or
  npx  react-scripts start
 # Flow
-
-index.js
-App.js
+- index.html
+- index.js
+- App.js
