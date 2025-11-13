@@ -1,4 +1,93 @@
-Excellent question 👍 Let’s break it down step by step.
+ **Fork/Join** works under the hood when you use a **parallel stream** in Java:
+
+---
+
+### **Example:**
+
+```java
+import java.util.List;
+import java.util.stream.IntStream;
+
+public class ParallelStreamExample {
+    public static void main(String[] args) {
+        List<Integer> numbers = IntStream.rangeClosed(1, 10).boxed().toList();
+
+        int sum = numbers.parallelStream()      // uses ForkJoinPool.commonPool()
+                         .mapToInt(n -> {
+                             System.out.println(Thread.currentThread().getName() + " processing " + n);
+                             return n;
+                         })
+                         .sum();
+
+        System.out.println("Sum = " + sum);
+    }
+}
+```
+
+---
+
+### **How it works :**
+
+1. `parallelStream()` divides the data source (here, 1–10) into **subtasks**.
+2. These subtasks are submitted to the **ForkJoinPool.commonPool()**, which uses multiple worker threads (usually equal to CPU cores).
+3. Each worker thread **processes part of the stream** concurrently.
+4. The **Fork/Join Framework** automatically **splits (fork)** the work and **combines (join)** results efficiently.
+5. Finally, `sum()` (a terminal operation) **aggregates** the partial results into a single output.
+
+
+
+> `parallelStream()` is a high-level abstraction built on top of the **Fork/Join Framework** that automatically handles task splitting, scheduling, and joining behind the scenes.
+
+
+
+## **same example rewritten using the ForkJoinTask / RecursiveTask API** manually
+ (to see what happens under the hood)
+
+
+- the **manual Fork/Join version** 
+
+---
+
+### ⚙️ **Code Example:**
+
+```java
+import java.util.concurrent.*;
+
+class SumTask extends RecursiveTask<Integer> {
+    int[] arr; int start, end;
+    SumTask(int[] arr, int start, int end) { this.arr = arr; this.start = start; this.end = end; }
+
+    @Override
+    protected Integer compute() {
+        if (end - start <= 2)  // small task
+            return IntStream.range(start, end).map(i -> arr[i]).sum();
+
+        int mid = (start + end) / 2;
+        SumTask left = new SumTask(arr, start, mid);
+        SumTask right = new SumTask(arr, mid, end);
+        left.fork();                       // run left in parallel
+        return right.compute() + left.join(); // combine results
+    }
+}
+
+public class ForkJoinExample {
+    public static void main(String[] args) {
+        int[] arr = {1,2,3,4,5,6,7,8,9,10};
+        ForkJoinPool pool = new ForkJoinPool();
+        int sum = pool.invoke(new SumTask(arr, 0, arr.length));
+        System.out.println("Sum = " + sum);
+    }
+}
+```
+
+
+
+* **Fork:** splits task into smaller parts (`left`, `right`).
+* **Join:** waits for subtask results and combines them.
+* **ForkJoinPool:** runs tasks on multiple threads efficiently.
+
+> Essentially, this manual version is what `parallelStream()` does internally — split work, execute in parallel, and merge results.
+
 
 ---
 
