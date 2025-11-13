@@ -4,6 +4,23 @@
 
 # Multithreading in Java
 
+### Types of Thread 
+
+
+In Java, threads can be classified as:
+
+1. **User threads** – main application threads that keep the JVM alive.
+2. **Daemon threads** – background service threads (e.g., GC).
+3. **By execution type:**
+
+   * **Single-threaded** (one task at a time)
+   * **Multi-threaded** (concurrent tasks)
+4. **By purpose:**
+
+   * **Worker threads** (thread pools, executors)
+   * **Timer/Scheduler threads** (e.g., `ScheduledExecutorService`)
+
+
 | Concept                            | Explanation                                                                                                   |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | **Thread**                         | A lightweight unit of execution. In Java, created by extending `Thread` or implementing `Runnable`.           |
