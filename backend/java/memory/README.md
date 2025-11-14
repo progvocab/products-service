@@ -174,8 +174,9 @@ flowchart TD
 
 
 
- This is why recursion in Java can cause a **StackOverflowError** → too many frames get pushed onto the JVM stack.
- 
+> This is why recursion in Java can cause a **StackOverflowError** → too many frames get pushed onto the JVM stack.
+
+## [Garebage Collectors](garbage_collector)
 
 ## Reference 
 
