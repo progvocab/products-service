@@ -47,7 +47,6 @@ In Java, threads can be classified as:
 
 
 * **Thread Safety**: Avoid [race conditions](race_condition.md) using [synchronization](synchronized.md) , locks, atomics.
-  1. Refer 
 * **Executors**: Prefer over manual `Thread` creation for better scalability.
 * **Avoid Deadlocks**: Use consistent lock ordering, timeouts, or try-lock.
 * **Best Practice**: Use high-level concurrency utilities (Executor, CompletableFuture) instead of low-level `wait/notify`.
@@ -55,7 +54,7 @@ In Java, threads can be classified as:
 
 
 
-## **Locking mechanism**: 🔒 
+## **Locking mechanism**:  
  
 
 1. **Object Monitor (Intrinsic Lock)**
@@ -123,16 +122,6 @@ In Java, threads can be classified as:
 * Not a lock, but ensures **visibility** of changes across threads.
 * Used to prevent caching issues in multi-threading.
 
----
-
- **Summary**:
-
-* **Basic locking** → `synchronized` (object monitors).
-* **Advanced locking** → `ReentrantLock`, `ReadWriteLock`, `StampedLock`.
-* **Coordination tools** → `Semaphore`, `CountDownLatch`, `CyclicBarrier`, `Phaser`.
-* **Lock-free** → `Atomic` classes + `volatile`.
-
----
 
 
 ##  Default Threads   in a fresh JVM 
@@ -206,13 +195,11 @@ C2 CompilerThread1
 ```
 
 
-Fantastic — this is one of the most **important deep-dive topics** when understanding how Java concurrency works *under the hood* on Linux.
+## **hardware → OS kernel → JVM → Java threads** 
 
-Let’s unpack it step by step — from **hardware → OS kernel → JVM → Java threads** 👇
 
----
 
-## 🧱 1. **Architecture Overview**
+###  1. **Architecture Overview**
 
 At a high level:
 
@@ -228,7 +215,6 @@ At a high level:
 [ Java Thread API (java.lang.Thread) ]
 ```
 
----
 
 ###   2. **Linux OS Thread Model**
 
@@ -257,9 +243,7 @@ This means:
 * All threads share the same memory (so `static` variables are visible to all)
 * The kernel scheduler treats them just like separate processes
 
----
-
-##   3. **Scheduler: How Linux Manages Threads**
+###   3. **Scheduler: How Linux Manages Threads**
 
 The **Completely Fair Scheduler (CFS)** in Linux is responsible for:
 
@@ -270,9 +254,7 @@ The **Completely Fair Scheduler (CFS)** in Linux is responsible for:
 Each thread has its own **task_struct** in kernel memory.
 The scheduler can preempt threads, save CPU context, and resume later.
 
----
-
-## ☕ 4. **How Java Threads Map to Linux Threads**
+###  4. **How Java Threads Map to Linux Threads**
 
 The JVM (HotSpot and OpenJ9) implements **Java threads as 1:1 mapped native threads**:
 
@@ -285,9 +267,7 @@ The JVM (HotSpot and OpenJ9) implements **Java threads as 1:1 mapped native thre
 
 Each Java thread corresponds to **one native pthread**, which the OS kernel schedules.
 
----
-
-## 🧠 5. **Thread Lifecycle Integration**
+### 5. **Thread Lifecycle Integration**
 
 | Java Thread State       | Linux Kernel State                            | Description                             |
 | ----------------------- | --------------------------------------------- | --------------------------------------- |
@@ -297,9 +277,8 @@ Each Java thread corresponds to **one native pthread**, which the OS kernel sche
 | WAITING / TIMED_WAITING | Sleeping / waiting for condition              | No CPU time, waiting for signal         |
 | TERMINATED              | Exited                                        | Cleaned up by kernel and JVM            |
 
----
 
-## 🧮 6. **Thread Context Switching**
+### 6. **Thread Context Switching**
 
 When Java has multiple threads and few CPU cores:
 
@@ -310,9 +289,8 @@ When Java has multiple threads and few CPU cores:
 This switching happens at **kernel level**, not inside the JVM.
 That’s why Java’s `Thread.yield()` only *hints* — it depends on the OS scheduler.
 
----
 
-## 🧩 7. **How JVM Interacts with Native Threads**
+### 7. **How JVM Interacts with Native Threads**
 
 Each Java thread maintains:
 
@@ -324,9 +302,7 @@ Each Java thread maintains:
 
 JVM manages the mapping but the OS kernel handles actual scheduling.
 
----
-
-## ⚡ 8. **JVM Synchronization & Linux**
+### 8. **JVM Synchronization & Linux**
 
 When Java uses synchronization (`synchronized`, `Lock`, etc.):
 
@@ -337,9 +313,8 @@ When Java uses synchronization (`synchronized`, `Lock`, etc.):
 So Java locks often map to **futex syscalls** (`futex(2)`),
 which are highly optimized in Linux for thread synchronization.
 
----
 
-## 🧩 9. **Memory Model Interaction**
+### 9. **Memory Model Interaction**
 
 Java Memory Model (JMM) defines what Java sees.
 Linux memory model and CPU caches define what actually happens.
@@ -352,9 +327,7 @@ When Java uses:
 This ensures the **happens-before** guarantees are honored across threads
 even though the Linux kernel itself doesn’t enforce Java semantics.
 
----
-
-## 🧠 10. **Key Architecture Summary**
+### 10. **Key Architecture Summary**
 
 | Layer                  | Responsibility                                                                            |
 | ---------------------- | ----------------------------------------------------------------------------------------- |
@@ -364,9 +337,7 @@ even though the Linux kernel itself doesn’t enforce Java semantics.
 | **JVM (HotSpot)**      | Maps Java threads to native threads, manages memory model                                 |
 | **Java API**           | Provides high-level abstractions like `Thread`, `ExecutorService`, `Lock`, `ForkJoinPool` |
 
----
-
-## 🔍 11. **How to Inspect on a Linux System**
+### 11. **How to Inspect on a Linux System**
 
 You can actually **see Java threads as Linux threads**:
 
@@ -375,7 +346,7 @@ ps -eLf | grep java
 ```
 
 Each Java thread → separate LWP (Lightweight Process)
-Example output:
+
 
 ```
 UID   PID   LWP  C NLWP STIME TTY  TIME CMD
@@ -386,9 +357,7 @@ user  1234  1235 0  10  ...  java ...
 Here, `PID=1234` is the JVM process,
 `LWP` values (1235, 1236, …) are each Java thread.
 
----
-
-## 🧭 12. **Recent Evolution: Virtual Threads**
+### 12. **Recent Evolution: Virtual Threads**
 
 From **Java 19+**, we have **virtual threads (Project Loom)**:
 
@@ -403,14 +372,11 @@ So:
 | Platform Thread | 1:1                 | Linux kernel         |
 | Virtual Thread  | Many:1              | JVM (Loom scheduler) |
 
----
-
-## 🧾 13. **Summary Diagram**
 
 ```mermaid
 graph TD
     A[Java Thread API] --> B[JVM Thread Manager]
-    B --> C[pthread (libpthread)]
+    B --> C["pthread (libpthread)"]
     C --> D[Linux Kernel Scheduler]
     D --> E[CPU Cores]
     subgraph "Memory Interaction"
@@ -419,27 +385,12 @@ graph TD
     B --> F
 ```
 
----
-
-Would you like me to extend this with a **diagram of how futex-based locking works** between Java’s `synchronized` blocks and the Linux kernel scheduler?
-
-
-✅ Great question — this dives straight into **how Java threads map to OS threads and CPU cores**.
-
-Let’s break it down carefully 👇
-
----
-
-### 🧠 Setup:
+### **how Java threads map to OS threads and CPU cores**.
 
 * 4 **Java threads** (`Thread` objects in JVM)
 * 4 **CPU cores**
 * **Linux OS** with native threading model (`NPTL` — Native POSIX Thread Library)
 * JVM using **1:1 thread mapping** (each Java thread → one native OS thread)
-
----
-
-### ⚙️ What Actually Happens
 
 When you start 4 Java threads:
 
@@ -447,13 +398,7 @@ When you start 4 Java threads:
 2. Each native thread is eligible to be scheduled **independently** by the Linux scheduler.
 3. Since there are 4 cores available, **the OS scheduler can assign each thread to one core**.
 
----
-
-### 💡 So does that mean no context switching?
-
-Not necessarily.
-
-Even with 4 threads and 4 cores:
+4. Even with 4 threads and 4 cores:
 
 * **Context switching can still occur**:
 
@@ -461,76 +406,11 @@ Even with 4 threads and 4 cores:
   * The OS might preempt a thread for short periods.
 * But: if all threads are **CPU-bound**, **equal priority**, and the system is otherwise idle —
   then **each thread can continuously run on its own core**, meaning **minimal or no context switching**.
-
----
-
-### 🔍 Interactions Between Java Threads and Linux Threads
-
-| Layer                    | Component                          | Role                           |
-| ------------------------ | ---------------------------------- | ------------------------------ |
-| **Java Level**           | `java.lang.Thread`                 | Abstraction in JVM             |
-| **JVM Native Interface** | JVM uses JNI → `pthread_create`    | Creates real OS thread         |
-| **OS Scheduler**         | NPTL (Native POSIX Thread Library) | Schedules threads to CPU cores |
-| **CPU Hardware**         | Multiple cores + caches            | Executes machine instructions  |
-
----
-
-### 🧩 Key Architectural Points
-
-1. **1:1 Mapping Model (used by HotSpot JVM)**
-
-   * Each Java thread → one kernel-level thread
-   * Full parallel execution on multi-core CPUs
-
-2. **User-space scheduling (JVM)**
+ 
+ 
+ 5. **User-space scheduling (JVM)**
 
    * JVM doesn’t schedule threads — the **Linux scheduler** does.
    * JVM only cooperates by marking threads as blocked or runnable.
 
-3. **Thread-Local Data & Stacks**
-
-   * Each Java thread has its own **stack** and **Thread Local Storage (TLS)**.
-
-4. **Memory Visibility (Java Memory Model)**
-
-   * Even if threads run truly parallel on 4 cores, **JMM controls visibility**.
-   * Shared data changes become visible only via `volatile`, `synchronized`, or atomic operations.
-
----
-
-### 🧠 Example: True Parallelism
-
-```java
-public class ParallelTest {
-    public static void main(String[] args) {
-        Runnable task = () -> {
-            long sum = 0;
-            for (int i = 0; i < 1_000_000_000; i++) sum += i;
-            System.out.println(Thread.currentThread().getName() + " done");
-        };
-
-        for (int i = 0; i < 4; i++)
-            new Thread(task, "Thread-" + i).start();
-    }
-}
-```
-
-If your CPU has 4 cores and no other load, each thread will run **truly in parallel** — all four cores busy.
-
----
-
-### ⚡ Summary
-
-| Concept              | Description                                    |
-| -------------------- | ---------------------------------------------- |
-| **Thread Mapping**   | Java thread → Linux kernel thread (1:1)        |
-| **Scheduler**        | Linux decides which core runs which thread     |
-| **Parallelism**      | 4 threads on 4 cores = true parallel execution |
-| **Context Switches** | Can still happen (I/O, interrupts, etc.)       |
-| **JMM Role**         | Controls how threads see shared memory changes |
-
----
-
-Would you like me to extend this with a **diagram** showing how JVM threads map to Linux threads and CPU cores (with caches and memory interaction)?
-
-
+ 
