@@ -6,7 +6,6 @@
 
 ### Types of Thread 
 
-
 In Java, threads can be classified as:
 
 1. **User threads** – main application threads that keep the JVM alive.
@@ -29,12 +28,12 @@ In Java, threads can be classified as:
 | **Runnable Interface**             | Defines the `run()` method. Preferred way to create threads (decouples task from thread).                     |
 | **Callable & Future**              | `Callable<V>` returns a result and can throw exceptions. `Future` represents the result of async computation. |
 | **Executor Framework**             | Provides a high-level API (`ExecutorService`, `ThreadPoolExecutor`) for managing thread pools.                |
-| **Synchronization**                | Mechanism to control access to shared resources. Done with `synchronized` keyword or locks.                   |
-| **Lock Interface (ReentrantLock)** | Provides explicit locking/unlocking, more flexible than `synchronized`.                                       |
-| **Volatile Keyword**               | Ensures visibility of variable updates across threads. Prevents caching in thread-local memory.               |
-| **Atomic Variables**               | (`AtomicInteger`, `AtomicLong`, etc.) provide lock-free thread-safe operations.                               |
+| [**Synchronization**](synchronized.md)                | Mechanism to control access to shared resources. Done with `synchronized` keyword or locks.                   |
+| [**Lock Interface (ReentrantLock)**](concurrent/lock) | Provides explicit locking/unlocking, more flexible than `synchronized`.                                       |
+| [**Volatile Keyword**](volatile.md)               | Ensures visibility of variable updates across threads. Prevents caching in thread-local memory.               |
+| [**Atomic Variables**](concurrent/Atomic.md)               | (`AtomicInteger`, `AtomicLong`, etc.) provide lock-free thread-safe operations.                               |
 | **ThreadLocal**                    | Each thread has its own isolated copy of a variable. Useful for user sessions, request context.               |
-| **Wait, Notify, NotifyAll**        | Methods used for inter-thread communication on objects’ monitors.                                             |
+| [**Wait, Notify, NotifyAll**](wait_notify)        | Methods used for inter-thread communication on objects’ monitors.                                             |
 | **Deadlock**                       | Situation where two or more threads wait indefinitely for each other’s resources.                             |
 | **Livelock**                       | Threads keep changing state in response to each other but never make progress.                                |
 | **Starvation**                     | A thread never gets CPU time/resources due to low priority or scheduling.                                     |
@@ -47,7 +46,8 @@ In Java, threads can be classified as:
 
 
 
-* **Thread Safety**: Avoid race conditions using synchronization, locks, atomics.
+* **Thread Safety**: Avoid [race conditions](race_condition.md) using [synchronization](synchronized.md) , locks, atomics.
+  1. Refer 
 * **Executors**: Prefer over manual `Thread` creation for better scalability.
 * **Avoid Deadlocks**: Use consistent lock ordering, timeouts, or try-lock.
 * **Best Practice**: Use high-level concurrency utilities (Executor, CompletableFuture) instead of low-level `wait/notify`.
@@ -135,7 +135,7 @@ In Java, threads can be classified as:
 ---
 
 
-##  Default Threads 🧵 in a fresh JVM 
+##  Default Threads   in a fresh JVM 
 
 Threads at startup, **depends on:**
 
@@ -230,7 +230,7 @@ At a high level:
 
 ---
 
-## ⚙️ 2. **Linux OS Thread Model**
+###   2. **Linux OS Thread Model**
 
 Linux implements threads as **Lightweight Processes (LWPs)**.
 All threads are essentially **tasks** managed by the same kernel scheduler.
@@ -241,7 +241,7 @@ Each thread has:
 * Its own **register set (CPU state)**
 * Shared **memory space (heap, globals)** with sibling threads
 
-### 📘 Linux Thread API
+###   Linux Thread API
 
 At the kernel level, all threads are created with the **`clone()` system call**,
 which allows selective sharing of resources (address space, file descriptors, etc.)
@@ -259,7 +259,7 @@ This means:
 
 ---
 
-## 🧩 3. **Scheduler: How Linux Manages Threads**
+##   3. **Scheduler: How Linux Manages Threads**
 
 The **Completely Fair Scheduler (CFS)** in Linux is responsible for:
 
