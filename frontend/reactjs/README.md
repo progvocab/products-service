@@ -1,3 +1,105 @@
+
+# React js
+
+ **Scheduler → Reconciler → Fiber Tree → Commit Phase / DOM**.
+
+
+
+##  **React Internal Architecture**
+
+```mermaid
+flowchart TD
+
+    subgraph Browser
+        EventLoop(Event Loop)
+        DOM[Real DOM]
+    end
+
+    subgraph ReactApp[React Application]
+        JSBundle[JS Bundle (React + App Code)]
+        RootFiber[Root Fiber Node]
+    end
+
+    subgraph Scheduler[React Scheduler]
+        TaskQueue[Task Queue (priority-based)]
+        LaneModel[Lanes / Priority System]
+    end
+
+    subgraph Reconciler[Reconciler (Render Phase)]
+        VDOM[Virtual DOM Elements]
+        Diffing[Diff Algorithm]
+        FiberTree[Fiber Tree (Work In Progress)]
+    end
+
+    subgraph CommitPhase[Commit Phase]
+        EffectsList[Effects List]
+        DOMUpdates[Apply DOM Updates]
+        LayoutEffects[Run Layout Effects]
+        PassiveEffects[Run useEffect]
+    end
+
+    EventLoop -->|Triggers callbacks| Scheduler
+    JSBundle --> |Creates| VDOM
+    VDOM --> Reconciler
+    Scheduler --> Reconciler
+    Diffing --> FiberTree
+    FiberTree --> CommitPhase
+    EffectsList --> DOMUpdates --> DOM
+    LayoutEffects --> DOM
+    PassiveEffects --> DOM
+    RootFiber --> FiberTree
+```
+
+
+
+## **Components**
+
+###  Scheduler
+
+React’s cooperative scheduler decides:
+
+* Which update to run first
+* Which updates can be interrupted
+* Assigns priorities using **Lanes**
+* Breaks work into small chunks to keep UI responsive
+
+###  Reconciler (Render Phase)
+
+Creates the **Virtual DOM**, compares it with the previous one, and builds a **work-in-progress Fiber Tree**:
+
+* Runs render functions
+* Diffing algorithm
+* Prepares effects list
+* Produces minimal required DOM changes
+
+*This phase is pure and does not touch the DOM.*
+
+### **3. Fiber Tree**
+
+A tree data structure where:
+
+* Each Fiber = one UI component
+* Tracks: props, state, hooks, lanes, effects
+* Has links: `child`, `sibling`, `return`
+* Supports pausing, resuming, and interrupting work
+
+### **4. Commit Phase**
+
+This is synchronous and cannot be interrupted:
+
+* DOM updates are applied
+* Layout effects (`useLayoutEffect`)
+* Passive effects (`useEffect`)
+* Browser paints next frame
+
+
+
+✅ A sequence diagram of React render → commit
+✅ A diagram of Fiber structure
+✅ A diagram showing what causes a re-render
+Just tell me!
+
+
 ### what happens when you hit a URL of a React application (SPA).
 
 
