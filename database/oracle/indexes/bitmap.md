@@ -3,6 +3,7 @@ A **bitmap** (or bitset) is a data structure that compactly stores bits (0s and 
 ---
 
 ## **Bitmap Use Cases**
+- used in OLAP,  not suitable for OLTP as it locks the entire range.
 - Representing presence/absence (e.g., bloom filters, indexing in DBs like Oracle)
 - Set operations (union, intersection)
 - Sparse data compression
