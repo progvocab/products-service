@@ -21,7 +21,7 @@ flowchart TD
     end
 
     subgraph Scheduler[React Scheduler]
-        TaskQueue[Task Queue (priority-based)]
+        TaskQueue["Task Queue (priority-based)"]
         LaneModel["Lanes / Priority System"]
     end
 
@@ -94,10 +94,56 @@ This is synchronous and cannot be interrupted:
 
 
 
-✅ A sequence diagram of React render → commit
+### Sequence diagram of React render → commit
+
+```mermaid 
+sequenceDiagram
+    autonumber
+
+    participant Browser as Browser
+    participant HTML as index.html
+    participant Script as React JS Bundle<br/>(react, react-dom, app code)
+    participant ReactDOM as ReactDOM
+    participant Scheduler as React Scheduler
+    participant Reconciler as Reconciler (Render Phase)
+    participant Fiber as Fiber Tree
+    participant Commit as Commit Phase
+    participant DOM as Real DOM
+
+    Browser->>HTML: Request index.html
+    HTML-->>Browser: Return HTML + script tags
+
+    Browser->>Script: Download JS bundle
+    Script->>Browser: Parsed & Evaluated
+
+    Script->>ReactDOM: call ReactDOM.createRoot()
+    ReactDOM->>Fiber: Create Root Fiber
+
+    Script->>ReactDOM: call root.render(<App />)
+
+    ReactDOM->>Scheduler: Schedule initial render task
+    Scheduler->>Reconciler: Start Render Phase (work loop)
+
+    Reconciler->>Script: Call App() component
+    Script-->>Reconciler: Return virtual DOM elements
+
+    Reconciler->>Fiber: Build Work-In-Progress Fiber Tree
+    Reconciler->>Fiber: Compute diff + prepare effect list
+
+    Reconciler->>Scheduler: Render phase completed
+
+    Scheduler->>Commit: Run Commit Phase
+    Commit->>DOM: Apply DOM mutations
+    Commit->>DOM: Attach event listeners
+    Commit->>Script: Run useLayoutEffect()
+    Commit->>Script: Schedule useEffect() for later
+
+    DOM-->>Browser: Paint UI to screen
+```
+
 ✅ A diagram of Fiber structure
 ✅ A diagram showing what causes a re-render
-Just tell me!
+
 
 
 ### what happens when you hit a URL of a React application (SPA).
