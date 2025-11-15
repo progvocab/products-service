@@ -1,18 +1,16 @@
-Here is a **very concise, accurate, step-by-step explanation** of what happens when you hit a URL of a React application (SPA).
+### what happens when you hit a URL of a React application (SPA).
 
----
 
-# 🌐 What Happens When You Hit a URL in a React App
+**Browser sends HTTP request to the server**
 
-### **Browser sends HTTP request to the server**
 
-Example:
 
 ```
 GET /dashboard
 ```
 
-### **Server returns the same `index.html` for **all routes** (SPA behavior)**
+**Server returns the same `index.html` for **all routes** (SPA behavior)**
+
 
 In typical React deployments:
 
@@ -27,9 +25,9 @@ So server returns:
 index.html
 ```
 
----
 
-## **Browser downloads JavaScript bundles**
+
+### **Browser downloads JavaScript bundles**
 
 Inside `index.html`, the `<script>` tags load:
 
@@ -53,7 +51,7 @@ The JavaScript bundle:
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
----
+
 
 ### **React Router interprets the URL**
 
@@ -102,6 +100,246 @@ This creates **separate** network requests to backend APIs (not related to routi
 6. API calls happen if required
 
 The server is only responsible for serving static files; **React handles all routing on the client side**.
+
+
+
+## Events in React
+
+### **Browser generates a native DOM event**
+
+Example:
+
+* `click`
+* `keydown`
+* `change`
+* `input`
+
+This event is captured by the browser’s native event system.
+
+
+
+### **React’s event delegation system intercepts it**
+
+React attaches **one listener per event type** at the **root** (document or root DOM node).
+
+So React doesn’t attach listeners to every JSX element.
+
+This gives:
+
+* Better performance
+* Lower memory usage
+* Faster cleanup
+
+
+
+### **React converts the native event → SyntheticEvent**
+
+React wraps the native event inside a **SyntheticEvent**, which:
+
+* Normalizes behavior across browsers
+* Provides pooled objects for performance (React 17 and below)
+
+SyntheticEvent contains:
+
+* `target`
+* `currentTarget`
+* `preventDefault()`
+* `stopPropagation()`
+
+
+
+### **React determines which component should receive the event**
+
+React uses its **internal fiber tree** to identify which component’s handler corresponds to the event target.
+
+Example:
+
+```jsx
+<button onClick={handleClick}>Submit</button>
+```
+
+
+
+### **React calls your event handler function**
+
+Your function is called with the SyntheticEvent.
+
+```jsx
+function handleClick(e) {
+  setCount(count + 1);
+}
+```
+
+
+
+###  **If `setState` is called, React schedules an update**
+
+React doesn’t update the UI immediately.
+
+It:
+
+* Schedules a state update
+* Batches multiple updates (in React 18 always concurrent)
+* Marks components as “dirty”
+
+
+
+### **React runs reconciliation (diffing)**
+
+React:
+
+* Creates a new Virtual DOM for affected components
+* Diffs it with previous Virtual DOM
+* Finds minimal changes required
+
+
+### **React commits changes to the real DOM**
+
+Only the changed nodes are updated.
+
+This is the **commit phase**.
+
+
+
+### When a click/keypress happens:
+
+1. Browser fires native DOM event
+2. React catches it at root via event delegation
+3. Native event → SyntheticEvent
+4. React finds the component listener
+5. Calls your handler
+6. `setState` schedules render
+7. Reconciliation runs
+8. DOM updates minimally
+
+
+
+
+## **What Causes a Render in React 
+
+### **State changes (`setState`, `useState`)**
+
+Any time state updates, the component re-renders.
+
+
+
+###  **Props change**
+
+If a parent passes new props → child re-renders.
+
+Even if value is **structurally same but a new reference**, e.g.:
+
+```js
+<MyComp data={{ x: 1 }} />   // new object → new render
+```
+
+
+
+###  **Context value changes**
+
+Any component consuming a context re-renders if:
+
+```js
+value in <MyContext.Provider value={...}>  // changes
+```
+
+even if deep inside the tree.
+
+
+
+###  **Parent re-render**
+
+When a parent renders, all of its children render **by default**.
+
+Even if child props did not change.
+
+
+
+### **Force update**
+
+Using:
+
+* `this.forceUpdate()` (class components)
+* Calling a reducer with a new object
+* Using a dummy state toggle
+
+
+
+### **Redux / Zustand / Recoil store updates**
+
+If a component selects part of global store that changed → re-renders.
+
+
+
+### **React Strict Mode (dev only)**
+
+In development, StrictMode **intentionally double-invokes**:
+
+* render
+* effects cleanup
+* constructors
+
+To detect side effects.
+
+Production does not double-render.
+
+
+
+###  **Component key changes**
+
+Changing a component’s `key` forces React to recreate it:
+
+```js
+<MyComp key={Math.random()} />  // re-created every render
+```
+
+
+
+###  **Unstable references created inside render**
+
+Each render re-creates:
+
+* Arrays
+* Objects
+* Inline functions
+
+Causing child re-renders:
+
+```js
+<MyComp fn={() => {}} arr={[1,2]} />
+```
+
+Use `useCallback` / `useMemo` to avoid this.
+
+
+
+###  **Suspense boundary resolution**
+
+When Suspense finishes loading a component (lazy import, data fetching), it triggers render.
+
+
+
+###  **React router navigation**
+
+When route changes, the router re-renders relevant components.
+
+
+
+###  **Error boundaries catching errors**
+
+If an error boundary catches an error in child tree, it re-renders with fallback UI.
+
+
+
+### component re-renders when:
+
+* **its state changes**
+* **its props change**
+* **its context changes**
+* **its parent re-renders**
+* **its key changes**
+* **external stores change**
+* **React effects (StrictMode, Suspense, errors) cause it**
 
 
 
