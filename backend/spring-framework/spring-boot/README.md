@@ -276,4 +276,110 @@ Spring is now ready:
 ### 12. Error Scenario 
 ➤ `ApplicationFailedEvent`
 
+ Spring Boot has **only ONE official failure event**: **`ApplicationFailedEvent`**
+
+ 
+
+1. **ApplicationStartingEvent Stage**
+
+ 
+
+* Incorrect JVM flags
+* Classpath issues
+* Bootstrap initialization error
+ 
+
+2. **ApplicationEnvironmentPreparedEvent Stage**
+
+Environment preparation failures:
+
+ 
+
+* Invalid `application.properties`
+* YAML parsing error
+* Missing environment variables
+* Invalid profile activation
+ 
+
+3. **ApplicationContextInitializedEvent Stage**
+
+Context is created but no beans are loaded.
+
+ 
+
+* Bad ApplicationContext initializer
+* Incorrect custom context logic
+
+ 
+
+4. **ApplicationPreparedEvent Stage**
+
+Bean definitions are loaded, but beans are NOT created.
+
+ 
+
+* Invalid bean definition
+* Circular bean reference detected early
+* Problem in BeanFactoryPostProcessor
+* Error in @Configuration parsing
+
+ 
+
+5. **ContextRefreshedEvent Stage**
+
+Beans are being created and autowired.
+
+ 
+
+* Missing @Autowired dependency
+* Bean creation exception
+* Proxy creation failure (AOP)
+* Transaction manager missing
+* JPA/Hibernate initialization error
+
+ 
+
+6. **Web Server Initialization Stage**
+
+Web server (Tomcat/Jetty/Netty) is starting.
+
+ 
+
+* Port already in use
+* Missing servlet container
+* Invalid server config
+
+ 
+7. **ApplicationStartedEvent Stage**
+
+Context refresh completed, server running, BUT runners not executed.
+
+ 
+
+* CommandLineRunner exception
+* ApplicationRunner exception
+
+ 
+
+8. **ApplicationReadyEvent Stage**
+
+App is ready; final step.
+
+ 
+
+* Triggered by code running *after* app startup
+  (e.g., scheduled job, background init)
+ 
+
+| Startup Stage       | Success Event                       | Failure Event          | Typical Failure Causes               |
+| ------------------- | ----------------------------------- | ---------------------- | ------------------------------------ |
+| Start               | ApplicationStartingEvent            | ApplicationFailedEvent | Bootstrapping errors                 |
+| Environment Ready   | ApplicationEnvironmentPreparedEvent | ApplicationFailedEvent | YAML errors, invalid config          |
+| Context Initialized | ApplicationContextInitializedEvent  | ApplicationFailedEvent | Bad initializers                     |
+| Context Prepared    | ApplicationPreparedEvent            | ApplicationFailedEvent | Invalid bean definitions             |
+| Beans Created       | ContextRefreshedEvent               | ApplicationFailedEvent | Autowiring/AOP/Bean creation errors  |
+| Server Started      | ServletWebServerInitializedEvent    | ApplicationFailedEvent | Port issues, server misconfiguration |
+| App Started         | ApplicationStartedEvent             | ApplicationFailedEvent | Runner exceptions                    |
+| App Ready           | ApplicationReadyEvent               | ApplicationFailedEvent | Post-startup failures                |
+
  
