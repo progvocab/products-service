@@ -16,19 +16,19 @@ flowchart TD
     end
 
     subgraph ReactApp[React Application]
-        JSBundle[JS Bundle (React + App Code)]
+        JSBundle["JS Bundle (React + App Code)"]
         RootFiber[Root Fiber Node]
     end
 
     subgraph Scheduler[React Scheduler]
         TaskQueue[Task Queue (priority-based)]
-        LaneModel[Lanes / Priority System]
+        LaneModel["Lanes / Priority System"]
     end
 
-    subgraph Reconciler[Reconciler (Render Phase)]
+    subgraph Reconciler["Reconciler (Render Phase)"]
         VDOM[Virtual DOM Elements]
         Diffing[Diff Algorithm]
-        FiberTree[Fiber Tree (Work In Progress)]
+        FiberTree["Fiber Tree (Work In Progress)"]
     end
 
     subgraph CommitPhase[Commit Phase]
