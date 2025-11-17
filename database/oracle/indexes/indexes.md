@@ -2,7 +2,7 @@ Oracle supports a wide range of **index types**, each designed to optimize diffe
 
 
 
-### **1. B-tree Index (Default)**
+## B-tree Index (Default)
 - **Structure**: Balanced tree structure
 - **Use Case**: Fast lookup on columns with high cardinality (many distinct values)
 - **Example**:
@@ -80,7 +80,7 @@ More
 - How index block splitting works during inserts
 
 
-### **2. Bitmap Index**
+## Bitmap Index**
 - **Structure**: Uses bitmap vectors for each key value
 - **Use Case**: Ideal for columns with **low cardinality** (few distinct values) like gender, status flags
 - **Example**:
@@ -91,7 +91,7 @@ More
 
 
 
-### **3. Unique Index**
+##  Unique Index**
 - **Use Case**: Ensures uniqueness on one or more columns
 - **Example**:
   ```sql
@@ -109,13 +109,138 @@ More
 
 
 
-### **5. Function-Based Index**
+##  Function-Based Index**
 - **Use Case**: Index on expressions or functions to speed up computed WHERE clauses
 - **Example**:
   ```sql
   CREATE INDEX idx_upper_name ON employee(UPPER(name));
   ```
 
+
+
+A functional index is an index created on an expression instead of a physical column. It allows Oracle's Cost-Based Optimizer (CBO) to use an index even when the query applies a function to the column.
+
+### Why Functional Index Is Needed
+
+When a function is applied to a column, Oracle cannot use a normal B-tree index because the stored values in the index differ from the function-applied values.
+A functional index stores the computed expression, enabling CBO to choose an INDEX RANGE SCAN instead of a TABLE ACCESS FULL.
+
+### Basic Example
+
+Table:
+
+```sql
+CREATE TABLE customers (
+  id NUMBER,
+  name VARCHAR2(100)
+);
+```
+
+Query that cannot use a normal index:
+
+```sql
+SELECT * FROM customers WHERE UPPER(name) = 'JOHN';
+```
+
+Create functional index:
+
+```sql
+CREATE INDEX idx_cust_upper_name ON customers (UPPER(name));
+```
+
+After creation, CBO performs:
+
+* Expression evaluation using the stored function result
+* INDEX RANGE SCAN instead of TABLE ACCESS FULL
+
+### Example With TRIM
+
+Query:
+
+```sql
+SELECT * FROM customers WHERE TRIM(phone) = '8888888888';
+```
+
+Index:
+
+```sql
+CREATE INDEX idx_phone_trim ON customers (TRIM(phone));
+```
+
+CBO can now pick IDX_PHONE_TRIM and avoid full table scan.
+
+### Example With CASE Expression
+
+```sql
+CREATE INDEX idx_order_status 
+ON orders (
+  CASE WHEN status IN ('PENDING','CONFIRMED') THEN 1 ELSE 0 END
+);
+```
+
+Query:
+
+```sql
+SELECT COUNT(*)
+FROM orders
+WHERE CASE WHEN status IN ('PENDING','CONFIRMED') THEN 1 ELSE 0 END = 1;
+```
+
+CBO resolves the CASE expression to a stored indexed value and uses INDEX RANGE SCAN.
+
+### Multi-Column Functional Index Example
+
+```sql
+CREATE INDEX idx_fullname
+ON employees (LOWER(first_name || ' ' || last_name));
+```
+
+Query:
+
+```sql
+SELECT *
+FROM employees
+WHERE LOWER(first_name || ' ' || last_name) = 'john doe';
+```
+
+CBO uses the stored concatenated lowercase value.
+
+### Requirements and Internal Behavior
+
+Functional indexing requires Oracle to evaluate the expression during DML:
+
+* Oracle Kernel evaluates the functional expression per row during INSERT/UPDATE.
+* Index maintenance logic inserts the computed value into the B-tree segment.
+* CBO uses the function result during predicate evaluation.
+
+Required session settings (usually default):
+
+```sql
+ALTER SESSION SET query_rewrite_enabled = TRUE;
+ALTER SESSION SET query_rewrite_integrity = TRUSTED;
+```
+
+### How to Verify the Functional Index Is Used
+
+```sql
+EXPLAIN PLAN FOR
+SELECT * FROM customers WHERE UPPER(name) = 'JOHN';
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+```
+
+Expected operations in the plan:
+
+* INDEX RANGE SCAN on IDX_CUST_UPPER_NAME
+* No TABLE ACCESS FULL
+
+### When Not to Use Functional Index
+
+* When the function result has low cardinality (CBO may ignore the index)
+* When expressions change frequently and increase DML cost
+* When virtual columns referencing the same expression are preferable
+
+If you want, I can generate a comparison between functional index and virtual column index or rewrite for a join optimization scenario.
 
 
 ### **6. Reverse Key Index**
