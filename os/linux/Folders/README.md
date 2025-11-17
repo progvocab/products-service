@@ -20,6 +20,13 @@ Contains variable data like logs, caches, mail, spool files, and PID files. Impo
 
 ### usr
 
+
+The original full form of `usr` is **Unix System Resources**. In early Unix systems, this directory stored system-wide resources, programs, and documentation.
+
+
+
+Today, `usr` is commonly interpreted as **user** directory, but this is historically incorrect. It now contains user-space applications, libraries, and utilities, such as `/usr/bin`, `/usr/lib`, and `/usr/share`.
+
 Stores user-space applications, libraries, and documentation. Contains large software packages under `/usr/bin`, `/usr/sbin`, `/usr/lib`.
 
 ### home
