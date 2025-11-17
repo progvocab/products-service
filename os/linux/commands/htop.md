@@ -127,3 +127,8 @@ top -b -n 1
 ```
 
 If you want, I can also share advanced monitoring tricks using top.
+Here is the **answer to the earlier medium-level Linux/DevOps question** about investigating a CPU spike with multiple Java processes:
+
+### Investigating High CPU Usage on a Linux Server
+
+When CPU spikes to 90 percent, start with `htop` or `top` to identify which Java processes are consuming the most CPU. Use `ps -p <pid> -o pid,user,pcpu,pmem,cmd` to inspect the exact command that launched each process. Run `lsof -p <pid>` to check open files, sockets, or JARs associated with the process, and explore `/proc/<pid>`, especially `status`, `cmdline`, and `stack`, for thread and memory details. Finally, correlate this information with system logs in `/var/log`, service logs (like systemd journal), and recent deployment or configuration changes to identify whether the spike is caused by a code change, runaway thread, memory leak, or external load.
