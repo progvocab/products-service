@@ -259,7 +259,9 @@ Browser connecting to a web server
 | **Transport (L4)**     | Logical Port  | `80`, `22`, `443`   | Identifies application/service          |
 | **Application (L7)**   | Socket        | `192.168.1.10:80`   | Actual communication endpoint           |
 
-Refer [Packet Life cycle](Packet.md) 
+Refer 
+- [Packet Life cycle](Packet.md) 
+- [OSI Model](/design/system-design/browser/osi_model.md)
 
 
 ```mermaid
@@ -292,6 +294,8 @@ sequenceDiagram
 4. The **physical port** (e.g., Ethernet) transmits the electrical or optical signals.
 5. On the receiving side, the server’s **network stack** decodes the packet, recognizes port `80`, and delivers it to the web server application.
 6. The same process happens in reverse for the response.
+
+
 
 ## Local Area Network (LAN)  
 
