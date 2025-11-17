@@ -108,6 +108,23 @@ Back-off restarting failed container
   ```
 - Ensure correct configuration and sufficient resources.
 
+
+A pod enters **CrashLoopBackOff** when the application inside the container repeatedly crashes. The kubelet tries to restart it according to the pod’s restartPolicy, but after multiple failures it applies an exponential backoff to avoid constant restarts. This often happens due to issues like missing configuration, failed dependencies (for example, the database is down), or runtime exceptions. To fix it, first check logs using
+
+```
+kubectl logs <pod> --previous
+```
+
+to capture logs from the failed container. Then inspect events
+
+```
+kubectl describe pod <pod>
+```
+
+to identify probe failures, image/config errors, or missing Secrets/ConfigMaps. Once the root cause is fixed (such as restoring the database, updating environment variables, or correcting the startup command), the pod will restart successfully and exit CrashLoopBackOff.
+
+If you want, I can also evaluate your answers to the other questions.
+
 ---
 
 ## **6. ImagePullBackOff (`ImagePullBackOff`)**  
