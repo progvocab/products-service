@@ -22,6 +22,52 @@ partitions: 6
 replication-factor: 3
 ```
 
+
+### Creating a Kafka Topic Named **orders** With 6 Partitions and Replication Factor 3
+
+If you want to create a Kafka topic by **topic name (store name = orders)** with **6 partitions** and **replication factor 3**, use the `kafka-topics.sh` CLI.
+The action is performed by the **Kafka Controller Broker**, which assigns partitions and replicas; ZooKeeper is not involved for KRaft clusters (Kafka 2.8+ in KRaft mode).
+
+### Command (KRaft Mode — Modern Kafka)
+
+```bash
+kafka-topics.sh \
+  --create \
+  --topic orders \
+  --partitions 6 \
+  --replication-factor 3 \
+  --bootstrap-server localhost:9092
+```
+
+### What Happens Internally and Which Component Performs It
+
+* **Kafka CLI (`kafka-topics.sh`)** sends a CreateTopic request.
+* **Controller Broker** performs partition assignment and replica distribution across brokers.
+* **Kafka Metadata API** stores the topic metadata in the KRaft metadata log.
+* **All Brokers** receive metadata updates and create local log directories for assigned partitions.
+
+### Example Creating Topic With Specific Partition Assignment (Optional)
+
+If your cluster has brokers: **1, 2, 3**, you can explicitly assign replicas:
+
+```bash
+kafka-topics.sh \
+  --create \
+  --topic orders \
+  --bootstrap-server localhost:9092 \
+  --replica-assignment \
+  1:2:3,2:3:1,3:1:2,1:3:2,2:1:3,3:2:1
+```
+
+This creates 6 partitions with manually controlled replica distribution.
+
+If you want, I can also generate:
+
+* Partition distribution diagram for all 6 partitions
+* How the Kafka Controller assigns replicas automatically
+* Producer config with partition key examples for consistent routing
+
+
 **Consumer Group**
 
 ```
