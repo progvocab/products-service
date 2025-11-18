@@ -243,7 +243,33 @@ You **cannot use Zookeeper CLI to add/remove brokers or create topics** directly
 | View topic partitions/leader info | ✅             | ✅         | ✅       |
 | Add/remove broker                 | ❌ (manual)    | ❌         | ❌       |
 
----
+### Disc first , Page Cache optimized
+
+If a Kafka broker’s memory becomes full, nothing is lost — Kafka is designed so that all persistent data is written to disk, not held in RAM.
+
+Here’s what actually happens:
+
+1. Broker does not store messages in RAM
+Kafka uses the OS page cache (Linux VFS cache), not JVM heap, for fast reads/writes.
+
+
+2. If memory fills, Kafka continues writing to disk
+The broker writes to its log segments on disk (log.dirs).
+Memory pressure just reduces caching effectiveness, making reads slower.
+
+
+3. If JVM heap fills, you get GC pressure
+The Kafka Broker JVM may slow down due to garbage collection pauses and eventually throw OutOfMemoryError.
+
+
+4. If disk (not memory) becomes full → messages stop
+This is the critical case:
+If disk is full, the broker stops accepting new writes, partitions become unavailable, and producers start failing with KafkaStorageException.
+
+
+
+Summary:
+Full memory slows Kafka down; full disk breaks Kafka ingestion.
 
 ### 💡 Bonus Tip:
 
