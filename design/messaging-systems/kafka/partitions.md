@@ -6,6 +6,8 @@ Kafka’s high availability comes from the fact that if a leader fails, one of t
 
 Kafka also ensures efficient data storage and retrieval by organizing partition data into append-only log segments on each broker’s local disk. This design allows for sequential disk writes, which are extremely fast, and lets consumers read at their own pace using their committed offsets. Since consumers track their own progress, multiple consumer groups can independently read the same partition data without impacting broker performance. This log-based structure, combined with replication and partitioning, enables Kafka to handle very high throughput while maintaining durability and replay capability.
 
+Kafka ensures durability by writing messages to the leader partition’s append-only log on disk and replicating them to follower replicas before acknowledging the write to producers. The producer’s acks setting controls how much durability is guaranteed—acks=1 returns once the leader writes to its log, while acks=all returns only after all In-Sync Replicas (ISR) have fully replicated the message. Because ISR members are always caught up to the leader’s latest committed offset, Kafka guarantees that data is safe even if the leader broker fails. This combination of disk persistence, replication, and controlled acknowledgments ensures strong durability and fault tolerance.
+
 In Kafka, the term **“partition”** is what Kafka itself uses.
 But **conceptually**, Kafka partitions are **shards** — units of parallelism and scalability.
 
