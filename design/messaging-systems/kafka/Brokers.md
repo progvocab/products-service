@@ -25,6 +25,77 @@ In Kafka, **brokers** and **partitions** are fundamental concepts that work toge
   - Producers can send messages to specific partitions, usually based on a key, to ensure ordering for that key.
 - **Replication**: Each partition has replicas, which are stored on different brokers to provide fault tolerance.
 
+### Leader Election 
+
+Leader election decides which replica of a partition becomes the leader.
+The leader handles all reads and writes for that partition.
+
+Components Involved
+
+Kafka Controller (inside the controller broker) performs leader election.
+
+ZooKeeper (Kafka versions before KIP-500) stores partition state and watches controller changes.
+
+Kafka Quorum Controller / Raft (Kafka 2.8+ KIP-500 mode) replaces ZooKeeper and performs the same role.
+
+Brokers host replicas and report ISR (in-sync replicas) status.
+
+
+How Leader Election Works Internally
+
+1. The controller detects leader failure using broker heartbeat timeouts.
+
+
+2. The controller reads the ISR list for the partition.
+
+
+3. The controller chooses a new leader based on the configured policy.
+
+
+4. The controller writes the new leader assignment to ZooKeeper or Raft metadata.
+
+
+5. All brokers receive a metadata update and route traffic to the new leader.
+
+
+
+Leader Selection Rules
+
+Kafka picks the first healthy replica in the ISR list.
+Policy depends on config:
+
+Default: choose the first ISR replica
+
+If unclean.leader.election.enabled=true: can choose out-of-sync replica (unsafe)
+
+
+Relevant Details
+
+ISR is maintained by each broker and sent to the controller through heartbeat-based replica state updates.
+
+ZooKeeper-based clusters use ZK watches; Raft-based clusters use log replication and controller voting.
+
+If no ISR exists and unclean leader election is disabled, the partition becomes unavailable.
+
+
+Pseudocode Close to Real Kafka Logic
+```python 
+onLeaderFailure(partition):
+    isr = getISR(partition)
+    if isr not empty:
+        newLeader = isr[0]        # controller chooses first ISR
+    else if uncleanLeaderElection:
+        newLeader = anyAvailableReplica()
+    else:
+        markUnavailable(partition)
+    updateMetadataStore(partition, newLeader)  # ZooKeeper or Raft
+    notifyBrokers()
+```
+Real Use Case
+
+When a broker hosting the leader for partition P fails, the Kafka Controller instantly elects another ISR replica as leader so that producers and consumers can continue operating with minimal interruption.
+
+
 ### **Key Differences**
 
 | **Aspect**               | **Kafka Broker**                                 | **Kafka Partition**                               |
