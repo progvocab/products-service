@@ -142,3 +142,83 @@ kafka-consumer-groups.sh \
 ---
 
 Let me know your Kafka version — if you're using Kafka 2.0+ or 3.x, you should **avoid managing consumer groups via ZooKeeper** and use Kafka CLI tools instead.
+
+### Kafka Consumer Partition Assignment Strategies
+
+Kafka provides multiple **partition assignment strategies** that decide how partitions in a consumer group are divided among consumers. The component responsible for this is the **Kafka Consumer Group Coordinator** on the broker side, and the **Kafka Consumer Client** on the client side.
+
+Below are all the main assignors available in the Kafka client library (org.apache.kafka.clients.consumer).
+
+---
+
+### StickyAssignor
+
+Class: `org.apache.kafka.clients.consumer.StickyAssignor`
+Keeps partition assignments **as stable as possible** across rebalances.
+Attempts to avoid unnecessary partition movement while keeping load nearly even.
+
+---
+
+### CooperativeStickyAssignor
+
+Class: `org.apache.kafka.clients.consumer.CooperativeStickyAssignor`
+A safer, incremental rebalance version of StickyAssignor.
+Avoids stopping all consumers at once (uses **cooperative rebalancing**) and ensures minimal partition churn.
+
+---
+
+### RangeAssignor
+
+Class: `org.apache.kafka.clients.consumer.RangeAssignor`
+Partitions are divided **contiguously** based on lexicographical order of topics.
+Can lead to imbalance when partition count is not divisible by consumer count.
+
+---
+
+### RoundRobinAssignor
+
+Class: `org.apache.kafka.clients.consumer.RoundRobinAssignor`
+Distributes partitions in a **round-robin** fashion across consumers, ensuring even distribution.
+Needs all consumers to subscribe to **exactly the same topic list**.
+
+---
+
+### Custom Assignor (User-Defined)
+
+You can implement your own strategy:
+
+```java
+public class MyCustomAssignor implements PartitionAssignor {
+    // implement subscription(), assign(), onAssignment()
+}
+```
+
+The Kafka Consumer Group Coordinator executes this custom logic during rebalancing.
+
+---
+
+### Default Assignor Behavior
+
+Since Kafka **2.6+**, the default is:
+
+* **CooperativeStickyAssignor** for incremental cooperative rebalancing.
+
+---
+
+### How to Configure Assignor
+
+```properties
+partition.assignment.strategy=org.apache.kafka.clients.consumer.CooperativeStickyAssignor
+```
+
+Java code:
+
+```java
+props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+          List.of(CooperativeStickyAssignor.class.getName()));
+```
+
+---
+
+If you want, I can generate a comparison table describing when to use each assignor and show an example rebalance log for Sticky vs RoundRobin.
+
