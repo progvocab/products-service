@@ -13,6 +13,22 @@ In Kafka, **brokers** and **partitions** are fundamental concepts that work toge
   - Process requests from producers and consumers.
 - **Identification**: Each broker has a unique ID within the Kafka cluster.
 
+
+
+A Kafka cluster is simply a group of independent servers (physical machines or VMs or containers), each running its own Kafka Broker process.
+Together they coordinate to store topic partitions, handle replication, and balance client traffic.
+
+
+Cluster = multiple brokers (servers)
+
+Each broker stores a subset of partitions and replicas
+
+They communicate using Kafka’s internal protocol, not shared memory
+
+
+So in practice:
+1 broker = 1 server instance (though it can be a VM, container, cloud instance, or bare metal).
+
 ### **Kafka Partition**
 - **Definition**: A partition is a subset of a Kafka topic, and it is the fundamental unit of parallelism and scalability in Kafka.
 - **Role**:
