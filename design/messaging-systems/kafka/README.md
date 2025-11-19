@@ -1,3 +1,39 @@
+## Architecture of Kafka
+
+
+### Storage-Centric vs Queue-Centric Design
+
+Kafka uses a **distributed commit log** stored on disk in an append-only format, allowing linear writes and high throughput. Traditional systems like IBM MQ store messages in **queue structures** where messages are removed after consumption, limiting replay, throughput, and horizontal scaling.
+
+### Consumer Model
+
+Kafka uses a **pull-based** consumer model where the Consumer client controls fetch rate and offsets. IBM MQ is **push-based**, where the broker decides delivery timing. Kafka allows replay, rewind, and independent offsets for each Consumer Group; IBM MQ removes messages once acknowledged.
+
+### Scaling and Partitioning
+
+Kafka partitions each topic across brokers, enabling horizontal scaling. Partition assignment is handled by the **Consumer Group Coordinator** on the broker. IBM MQ relies on **single-queue managers**, scaling vertically rather than horizontally.
+
+### Broker Responsibilities
+
+Kafka Brokers are **dumb storage nodes** that do no message routing or transformation. IBM MQ brokers are **smart brokers** that perform routing, transactions, persistence checks, transformations, and priority scheduling. Kafka offloads most logic to the Producer and Consumer clients.
+
+### Replication and Fault Tolerance
+
+Kafka uses **log replication** with leader–follower architecture and high-throughput replication managed by the Broker replication layer. IBM MQ typically uses **active-passive** or shared-disk failover models, limiting concurrent scaling and throughput.
+
+### Delivery Guarantees
+
+Kafka supports **at-least-once**, **at-most-once**, and **exactly-once** using the Producer client, Broker replication layer, and Transaction Coordinator. IBM MQ provides strict **exactly-once** but at much higher cost and lower throughput due to synchronous persistence and broker-level transactions.
+
+### Data Retention and Replay
+
+Kafka retains messages for a configured period regardless of consumption. Consumers maintain offsets in the Consumer Group Coordinator and may replay historical events. IBM MQ deletes messages after consumption, making replay difficult or impossible.
+
+### Use Case Orientation
+
+Kafka is optimized for **event streaming, real-time analytics, and log ingestion**. IBM MQ is optimized for **transactional messaging, request–reply, and guaranteed delivery** within enterprise systems.
+
+
  flow of messages between Producer → Broker → Partition → Replica → Consumer.
 
 ```mermaid 
