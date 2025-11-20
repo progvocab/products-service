@@ -162,6 +162,76 @@ public class MyApp {
 | `@Bean(initMethod,…)`    | Bean Config | External lifecycle hooks               |
 | `BeanPostProcessor`      | Interface   | Intercept or modify beans at runtime   |
 
+
+
+
+
+### What BeanPostProcessor Does
+
+**BeanPostProcessor (BPP) runs during bean creation time**
+
+It allows Spring to:
+
+* inspect a bean before initialization
+* wrap the bean in a proxy after initialization
+* modify or replace the bean instance
+
+**BPP runs before the bean is placed in the ApplicationContext.**
+
+### Proxy 
+
+A proxy intercepts runtime calls and adds behavior such as:
+
+* transaction begin/commit/rollback
+* async execution
+* caching
+* security checks
+* logging / tracing
+
+### Correct Roles
+
+#### BeanPostProcessor (BPP)
+
+* Runs **once per bean**, during startup
+* Inspects the bean class/annotations
+* Creates/wraps the actual proxy
+* Returns the proxy instead of the original bean
+
+Example: `AnnotationAwareAspectJAutoProxyCreator` creates proxies.
+
+#### Proxy
+
+* Runs **on every method call**
+* Adds cross-cutting behavior
+* Delegates to the original bean
+
+
+
+| Component             | Does What                                           | When        |
+| --------------------- | --------------------------------------------------- | ----------- |
+| **BeanPostProcessor** | Decides how to decorate a bean, and returns a proxy | App startup |
+| **Proxy**             | Runs code before/after method calls                 | Runtime     |
+
+
+
+But the actual runtime behavior comes from:
+
+* `JdkDynamicProxyInvocationHandler`
+* `CglibMethodInterceptor`
+* AOP interceptors
+* TransactionInterceptor
+* AsyncMethodInterceptor
+* CacheInterceptor
+
+
+**BeanPostProcessor creates the proxy that performs before/after method actions.**
+
+More:
+
+* BPP creating a proxy
+* Proxy intercepting method invocation at runtime
+
+
 ---
 
 Would you like an interactive Spring Boot example repo to test and play with these lifecycle methods? Or an example integrating event listeners (`ApplicationListener`) as well?
