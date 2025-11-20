@@ -166,5 +166,11 @@ Key Differences and Relationship:
 
 In essence, ThreadPoolExecutor is a specific implementation of the ExecutorService interface, providing the concrete mechanism for managing and executing tasks within a thread pool. You choose between using Executors factory methods (returning ExecutorService) or directly instantiating ThreadPoolExecutor based on the level of control and customization required for your thread pool. 
 
-AI responses may include mistakes.
+A ThreadPoolExecutor uses three parameters to control how tasks are executed. 
+
+The core pool size defines the minimum number of threads that stay alive even if idle. When tasks arrive, the executor first uses these core threads. 
+
+If all core threads are busy, new tasks go into the work queue. 
+
+Only when the queue is full does the executor create additional threads—up to the maximum pool size. If both the queue and maximum threads are exhausted, new tasks are rejected based on the configured RejectedExecutionHandler. Together, these three settings control concurrency, task buffering, and rejection behavior.
 
