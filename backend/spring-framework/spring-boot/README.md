@@ -106,14 +106,30 @@ public class MyApp {
 }
 ```
 
-This triggers Spring Boot's bootstrap process.
 
 
----
+The @SpringBootApplication annotation simplifies Spring Boot setup by combining three annotations under the hood:
+
+1. @Configuration → Marks the class as a source of bean definitions.
+
+
+2. @EnableAutoConfiguration → Enables Spring Boot’s auto-configuration mechanism, which automatically configures beans based on classpath and properties.
+
+
+3. @ComponentScan → Scans the package of the annotated class and its sub-packages for Spring components (@Component, @Service, @Repository, @Controller) so they are registered as beans.
+
+
+
+```java
+@SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan
+```
+
 
 
 ➤ `ApplicationStartingEvent` triggered 
 - Fired immediately when the SpringApplication starts, before environment or context are created.
+
+
 
 ➤ `ApplicationEnvironmentPreparedEvent` triggered
 - Environment is prepared (properties, profiles loaded), but ApplicationContext is not created yet.
