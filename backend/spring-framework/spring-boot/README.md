@@ -70,7 +70,7 @@ java -jar myapp-1.0.jar
 * It loads the JAR file.
 * Finds the `Main-Class` in `META-INF/MANIFEST.MF`.
 
-Example:
+
 
 ```
 Main-Class: org.springframework.boot.loader.JarLauncher
@@ -109,11 +109,108 @@ public class MyApp {
 This triggers Spring Boot's bootstrap process.
 
 
+---
+
+
 ➤ `ApplicationStartingEvent` triggered 
 - Fired immediately when the SpringApplication starts, before environment or context are created.
 
 ➤ `ApplicationEnvironmentPreparedEvent` triggered
 - Environment is prepared (properties, profiles loaded), but ApplicationContext is not created yet.
+
+### Loading configuration 
+
+
+Configuration is specified as 
+
+
+
+
+---
+
+1. Using Command-Line Arguments
+
+Pass properties directly when running the application:
+
+java -jar app.jar --server.port=8081 --app.datasource.url=jdbc:mysql://localhost/db
+
+Spring Boot automatically maps these to @Value or @ConfigurationProperties.
+
+
+---
+
+2. Using Environment Variables
+
+Spring Boot maps environment variables to properties using relaxed binding:
+
+export SERVER_PORT=8081
+export APP_DATASOURCE_URL=jdbc:mysql://localhost/db
+java -jar app.jar
+
+
+---
+
+3. Using an External Properties or YAML File
+
+Specify a custom file with --spring.config.location:
+
+java -jar app.jar --spring.config.location=file:/path/to/external-config.yml
+
+Can be .properties or .yml
+
+Overrides default application.properties or application.yml
+
+
+
+---
+
+4. Using Profiles
+
+Activate a profile-specific configuration:
+
+java -jar app.jar --spring.profiles.active=dev
+
+Loads application-dev.properties or application-dev.yml
+
+Allows different configurations per environment
+
+
+
+---
+
+Summary
+
+Spring Boot merges properties in the following order (later overrides earlier):
+
+1. Command-line arguments
+
+
+2. Environment variables
+
+
+3. External config files
+
+
+4. Default application.properties / application.yml
+
+
+
+This is how you can provide configuration properties at startup for both @Value and @ConfigurationProperties.
+
+
+Use it as : 
+
+```java
+@ConfigurationProperties(prefix = "app.datasource")
+public class DataSourceConfig {
+    private String url;
+    private String username;
+    private String password;
+    // getters and setters
+}
+
+```
+
 
 ### **4. SpringApplication Bootstraps the Application**
 
@@ -176,6 +273,15 @@ Example:
 
 These are triggered by `spring.factories` (Spring Boot 2) or `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` (Boot 3).
 
+Spring Boot’s auto-configuration works by inspecting the classpath and the application context at startup. When a dependency (like a Spring Boot starter) is present in the POM, Spring Boot loads the matching auto-config class. Each auto-config class defines beans guarded by conditions such as 
+- @ConditionalOnClass 
+- @ConditionalOnMissingBean 
+- @ConditionalOnProperty. 
+
+
+If the classpath contains the required classes and the application context does not already define a conflicting bean, Spring Boot creates the bean automatically—otherwise it backs off and lets your custom configuration take priority.
+
+
 
 ### **7. Beans Are Instantiated (Dependency Injection)**
 
@@ -202,6 +308,10 @@ Spring now creates all beans:
     - @Async proxy wrappers added
     - Security proxy layers added
       
+
+
+
+
 ➤ `ContextRefreshedEvent` triggered 
 - Bean factory setup ✓
 - BeanPostProcessors registered ✓
@@ -253,6 +363,44 @@ Spring publishes:
  - ApplicationContext is refreshed. ✓
  - Web server is started. ✓
  - But CommandLineRunner and ApplicationRunner have not run yet ⟳
+
+
+### ApplicationRunner and CommandLineRunner Hooks
+
+These runners are optional extension points. Only if a Bean of this type is implemented it comes to action during the startup, else no action is taken.
+
+If you run your Spring Boot app like this:
+
+```shell
+java -jar app.jar user=admin mode=fast --debug
+```
+
+Then CommandLineRunner receives:
+
+```java
+@Override
+public void run(String... args) {
+    // args contains raw arguments
+    // ["user=admin", "mode=fast", "--debug"]
+}
+```
+
+ApplicationRunner receives a parsed structure:
+
+```java
+@Override
+public void run(ApplicationArguments args) {
+    args.getNonOptionArgs();   // ["user=admin", "mode=fast"]
+    args.getOptionNames();     // ["debug"]
+    args.containsOption("debug"); // true
+}
+```
+
+
+Anything starting with -- becomes an option.Everything else is a non-option argument.
+
+
+
   
  ➤ `ApplicationReadyEvent`
  - Application is fully started, all runners executed. ✓
