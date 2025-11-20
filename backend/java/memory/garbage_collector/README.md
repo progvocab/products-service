@@ -38,7 +38,24 @@
 * **Generational ZGC** (Java 21) → combines generational model + ZGC’s low-latency design.
 
 
-## Parallel Garbage Collector
+## GC Algorithms
+
+
+
+| Garbage Collector                       | Algorithms Used                                                      | Notes                                       |
+| --------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------- |
+| Serial GC                               | Mark-Sweep-Compact                                                   | Single-threaded, for small heaps            |
+| Parallel GC (Throughput GC)             | Parallel Mark-Sweep-Compact                                          | Multi-threaded young and old generation GC  |
+| CMS (Concurrent Mark Sweep, deprecated) | Concurrent Mark-Sweep                                                | Low-pause but fragmentation issues          |
+| G1 GC                                   | Region-based + Concurrent Marking + Copying + Predictive Pause Model | Default since Java 9                        |
+| ZGC                                     | Region-based + Load Barriers + Colored Pointers + Concurrent Marking | Ultra-low pause (<10ms), scalable           |
+| Shenandoah GC                           | Region-based + Brooks Pointers + Concurrent Evacuation               | Low pause with concurrent compaction        |
+| Epsilon GC                              | No-op (no GC)                                                        | For performance testing or short-lived apps |
+
+
+
+
+### Parallel Garbage Collector
 
 Also called **Throughput Collector** (`-XX:+UseParallelGC`).
 
