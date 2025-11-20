@@ -122,7 +122,7 @@ Ensures accurate liveness before sweeping.
 These are short but mandatory pauses.
 
 
----
+
 
 2. CMS sweeping is concurrent, but metadata cleanup is not
 
@@ -182,7 +182,33 @@ So even though CMS’s design avoids compaction, the system still needs pauses u
 In one line
 
 CMS still needs pause time because accurate root marking and reference stability cannot be done concurrently, even though compaction is not performed.
-### Predictive Pause Model in G1 GC
+
+## Card Marking 
+
+In generational garbage collectors, card marking and remembered sets are used to efficiently track references from the old generation to the young generation without scanning the entire old heap. The JVM divides the heap into small “cards,” and whenever an old-gen object writes a reference to a young-gen object, that card is marked as dirty. G1 GC then uses these remembered sets to know exactly which regions contain such cross-gen references. This avoids full-heap scans during young GC cycles and significantly reduces pause times by focusing only on the relevant cards instead of the entire old generation.
+
+
+During a Young GC, the garbage collector performs a very specific action on dirty cards (cards marked because an old-gen object wrote a reference to a young-gen object):
+
+What GC does with dirty cards during Young GC
+
+The GC scans only the dirty cards, not the entire old generation.
+
+For each dirty card, it reads the object references inside that card to check whether any of them point to live objects in the young generation.
+
+These references are then added to the root set so the GC can correctly trace and mark live young-gen objects.
+
+After processing, the GC clears the dirty mark on the card so it's ready for future writes.
+
+
+In simple terms
+
+GC uses dirty cards to find pointers from old-gen → young-gen, treats them as roots for the young-generation collection, and avoids scanning the whole old generation.
+
+If you'd like, I can also explain how this behaves differently in Parallel GC vs G1 GC.
+
+
+## Predictive Pause Model in G1 GC
 
 G1 GC uses a **Predictive Pause Model** to meet a user-defined pause time target (for example, `-XX:MaxGCPauseMillis=200`). Instead of stopping the entire heap, the **G1 Garbage Collector** divides the heap into many small **regions** and uses runtime statistics to *predict* how long collecting each region will take. The **G1 GC Policy component** then selects just enough regions for the next GC cycle so that the pause stays within the requested time.
 
