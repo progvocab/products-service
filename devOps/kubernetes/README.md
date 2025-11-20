@@ -1,0 +1,4 @@
+
+
+
+The Kubernetes kube-scheduler assigns Pods to nodes through a two-phase process: filtering and scoring. In the filtering phase, the scheduler removes all nodes that cannot host the Pod based on resource requests (CPU/memory), node conditions (Ready, DiskPressure), taints and tolerations, affinity/anti-affinity rules, and topology constraints. After filtering, the scoring phase evaluates the remaining nodes using scoring plugins—such as resource balance, spreading, and node affinity—to assign a weighted score to each node. The scheduler then selects the node with the highest score and binds the Pod to it, ensuring an optimal placement based on health, capacity, and policy constraints.
