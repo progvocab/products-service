@@ -52,6 +52,47 @@
 | Shenandoah GC                           | Region-based + Brooks Pointers + Concurrent Evacuation               | Low pause with concurrent compaction        |
 | Epsilon GC                              | No-op (no GC)                                                        | For performance testing or short-lived apps |
 
+### Predictive Pause Model in G1 GC
+
+G1 GC uses a **Predictive Pause Model** to meet a user-defined pause time target (for example, `-XX:MaxGCPauseMillis=200`). Instead of stopping the entire heap, the **G1 Garbage Collector** divides the heap into many small **regions** and uses runtime statistics to *predict* how long collecting each region will take. The **G1 GC Policy component** then selects just enough regions for the next GC cycle so that the pause stays within the requested time.
+
+It continuously updates cost models from previous collections (copy cost, scan cost, remembered set cost) and uses these predictions to schedule incremental evacuation work. This allows G1 to offer **soft real-time behavior**, avoiding long unpredictable pauses typical in older garbage collectors.
+
+
+
+
+### Load Barriers
+
+A **load barrier** is a small piece of code inserted by the **JVM** when a reference is *read* from memory. It allows concurrent garbage collectors (like **ZGC** and **Shenandoah**) to intercept every pointer load and apply relocation, coloring checks, or pointer fixing. When a thread loads an object reference, the load barrier checks whether the object has been moved, needs color adjustment, or requires remediation. This enables **fully concurrent compaction** without stopping application threads.
+
+
+
+### Colored Pointers
+
+**Colored pointers** are used by **ZGC** to store GC metadata *inside the pointer bits* rather than in object headers. ZGC uses the unused upper bits of 64-bit pointers to encode color flags such as:
+
+* **Mark bit** (is the object marked?)
+* **Remap bit** (does the pointer point to the relocated address?)
+* **Finalizable bit** (is the object awaiting finalization?)
+
+When a pointer is loaded, the **ZGC load barrier** reads its color and decides whether to fix the pointer or perform relocation. This allows ZGC to maintain **concurrent marking and compaction** with extremely low pauses.
+
+
+### Brooks Pointers
+
+**Brooks pointers** are used by **Shenandoah GC**. Instead of encoding metadata inside pointer bits, Shenandoah keeps a **forwarding pointer inside each object** itself. Each object contains a hidden header field called the *Brooks forwarding pointer* that initially points to the object’s own address.
+
+When an object is moved, the GC updates this forwarding pointer to point to the new location. The **Shenandoah write/load barrier** always dereferences the Brooks pointer first, ensuring the application threads always see the latest object location. This allows **concurrent evacuation** without Stop-the-World compaction.
+
+
+
+
+
+| Concept          | Used By         | Purpose                                           | How It Works                                    |
+| ---------------- | --------------- | ------------------------------------------------- | ----------------------------------------------- |
+| Load Barriers    | ZGC, Shenandoah | Intercept every pointer load and apply relocation | JVM inserts code at reference loads             |
+| Colored Pointers | ZGC             | Encode GC metadata in pointer bits                | Pointer bits → mark/remap state                 |
+| Brooks Pointers  | Shenandoah      | Forwarding pointer stored in object header        | All pointer loads go through forwarding pointer |
 
 
 
