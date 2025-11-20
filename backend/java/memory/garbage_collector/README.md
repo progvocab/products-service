@@ -342,6 +342,16 @@ Examples: **CMS (Concurrent Mark-Sweep, deprecated in Java 9+)**, **G1 GC (defau
 | **Best for**   | Batch jobs, backend services where throughput matters more than latency | Low-latency apps, interactive systems, real-time response requirements |
 
 
+Great! Here's a clean, interview-ready version of your answer:
+
+
+---
+
+In Java garbage collectors, concurrent phases allow the GC to perform work—such as marking reachable objects—while the application threads (mutators) continue running. In contrast, a Stop-the-World (STW) pause halts all application threads so the GC can safely perform operations that require exclusive access, such as certain marking, cleanup, or reference processing steps. In collectors like Parallel GC, most work (including marking) happens during STW pauses, which can cause noticeable latency.
+
+Modern collectors like G1 reduce these pause times by breaking the heap into regions and focusing GC cycles only on selected regions rather than the entire heap. G1 performs much of the marking concurrently and provides configurable pause-time goals to keep latency predictable. Even more advanced collectors such as ZGC and Shenandoah push this further by performing both marking and compaction concurrently. They use techniques like colored pointers or load barriers so that mutators always access the correct, moved object without needing long pauses.
+
+
 
 
 
