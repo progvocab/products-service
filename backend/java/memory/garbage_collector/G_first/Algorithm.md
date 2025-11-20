@@ -94,7 +94,12 @@ flowchart TD
 * Collects **"Garbage-First" regions** (most space reclaimed per pause).
 * Avoids fragmentation with **copying compaction**.
 
----
+### Predictive Pause Model in G1 GC
+
+G1 GC uses a **Predictive Pause Model** to meet a user-defined pause time target (for example, `-XX:MaxGCPauseMillis=200`). Instead of stopping the entire heap, the **G1 Garbage Collector** divides the heap into many small **regions** and uses runtime statistics to *predict* how long collecting each region will take. The **G1 GC Policy component** then selects just enough regions for the next GC cycle so that the pause stays within the requested time.
+
+It continuously updates cost models from previous collections (copy cost, scan cost, remembered set cost) and uses these predictions to schedule incremental evacuation work. This allows G1 to offer **soft real-time behavior**, avoiding long unpredictable pauses typical in older garbage collectors.
+
 
 ⚡ So in short:
 
