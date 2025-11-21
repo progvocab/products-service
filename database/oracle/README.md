@@ -33,6 +33,67 @@ flowchart TD
 mapping of Oracle logical storage to physical storage using text/ASCII style. You can also represent it visually later.
 
 
+
+### What Is an OS-Level Block in Linux
+
+An **OS-level block** is the **smallest unit of data the operating system reads from or writes to a block device** (SSD, HDD, EBS, NVMe). It is managed by the **Linux Virtual File System (VFS)** and the **block layer** of the kernel, not by the database.
+
+### Key Characteristics of OS-Level Block
+
+1. **Physical Sector Size Based on Hardware**
+
+   * Common sector sizes: **512 bytes** or **4096 bytes (4 KB)**.
+   * The disk exports this size to the OS; the OS cannot change it.
+
+2. **Managed by the Linux Kernel Block I/O Layer**
+
+   * Components: **VFS → File System → Block Layer → Device Driver → Disk**.
+   * Handles I/O scheduling (CFQ, MQ, BFQ), merging, alignment, and caching.
+
+3. **Purpose**
+
+   * To provide fast, aligned, low-level access to storage devices.
+   * Higher-level structures (file system blocks, database blocks) sit on top of it.
+
+4. **Completely Independent of Application-Level Blocks**
+
+   * A database like Oracle may use 8K blocks, but the OS still writes in 4K physical blocks.
+
+### OS-Level Block vs File System Block vs Database Block
+
+| Layer                               | Example Size | Managed By               | Purpose                      |
+| ----------------------------------- | ------------ | ------------------------ | ---------------------------- |
+| **Database block**                  | 8 KB         | Oracle RDBMS             | Rows, indexes, SCN, undo     |
+| **File system block**               | 4 KB         | EXT4, XFS                | File allocation & mapping    |
+| **OS-level block (physical block)** | 512B or 4 KB | Linux kernel block layer | Lowest-level disk read/write |
+
+### How OS-Level Blocks Work Internally
+
+1. A process writes a file through the **VFS**.
+2. The file system breaks it into **file system blocks**.
+3. The Linux **block layer** splits or aligns that data into **physical blocks**.
+4. The device driver sends those blocks to the **disk or cloud block storage**.
+5. The device writes them as **sector-sized blocks**.
+
+### Example: Oracle Database on Linux
+
+* Oracle issues an 8 KB block write.
+* File system breaks it into 4 KB chunks.
+* OS writes two **4 KB** physical blocks to disk.
+* AWS EBS stores those as its own internal 4 KB sectors.
+
+### Why This Matters
+
+* Incorrect block alignment causes **extra I/O**.
+* Understanding block sizes helps optimize **IOPS**, **throughput**, and **latency**.
+* Databases perform better when DB block size aligns with file system and OS block sizes.
+
+If you want, I can also explain:
+
+* Difference between logical block size and physical block size
+* How Linux caches blocks in the page cache
+* Why cloud storage (EBS) internally uses 4 KB sectors even if abstracted as 512 bytes
+
 ---
 
 Oracle Storage Hierarchy
