@@ -10,6 +10,134 @@
 - [DB Link](db_link.md)
 
 
+# Oracle Database 
+
+
+The Oracle System Global Area (SGA) is a shared memory region that all Oracle background processes and user sessions access to manage database operations efficiently. It contains key memory structures such as the Buffer Cache (cached data blocks), Shared Pool (parsed SQL, execution plans, dictionary cache), Redo Log Buffer (change records before writing to redo logs), Large Pool, Java Pool, and Streams Pool. The SGA reduces disk I/O by caching frequently used data and SQL metadata, enabling faster query execution, efficient concurrency, and coordination between Oracle processes.
+
+```mermaid
+flowchart TD
+
+    SGA["Oracle SGA (System Global Area)"]
+
+    SGA --> BC["Buffer Cache<br/>(Cached Data Blocks)"]
+    SGA --> SP["Shared Pool<br/>(Library Cache + Dictionary Cache)"]
+    SGA --> RLB["Redo Log Buffer<br/>(Stores Change Vectors)"]
+    SGA --> LP["Large Pool<br/>(Shared Server, RMAN, Parallel Exec)"]
+    SGA --> JP["Java Pool<br/>(Java Stored Procedures)"]
+    SGA --> STP["Streams Pool<br/>(AQ & Streams)"]
+    SGA --> IM["In-Memory Column Store<br/>(Optional)"]
+
+```
+
+mapping of Oracle logical storage to physical storage using text/ASCII style. You can also represent it visually later.
+
+
+---
+
+Oracle Storage Hierarchy
+
+Physical Storage (Disk)
+ ├── Datafiles (store tablespace data)
+ │    ├── File: users01.dbf
+ │    ├── File: users02.dbf
+ │    └── File: system01.dbf
+ ├── Redo Log Files (store changes for recovery)
+ │    ├── redo01.log
+ │    └── redo02.log
+ ├── Undo Tablespace Files (store undo/rollback info)
+ │    └── undotbs01.dbf
+ └── Control Files (store metadata about database)
+      └── control01.ctl
+
+Logical Storage (within the database)
+ └── Tablespace (mapped to one or more datafiles)
+      ├── Segment (table, index, undo)
+      │    ├── Extent (contiguous blocks)
+      │    │    └── Block (smallest unit of storage)
+      │    │         └── Row / Data
+      │    └── Another Extent ...
+      └── Another Segment ...
+
+
+---
+
+Explanation
+
+1. Physical storage files are actual files on disk (datafiles, redo logs, undo tablespace files, control files).
+
+
+2. Tablespaces are logical containers mapped to one or more datafiles.
+
+
+3. Segments (tables, indexes) exist inside tablespaces.
+
+
+4. Extents are contiguous blocks allocated for a segment.
+
+
+5. Blocks are the smallest unit of I/O; they store rows/data.
+
+
+
+
+---
+
+Difference Between Logical Read and Physical Read in Oracle
+
+A logical read (consistent get) occurs when Oracle accesses a block that is already available in the Buffer Cache (SGA). No disk I/O happens. Oracle may also reconstruct an older version of the block using undo to maintain read consistency.
+
+A physical read happens when the required block is not found in the Buffer Cache, so Oracle must read the block from disk into memory. This is slower and done by the DBWR and OS I/O subsystem.
+
+
+The Buffer Cache is a component of the Oracle SGA that stores recently accessed database blocks in memory to avoid repeated disk I/O. When a query needs data, Oracle first checks the Buffer Cache; if the block is found, it performs a fast logical read, and if not, it triggers a physical read from disk and loads the block into the cache. The Buffer Cache improves performance by caching frequently used blocks, supports consistent reads using undo data, and is managed by Oracle using an LRU-like algorithm to decide which blocks remain in memory.
+
+How Oracle Decides Which One to Use
+
+1. Check Buffer Cache first:
+
+If the block is in memory → logical read.
+
+If block is not in memory → physical read.
+
+
+
+2. Execution plan influences behavior:
+
+Index scan → fewer blocks → more logical reads.
+
+Full table scan → may trigger direct path read (bypass Buffer Cache).
+
+
+
+3. Block versioning (undo):
+
+For consistent reads, Oracle may use undo segments to reconstruct the block image.
+
+
+
+
+
+---
+
+Summary
+
+Logical read = from memory (fast).
+
+Physical read = from disk (slow).
+
+Oracle always tries logical read first; physical read only when needed.
+
+
+
+---
+
+
+
+---
+
+
+
 ### **Oracle SELECT Query — Internal Execution Steps**
 
 When you run:
