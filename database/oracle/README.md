@@ -92,6 +92,16 @@ A physical read happens when the required block is not found in the Buffer Cache
 
 The Buffer Cache is a component of the Oracle SGA that stores recently accessed database blocks in memory to avoid repeated disk I/O. When a query needs data, Oracle first checks the Buffer Cache; if the block is found, it performs a fast logical read, and if not, it triggers a physical read from disk and loads the block into the cache. The Buffer Cache improves performance by caching frequently used blocks, supports consistent reads using undo data, and is managed by Oracle using an LRU-like algorithm to decide which blocks remain in memory.
 
+The Library Cache stores parsed SQL statements, execution plans, and PL/SQL code so Oracle can reuse them without reparsing, reducing CPU usage and improving performance for repeated queries.
+
+ The Data Dictionary Cache stores metadata about database objects—tables, indexes, users, privileges—so Oracle doesn’t need to read this information repeatedly from disk. Together, they speed up SQL execution: the Library Cache avoids hard parsing, and the Data Dictionary Cache avoids repeated metadata lookups.
+
+
+A latch is a low-level, lightweight lock used inside the SGA to protect shared memory structures like the Buffer Cache and Shared Pool during very short critical operations. It provides fast, CPU-level mutual exclusion and is always held for a brief time, never queued, meaning sessions spin or retry if the latch is busy. 
+
+An enqueue, on the other hand, is a high-level lock used to control access to database objects (tables, rows) and supports queuing, deadlock detection, and different lock modes. Latches protect internal memory structures, while enqueues manage transactional concurrency on database objects.
+
+
 How Oracle Decides Which One to Use
 
 1. Check Buffer Cache first:
