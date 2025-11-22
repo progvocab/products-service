@@ -4,6 +4,12 @@ A robust answer for designing a multi-tenant SaaS application on AWS with strict
 
 ***
 
+## Select from the model 
+
+- Silo model (data from the tenant is fully isolated)
+- Pool model (all the tenants use the same database and table)
+- Bridge model (single database but a different table for each tenant)
+
 ### Tenant Isolation and Data Security:
 - Implement **hybrid multi-tenant database models** combining schema isolation for large tenants and shared database with row-level security for smaller tenants.
 - Use **Amazon RDS** with read replicas or **DynamoDB Global Tables** to enable scalable, isolated data storage per tenant.
