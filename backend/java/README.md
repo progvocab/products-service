@@ -4,16 +4,8 @@
 
 
 - [Up](..)
-- [keywords](keywords)
-- [packages](packages)
-- [java17Features](java17Features.md)
-- [Java11Features](Java11Features.md)
-- [Java8Features](Java8Features.md)
-- [CompletableFuture](CompletableFuture.md)
-- [CompletionStage](CompletionStage.md)
-- [FunctionalInterfaces](FunctionalInterfaces.md)
-- [MemoryManagement](MemoryManagement.md)
-- [streamOperators](streamOperators.md)
+- [Memory Management](memory/)
+- [Multi Threading](multi_threading/)
 
 
 # Java
