@@ -28,3 +28,31 @@ Citations:
 [5] Amazon Simple Storage Service (S3) | Networking & ... https://aws.amazon.com/blogs/networking-and-content-delivery/category/storage/amazon-simple-storage-services-s3/
 [6] Amazon S3 - Cloud Object Storage - AWS https://aws.amazon.com/s3/
 [7] What Is S3 in AWS and How Does It Work? https://miro.com/diagramming/what-is-s3-aws/
+
+
+what about the ttl
+
+TTL (Time to Live) in AWS S3 caching, especially when used with Amazon CloudFront for global content delivery, manages how long an object stays cached at edge locations before CloudFront requests it again from the S3 origin.
+
+Key points about TTL in this context are:
+
+- You can configure **Minimum TTL, Maximum TTL, and Default TTL** on your CloudFront distribution cache behaviors.
+- If your S3 origin returns cache-control headers, CloudFront honors those values within the min/max TTL boundaries you set.
+- If no cache-control header is returned by your origin, CloudFront uses the Default TTL.
+- Setting a **low TTL** means content updates propagate faster but increases origin load.
+- Setting a **high TTL** improves cache hit ratio, reducing latency and origin calls, but delays updates reaching users.
+- Use **Cache-Control headers on S3 objects** to finely control caching behavior per object type.
+- Consider using directives like **stale-while-revalidate** to serve slightly stale content while revalidating in the background, reducing latency for end users.
+- For error responses, you can customize TTLs for each HTTP error code to control retry behavior.
+
+By carefully configuring TTL values in CloudFront alongside cache-control headers in S3, you can balance freshness and performance in your global content delivery architecture[1][2][3][6].
+
+Citations:
+[1] Content Delivery Network Tutorials | CDN, Setting up ... https://aws.amazon.com/cloudfront/getting-started/S3/
+[2] CloudFront Update – Configurable Max and Default TTL https://aws.amazon.com/blogs/aws/cloudfront-update-configurable-max-and-default-ttl/
+[3] Host Single Page Applications (SPA) with Tiered TTLs on ... https://aws.amazon.com/blogs/networking-and-content-delivery/host-single-page-applications-spa-with-tiered-ttls-on-cloudfront-and-s3/
+[4] Controlling how long Amazon S3 content is cached by ... https://docs.aws.amazon.com/whitepapers/latest/build-static-websites-aws/controlling-how-long-amazon-s3-content-is-cached-by-amazon-cloudfront.html
+[5] What is Cloudfront Minimum TTL for? https://stackoverflow.com/questions/51073731/what-is-cloudfront-minimum-ttl-for
+[6] Manage how long content stays in the cache (expiration) https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html
+[7] Configuring CloudFront distribution https://docs.v7labs.com/docs/configuring-cloudfront-distribution
+[8] Use managed cache policies - Amazon CloudFront https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html
