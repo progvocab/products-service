@@ -1,4 +1,316 @@
-answer
+### ### DynamoDB Terminology (With Clear, Concise Examples)
+
+Below are **all important DynamoDB terms**, each with **2–3 line explanations** and **relevant examples**.
+
+---
+
+### ### Table
+
+A collection of items (similar to a table in relational DB) but **schema-less** except for PK/SK.
+
+**Example:**
+A table named `Ecommerce` storing Users, Orders, Products—all in one table.
+
+---
+
+### ### Item
+
+A single record inside a DynamoDB table.
+
+**Example:**
+
+```
+{ "PK": "USER#1", "SK": "USER#1", "Name": "John" }
+```
+
+---
+
+### ### Attribute
+
+A field inside an item. DynamoDB allows **string, number, map, list, binary**, etc.
+
+**Example:**
+`Name`, `Age`, `Address.zip` are attributes.
+
+---
+
+### ### Primary Key (PK)
+
+Uniquely identifies an item. Two types:
+
+1. **Partition Key only**
+2. **Partition Key + Sort Key**
+
+**Example:**
+`PK = USER#1`.
+
+---
+
+### ### Partition Key (Hash Key)
+
+Determines the **physical partition** the item goes into.
+Items with the same PK are grouped together.
+
+**Example:**
+All `PK = USER#1` items stored contiguously.
+
+---
+
+### ### Sort Key (Range Key)
+
+Defines **ordering** inside a partition.
+
+**Example:**
+
+```
+PK = USER#1
+SK = ORDER#202501
+```
+
+---
+
+### ### Composite Key
+
+PK + SK together uniquely identify an item.
+
+**Example:**
+
+```
+PK = USER#1
+SK = ORDER#1001
+```
+
+---
+
+### ### Partition
+
+Underlying storage units managed by DynamoDB to distribute data and workload.
+
+**Example:**
+If you have heavy writes, DynamoDB automatically splits your partitions.
+
+---
+
+### ### Secondary Index (GSI & LSI)
+
+Alternate key structures for additional query patterns.
+
+---
+
+### ### Global Secondary Index (GSI)
+
+Index with **different PK and SK** from the main table.
+
+**Example:** Query users by email:
+
+```
+GSI1PK = EMAIL#john@example.com
+GSI1SK = USER#1
+```
+
+---
+
+### ### Local Secondary Index (LSI)
+
+Shares the same **PK**, but uses a **different SK**.
+
+**Example:**
+Sort orders by `OrderDate` instead of `SK`.
+
+---
+
+### ### Provisioned Capacity
+
+You configure **RCU** and **WCU** manually. Good for predictable traffic.
+
+---
+
+### ### On-Demand Capacity
+
+DynamoDB auto-scales capacity. Best for unpredictable traffic.
+
+---
+
+### ### Read Capacity Unit (RCU)
+
+1 strongly consistent read of 4 KB per second.
+
+**Example:** Reading an item of 8 KB = **2 RCUs**.
+
+---
+
+### ### Write Capacity Unit (WCU)
+
+1 write of 1 KB per second.
+
+**Example:** Writing a 2 KB item = **2 WCUs**.
+
+---
+
+### ### Strongly Consistent Read
+
+Reads the **latest** committed value.
+
+---
+
+### ### Eventually Consistent Read
+
+May return stale data but is **2× cheaper**.
+
+---
+
+### ### Query
+
+Fetches items by **PK** and optional **SK condition**.
+
+**Example:**
+Get all orders of user:
+
+```
+PK = USER#1
+SK begins_with ORDER#
+```
+
+---
+
+### ### Scan
+
+Reads **every item** in the table or index. Costly.
+
+**Example:**
+Scan table to find all products with price < 100.
+
+---
+
+### ### Filter Expression
+
+Filters results **after** query/scan—extra cost.
+
+**Example:**
+`price < 100` applied after reading items.
+
+---
+
+### ### Projection Expression
+
+Selects only specific attributes to reduce cost.
+
+**Example:**
+`Name, Email`.
+
+---
+
+### ### Expression Attribute Names
+
+Used when attribute names conflict with reserved keywords.
+
+**Example:**
+`#name = "John"` where `#name` refers to the Name attribute.
+
+---
+
+### ### Expression Attribute Values
+
+Placeholders for attribute values.
+
+**Example:**
+`:status = "PAID"`.
+
+---
+
+### ### TTL (Time To Live)
+
+Automatically deletes items after a timestamp.
+
+**Example:**
+`ttl = 1700000000` (expires at this UNIX time).
+
+---
+
+### ### DynamoDB Streams
+
+Captures **real-time changes** (insert, update, delete) for processing via **AWS Lambda**.
+
+---
+
+### ### BatchGetItem
+
+Reads up to **100 items** across multiple tables in a single request.
+
+---
+
+### ### BatchWriteItem
+
+Writes/deletes up to **25 items** in one request.
+
+---
+
+### ### Conditional Writes
+
+Writes occur only if a condition is satisfied.
+
+**Example:**
+Only deduct inventory if `stock > 0`.
+
+---
+
+### ### Optimistic Concurrency Control (OCC)
+
+Uses a version attribute to prevent overwriting newer updates.
+
+---
+
+### ### Item Collection
+
+All items with the same PK.
+
+**Example:**
+All `USER#1` items (orders, addresses, etc.).
+
+---
+
+### ### Single Table Design (STD)
+
+Storing multiple entity types in one table using PK/SK strategies.
+
+---
+
+### ### Hot Partition
+
+A partition receiving disproportionate traffic → throttle.
+DynamoDB uses internal auto-splitting to reduce this.
+
+---
+
+### ### Throttling
+
+Occurs when RCU/WCU limits exceed. SDK returns `ProvisionedThroughputExceededException`.
+
+---
+
+### ### Auto Scaling
+
+DynamoDB automatically adjusts RCU/WCU based on demand.
+
+---
+
+### ### S3 Export / Import
+
+Move DynamoDB data to/from S3 without writing custom code.
+
+---
+
+### ### Transactions
+
+ACID-compliant operations across multiple items.
+
+**Example:**
+Decrease inventory **and** increase order count atomically.
+
+---
+
+If you want, I can prepare a **one-page cheat sheet table (markdown)** with all DynamoDB terms, examples, and purpose.
+
 
 To design DynamoDB for globally distributed applications requiring low latency and strong consistency, consider these best practices and trade-offs:
 
