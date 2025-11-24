@@ -5,7 +5,7 @@ These protocols operate at **OSI Layer 2** and are processed by the **Linux kern
 ### Ethernet & LAN Technologies
 
 * **Ethernet (IEEE 802.3)**
-* **MAC addressing**
+* [**MAC addressing**](design/system-design/load_balancer/mac_address.md)
 * **VLAN – IEEE 802.1Q**
 * **Q-in-Q – IEEE 802.1ad**
 * **Provider Backbone Bridging – IEEE 802.1ah**
@@ -38,7 +38,40 @@ These protocols operate at **OSI Layer 2** and are processed by the **Linux kern
 * **L2CP (Link Layer Control Protocol)**
 * **PAUSE Frames (802.3x Flow Control)**
 
-### L2 Tunneling / Encapsulation
+ 
+### ARP (Address Resolution Protocol)
+
+Resolves IPv4 addresses to MAC addresses on a LAN.
+The Linux kernel sends ARP Requests and caches Replies in the ARP table for fast L2→L3 mapping.
+
+### NDP (Neighbor Discovery Protocol)
+
+IPv6 replacement for ARP using ICMPv6 messages.
+Handles address resolution, router discovery, neighbor reachability, and prefix advertisement.
+
+### LLDP (Link Layer Discovery Protocol)
+
+Vendor-neutral Layer-2 discovery protocol (IEEE 802.1AB).
+Devices send LLDP frames containing identity, capabilities, and port details for topology visibility.
+
+### CDP (Cisco Discovery Protocol)
+
+Cisco-proprietary equivalent of LLDP.
+Provides device information (ID, IP, port, model) for troubleshooting Cisco networks.
+
+### L2CP (Layer 2 Control Protocols)
+
+Special class of control protocols carried inside slow protocol frames (EtherType 0x8809).
+Includes LACP, STP, LLDP, PAUSE, and others; switches treat them specially and never forward them.
+
+### PAUSE Frames (IEEE 802.3x Flow Control)
+
+Layer-2 mechanism that slows down traffic to prevent NIC or switch buffer overflow.
+Receiver sends a PAUSE frame asking the sender to halt transmission for a specified time.
+
+ 
+
+## L2 Tunneling / Encapsulation
 
 * **L2TP (Layer 2 Tunneling Protocol)**
 * **PPPoE (Point-to-Point Protocol over Ethernet)**
