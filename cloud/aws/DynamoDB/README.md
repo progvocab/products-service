@@ -355,3 +355,488 @@ Citations:
 [7] Amazon DynamoDB Best Practices: 10 Tips to Maximize ... https://www.simform.com/blog/dynamodb-best-practices/
 [8] Best practices for designing and architecting with DynamoDB https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html
 [9] DynamoDB Data Modeling Best Practices - AWS - Amazon.com https://aws.amazon.com/awstv/watch/7dbdede0b17/
+
+
+Great question — and this is exactly the trap many people fall into in interviews.
+On the surface, it looks like a hot partition should only affect that partition — but in DynamoDB, that’s not true for several very real reasons.
+
+Here is the precise explanation that AWS expects:
+
+
+---
+
+✅ Why does a hot partition (noisy neighbor) impact other tenants?
+
+Although DynamoDB partitions are isolated for storage, they share table-level throughput and backend resources.
+So a single hot partition can affect the entire table in three ways:
+
+
+---
+
+1️⃣ Table-level WCU/RCU is shared across all partitions
+
+Even though each partition has a physical limit (around 3,000 RCUs / 1,000 WCUs per partition),
+the entire table’s provisioned capacity is shared across all partitions.
+
+Example:
+
+Table provisioned write capacity = 10,000 WCUs
+
+Tenant A (noisy neighbor) uses 1 partition and bursts to 8,000 WCUs
+
+Remaining 9 partitions must now share only 2,000 WCUs
+
+
+➡ Other tenants get throttled even though their partitions are not hot.
+
+This is the #1 cause of cross-tenant impact.
+
+
+---
+
+2️⃣ Adaptive Capacity helps, but only AFTER throttling starts
+
+DynamoDB can move unused capacity to hot partitions through Adaptive Capacity,
+but:
+
+It reacts after throttling begins
+
+It reallocates only unused table-level capacity
+
+It cannot exceed hard per-partition limits (like ~1,000 WCUs)
+
+
+➡ So if the noisy tenant exhausts the table's unused capacity, others see throttling before adaptive capacity stabilizes.
+
+
+---
+
+3️⃣ Internal DynamoDB resources are shared (workers, request queues, partitions placement)
+
+Internally, DynamoDB uses:
+
+Shared request queues
+
+Shared worker pools
+
+Shared storage nodes hosting multiple partitions
+
+
+A single tenant doing extremely high request rates:
+
+Fills the request queues
+
+Increases compaction/replication work on its partitions
+
+Can cause queue backpressure for all partitions on the same partition server
+
+
+➡ Result: Increased latency + throttling for unrelated partitions.
+
+This is the fundamental “noisy neighbor” problem.
+
+Even AWS re:Invent talks explicitly say:
+"One hot partition can impact the performance of the entire table."
+
+
+---
+
+4️⃣ GSIs make it worse (hot GSI partitions = global throttling)
+
+If a noisy neighbor causes hot activity on a GSI:
+
+GSIs have their own partitions
+
+GSIs share their own throughput limits
+
+
+A single tenant whose items update a GSI heavily causes:
+
+GSI write throttles
+
+Which then throttle writes on the main table
+
+
+➡ This cascades throttling to everyone.
+
+
+---
+
+5️⃣ Large spikes cause request-routing imbalances at the front-end fleet
+
+DynamoDB’s front-end routers distribute requests across backend partitions.
+A sudden 100× spike from a single tenant:
+
+Floods the routing tier
+
+Causes queuing delays for other tenants
+
+Returns throttling (ProvisionedThroughputExceeded)
+
+
+
+---
+
+🧠 Simplified answer for interviews
+
+Use this version in interviews:
+
+> “Hot partitions affect the table globally because throughput is allocated at the table level, not per partition.
+A single noisy neighbor can consume most WCUs/RCUs and fill shared internal request queues, causing throttling and high latency for others. Adaptive capacity helps but reacts only after throttling, and it can’t break the hard per-partition limits.
+Therefore, a hot partition always risks degrading performance for the entire table.”
+
+
+
+
+---
+
+If you want, I can also explain:
+
+✔ How DynamoDB internally balances partitions
+✔ How many partitions a table will have
+✔ How adaptive capacity actually redistributes throughput internally
+✔ How to completely isolate tenants using dedicated tables or capacity units
+
+Want the deeper internal mechanics?
+
+
+Great follow-up — this is exactly where DynamoDB design clicks.
+Let’s go deeper and make it crystal clear.
+
+
+---
+
+✅ Why adding a shardId to the partition key helps (even though the table has limited partitions)
+
+Adding a shard ID dramatically increases the number of distinct partition key values.
+DynamoDB will then split these keys across many physical partitions, giving you:
+
+✔ More partitions
+
+✔ More throughput
+
+✔ No hot key concentration
+
+✔ Adaptive capacity becomes far more effective
+
+Let’s break it down.
+
+
+---
+
+✅ 1) DynamoDB partitions are created based on key cardinality + throughput pressure
+
+A table does not have a fixed number of partitions.
+DynamoDB automatically creates new partitions whenever:
+
+1. Storage grows near 10GB
+
+
+2. A partition hits throughput limits (WCU/RCU pressure)
+
+
+
+When you add a shardId (synthetic sharding), example:
+
+PK = tenantId#00
+PK = tenantId#01
+PK = tenantId#02
+…
+PK = tenantId#09
+
+Suddenly the table has 10× more partition key values, so DynamoDB spreads these logical keys across more physical partitions.
+
+➡ More physical partitions means more total available throughput.
+
+
+---
+
+✅ 2) Writes get evenly distributed across partitions instead of hitting one partition
+
+Without sharding:
+
+PK = tenantA
+All writes → same partition → throttling
+
+With sharding:
+
+PK = tenantA#0 → Partition #37
+PK = tenantA#1 → Partition #12
+PK = tenantA#2 → Partition #89
+...
+
+Now your workload is spread across multiple backend partitions.
+
+➡ Instead of 1 partition hitting 1,000 WCUs limit, you now have 10 partitions → ~10,000 WCUs potential capacity.
+
+
+---
+
+✅ 3) Adaptive capacity can now work properly
+
+Adaptive capacity can move unused throughput across partitions only when there is high key cardinality.
+
+If you have one partition key:
+
+Adaptive capacity can’t help
+
+All requests go to the same backend node → hot partition → throttles
+
+
+If you have 10–20 sharded keys:
+
+Adaptive capacity reallocates throughput between backend partitions
+
+Hotter shards get more throughput
+
+No throttles to other tenants
+
+
+
+---
+
+✅ 4) Even though the table is “one logical table,” partitions scale up underneath it
+
+A DynamoDB table is logically one table, but physically:
+
+Table
+  ├─ Partition 1
+  ├─ Partition 2
+  ├─ Partition 3
+  ├─ ...
+  └─ Partition N  (created automatically)
+
+Sharding increases N.
+
+More partitions = More write queues, more storage isolation, more request capacity.
+
+
+---
+
+✅ 5) Adding a shardId multiplies the per-tenant maximum throughput
+
+Let’s use numbers — they make this extremely obvious:
+
+Without shard ID
+
+Tenant A writes 2,000 WCU/sec
+
+One partition can do ~1,000 WCU
+
+→ Throttling
+
+
+With shard ID (10 shards)
+
+Tenant A writes 2,000 WCU/sec
+
+Writes distributed across 10 partitions (~200 per shard)
+
+Each shard well below 1,000 WCU limit
+
+→ NO throttling
+
+
+Sharding takes you from a physics limit (1 partition ≈ 1,000 WCUs)
+to a scalable model (N partitions ≈ N * 1,000 WCUs).
+
+
+---
+
+✔ Concise Interview Answer
+
+You can answer in this clean short form:
+
+> “A hot partition forms when too many writes hit the same partition key. Adding a shardId creates multiple partition key values, which DynamoDB distributes across multiple physical partitions.
+
+So instead of one key overwhelming one partition (≈1000 WCUs limit), the workload spreads across many backend partitions. This increases total throughput, removes the single hot spot, and allows adaptive capacity to redistribute unused throughput.
+
+That’s why synthetic sharding eliminates hot partitions.”
+
+
+
+
+---
+
+If you want, I can also explain:
+
+How to choose the right number of shards (formula)
+
+Automatic shard scaling pattern
+
+How to shard GSIs safely
+
+When to move a tenant to a dedicated table instead of sharding
+
+
+Just tell me.
+
+
+Below is the most accurate and interview-ready summary of DynamoDB RCU/WCU limits at every level:
+table, partition, GSI, LSI, and account-level.
+
+This is a topic AWS loves asking because people confuse the “per-partition” vs “per-table” limits.
+
+
+---
+
+✅ 1. Partition-Level Limits (hard physical limits)
+
+These limits are non-negotiable — the most important to understand.
+
+For each physical partition:
+
+Resource	Limit
+
+Write throughput	~1,000 WCUs per partition
+Read throughput	~3,000 RCUs per partition
+Storage	10 GB max per partition
+
+
+These limits are why hot partitions cause throttling.
+No matter how much table capacity you provision, each partition cannot exceed these numbers.
+
+
+---
+
+✅ 2. Table-Level Throughput Limits (soft / scalable)
+
+A table’s total throughput = sum of all its physical partitions.
+
+DynamoDB will automatically create more partitions when:
+
+1. Table size nears 10 GB × #partitions
+
+
+2. Provisioned throughput increases enough
+
+
+3. Traffic patterns require repartitioning
+
+
+
+Table has NO global throughput ceiling except your AWS account limits.
+
+You can provision:
+
+Hundreds of thousands of WCUs
+
+Hundreds of thousands of RCUs
+
+Table will scale partitions accordingly.
+
+
+But a single partition key stays limited to the partition-level limits above.
+
+
+---
+
+✅ 3. GSI-Level Throughput Limits
+
+Each GSI is its own index with its own partitions, so:
+
+GSI partitions have the SAME limits as a table:
+
+Resource	Limit
+
+Write throughput	~1,000 WCUs per partition
+Read throughput	~3,000 RCUs per partition
+Storage	10 GB per partition
+
+
+BUT two important constraints:
+
+A) GSI write throttling throttles the base table
+
+Whenever you write to the base table, DynamoDB also writes to the GSI.
+If the GSI is throttled → the base table write is throttled.
+
+B) GSI scaling is independent of table scaling
+
+GSIs scale their partitions separately from table partitions.
+
+
+---
+
+✅ 4. LSI-Level Limits (Local Secondary Index)
+
+LSIs share partitions with the base table.
+Therefore:
+
+LSIs have the EXACT SAME partition limits as the base table
+
+Because LSIs reuse the base table’s storage nodes.
+
+Meaning:
+
+~1,000 WCUs / partition
+
+~3,000 RCUs / partition
+
+10 GB storage per partition TOTAL (base + LSI indexes combined)
+
+
+LSIs cannot exceed these limits or scale independently.
+
+
+---
+
+✅ 5. Item-Level Limits (not throughput, but important)
+
+Limitation	Value
+
+Max item size	400 KB
+Strongly consistent read	1 RCU = 4KB read
+Eventually consistent read	1 RCU = 8KB read
+1 WCU writes (up to 1KB)	1 KB per WCU
+
+
+
+---
+
+✅ 6. Account-Level Limits (Soft Limits)
+
+Per AWS account per region:
+
+Resource	Default Soft Limit	Hard Limit
+
+Provisioned WCUs	~40k	Scales higher with request
+Provisioned RCUs	~80k	Scales higher
+On-Demand Burst	Region-dependent	Flexible
+Number of tables	~256	Request increase
+
+
+These are easy to increase with AWS Support.
+
+
+---
+
+🔥 Putting Everything Together (Exam Summary)
+
+Use this 5-liner during an interview:
+
+> “DynamoDB partitions have hard limits: ~1,000 WCUs, ~3,000 RCUs, and 10 GB per partition.
+A table consists of many such partitions, so table throughput has no fixed upper limit.
+GSIs also have their own partitions with the same per-partition limits.
+LSIs share partitions with the base table, so they share the same limits and cannot scale independently.
+Account-level limits cap the maximum provisioned capacity unless increased by AWS Support.”
+
+
+
+
+---
+
+Want a diagram?
+
+I can create a diagram showing the hierarchy of RCU/WCU limits like:
+
+AWS Account
+   └── Table
+         ├── Partitions
+         │      ├── 1000 WCUs max
+         │      ├── 3000 RCUs max
+         │      └── 10GB storage
+         ├── GSIs → own partitions
+         └── LSIs → shared partitions
+
+Should I create the diagram for you?
