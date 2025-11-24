@@ -1,3 +1,317 @@
+
+### Consistency Configuration In DynamoDB
+
+DynamoDB supports two consistency models for **read operations only**:
+
+1. **Eventually Consistent Reads (Default)**
+2. **Strongly Consistent Reads**
+
+Write operations are always strongly consistent within a region.
+
+Below is a concise breakdown of both and their impact on **performance**, **cost**, and **latency**, and what internal DynamoDB components are involved.
+
+---
+
+### Eventually Consistent Reads
+
+### Definition
+
+The read may return data that is **slightly stale** (usually 10–100 ms old).
+DynamoDB returns data from **any available replica**, not necessarily the leader.
+
+### Performance Impact
+
+* Faster read latency because DynamoDB chooses the closest, least-loaded replica.
+* Higher throughput because read load can be distributed across replicas.
+* Less chance of throttling under bursty read traffic.
+
+Component
+The **Replica Selection Engine** chooses the replica with available read capacity.
+
+### Cost Impact
+
+* **1 RCU allows 2 eventually consistent reads (1 KB each).**
+  You get double the throughput for the same cost.
+
+Example
+Reading 100 items/sec (each 1 KB):
+
+* Eventually consistent: consumes **50 RCU**
+* Strongly consistent: consumes **100 RCU**
+
+---
+
+### Strongly Consistent Reads
+
+### Definition
+
+Guarantees the latest committed write is returned.
+DynamoDB must read from the **leader partition**, not replicas.
+
+### Performance Impact
+
+* Higher latency because only the leader can serve the read.
+* Lower read throughput (limited to a single partition leader).
+* More likely to cause **partition-level throttling** on hot keys.
+
+Component
+The **Leader Coordination Engine** ensures reads come from the leader partition only.
+
+### Cost Impact
+
+* **1 strongly consistent read = full RCU.**
+* No 2× benefit like eventual consistency.
+
+Example
+Read 100 items/sec → **100 RCU**, double the cost of eventual.
+
+---
+
+### Internal Behavior That Causes Performance Differences
+
+### 1. Leader vs Replica
+
+Strong reads = always leader
+Eventual reads = any replica
+This affects latency and partition saturation.
+
+### 2. Partition Throughput
+
+Strong reads concentrate all traffic on a single node → easier throttling.
+Eventual reads spread load across multiple replicas → more stable.
+
+### 3. RCU Computation
+
+Strong read of a 4 KB item = **4 RCU**
+Eventual read of same item = **2 RCU**
+
+---
+
+### Example Scenario: Employees Table
+
+Suppose applications frequently fetch real-time status of EmployeeId = 321.
+
+Case 1: Strong Consistency
+1000 reads/sec of a 1 KB item
+Cost = 1000 RCU
+Risk: Hot partition throttling
+
+Case 2: Eventual Consistency
+1000 reads/sec
+Cost = **500 RCU**
+Lower latency, less partition load, fewer throttles
+
+---
+
+### When To Use Strong Consistency
+
+* Real-time financial writes (salary update must reflect immediately)
+* Document approval systems (must read latest version immediately)
+* Inventory decrement systems requiring precise stock count
+
+### When Not To Use Strong Consistency
+
+* Employee profile displays
+* HR reporting dashboards
+* Search queries
+* Event streams and timeline listings
+* High-traffic public endpoints
+
+---
+
+### Final Summary
+
+| Consistency           | Behavior      | Cost             | Performance    | Throttling Risk |
+| --------------------- | ------------- | ---------------- | -------------- | --------------- |
+| Eventually Consistent | May be stale  | Cheapest (½ RCU) | Fastest        | Lowest          |
+| Strongly Consistent   | Always latest | 2× cost          | Higher latency | Highest         |
+
+Strong consistency centralizes all reads on the leader, increasing cost and potential throttling.
+Eventual consistency spreads reads across replicas, reducing cost and improving performance.
+
+If you want, I can also explain:
+
+* How consistency interacts with GSIs
+* How DynamoDB Streams behave w.r.t consistency
+* Best read patterns for high-scale Employee tables
+
+
+
+### Partition Throughput Quotas In DynamoDB
+
+DynamoDB tables are internally split into **physical partitions**.
+Each partition has **throughput quotas** that limit how many reads/writes it can serve per second, regardless of table-wide RCU/WCU.
+
+AWS does **not** publish exact numbers, but the behavior is well-defined:
+
+### What DynamoDB Guarantees Per Partition
+
+* Each partition has **fixed internal CPU, memory, and I/O limits**.
+* Throughput to a single partition is limited.
+* Adaptive Capacity allows a **single partition key** to use up to:
+
+  * about **3,000 strongly consistent reads/sec**, or
+  * about **2,000 writes/sec**
+    *even if all requests hit one partition.*
+
+These values come from how much “boost” adaptive capacity can provide to a hot key on one partition.
+
+### Why Partitions Have Quotas
+
+Every partition is a separate SSD-backed storage unit with:
+
+* its own request queue,
+* its own capacity controller,
+* its own adaptive capacity bucket.
+
+This prevents a single hot partition from overwhelming the entire database cluster.
+
+---
+
+### What Happens When Partition Throughput Quotas Are Exceeded
+
+### 1. Immediate Partition-Level Throttling
+
+If a client exceeds the internal per-partition limits, DynamoDB throttles requests from that partition even if:
+
+* the table has plenty of unused RCU/WCU,
+* the application is far below table-wide throughput.
+
+Typical error:
+`ProvisionedThroughputExceededException`
+
+This is the most common cause of “mysterious throttling.”
+
+Component
+DynamoDB’s **partition-level request scheduler** enforces these quotas.
+
+---
+
+### 2. Adaptive Capacity Attempts To Rescue the Hot Partition
+
+DynamoDB tries to use unused capacity from other partitions to boost the hot partition.
+
+This works if:
+
+* the hot key is isolated (one PK dominates traffic),
+* the spike is not too sudden.
+
+If adaptive capacity can absorb the spike → throttling stops.
+
+Component
+The **Adaptive Capacity Engine** redistributes quota at runtime.
+
+---
+
+### 3. Burst Credits May Be Consumed
+
+Each partition accumulates unused capacity for up to 5 minutes.
+If partition quotas are exceeded, DynamoDB uses burst credits.
+
+If burst credits run out → throttling immediately begins.
+
+Component
+Partition-level **burst credit bucket**.
+
+---
+
+### 4. No Partition Splitting Due to Traffic
+
+A common misconception is “heavy traffic causes DynamoDB to split partitions.”
+
+This is incorrect.
+
+Partitions **only split when size exceeds ~10 GB**, never due to throughput.
+
+That means:
+
+* hot partitions stay hot
+* skewed access patterns keep creating throttling
+
+Component
+The **partition splitting engine** (triggered only by storage size, not by traffic).
+
+---
+
+### 5. Excess Traffic Above Adaptive Capacity = Permanent Throttling
+
+If the workload continues exceeding:
+
+* the partition’s baseline throughput, and
+* the extra capacity adaptive capacity can borrow,
+
+then the partition will continuously throttle.
+
+No amount of table-wide RCU/WCU increases will help unless:
+
+* traffic is spread across more partition keys, or
+* the partition is split due to size growth.
+
+---
+
+### Example: Employees Table Hot Partition Scenario
+
+EmployeeId is the partition key.
+Suppose 90% of traffic hits EmployeeId = "E12345".
+
+Even if the table has:
+
+```
+Provisioned RCU = 20,000
+Provisioned WCU = 10,000
+```
+
+If the partition containing E12345 cannot serve more than ~3,000 reads/sec and ~2,000 writes/sec:
+
+* that partition throttles
+* other partitions stay idle
+* table-level metrics look low
+* application sees throttling
+
+This is a **classic hot partition** throttling scenario.
+
+---
+
+### Example Timeline When Quota Is Exceeded
+
+```
+Write traffic to PK "E12345" = 5000 writes/sec
+Partition quota + adaptive capacity = ~2000 writes/sec
+```
+
+Flow:
+
+1. DynamoDB uses burst credits (no throttling for a short time)
+2. Burst credits drain
+3. Adaptive capacity boosts writes from 1,000 → 2,000 WCU
+4. Remaining 3,000 writes/sec are throttled
+5. Throttling continues until traffic reduces
+
+No partition split will occur unless item size pushes partition above 10 GB.
+
+---
+
+### Final Summary
+
+Partition throughput quotas are the **real limits** in DynamoDB.
+When exceeded:
+
+1. Partition-level throttling begins
+2. Adaptive capacity tries to redistribute throughput
+3. Burst credits may temporarily absorb excess load
+4. Throttling persists if traffic remains too high
+5. Partition does not split because of throughput
+6. Table-level metrics can look fine while clients are still throttled
+
+Partition throughput limits are why **high-cardinality keys** and **even distribution** are critical for DynamoDB design.
+
+If you want, I can also generate:
+
+* Mermaid diagram of partition throttling events
+* Employees table key design that eliminates hot partitions
+* Example CloudWatch alarms for detecting partition-level throttling
+
+
 ### ### Example: Auto Scaling an **Employees** Table in DynamoDB
 
 
