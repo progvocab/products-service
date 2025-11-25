@@ -134,4 +134,71 @@ CloudWatch Logs also supports advanced querying via CloudWatch Logs Insights for
 
 This service centralizes log management across your AWS environment to provide a unified view of all logs for diagnostic and operational purposes.
 
+Here is the **concise, to-the-point explanation** of how to send an email when a **CloudWatch Alarm** is triggered.
+
+### How to Send an Email When a CloudWatch Alarm is Triggered
+
+### Step 1: Create an SNS Topic
+
+1. Open **SNS Console**.
+2. Click **Create Topic** → **Standard**.
+3. Give it a name (example: `HighCPUAlerts`).
+4. Create the topic.
+
+### Step 2: Subscribe an Email Address to the Topic
+
+1. Inside the topic → **Create Subscription**.
+2. **Protocol**: `Email`.
+3. **Endpoint**: your email address.
+4. You will receive a confirmation email → **click Confirm**.
+   (Required, otherwise SNS cannot send messages.)
+
+### Step 3: Create the CloudWatch Alarm
+
+1. Open **CloudWatch Console**.
+2. Go to **Alarms** → **Create Alarm**.
+3. Select a metric (example: `EC2 > CPUUtilization`).
+4. Set threshold (example: `CPUUtilization > 80%` for 5 minutes).
+5. **Alarm actions**:
+
+   * Select **Send notification to an SNS topic**.
+   * Choose the topic you created: `HighCPUAlerts`.
+
+### Step 4: Save the Alarm
+
+Once saved, CloudWatch will automatically:
+
+* monitor the metric,
+* evaluate thresholds using **Amazon CloudWatch backend**,
+* trigger **SNS publish** if alarm state = `ALARM`,
+* SNS will send an **email** to subscribed addresses.
+
+### What Exactly Happens Internally (AWS Components)
+
+* **CloudWatch Metrics Service** collects and evaluates metric thresholds.
+* When threshold is breached, CloudWatch invokes **SNS Publish API**.
+* **SNS Email Delivery System** sends the email via AWS global email endpoints.
+* User receives **alarm notification** in their inbox.
+
+### Example Email Content (typical)
+
+```
+ALARM: "HighCPUAlerts"
+State changed to: ALARM
+Metric: CPUUtilization > 80%
+Resource: i-0123456789abcdef0
+```
+
+### Optional Enhancements
+
+* Add **multiple emails**, SMS, or webhook for Slack/Teams.
+* Use **Lambda** subscribed to SNS to perform automated remediation.
+* Use **CloudWatch Alarm → EventBridge → SNS** for advanced routing.
+
+If you want, I can also generate:
+
+* Terraform for this setup
+* AWS CLI commands
+* CloudFormation template
+* Step-by-step with IAM permissions required
 
