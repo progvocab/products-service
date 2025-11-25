@@ -40,12 +40,11 @@ Compute engines contact this catalog to resolve table paths and schemas.
 
 BI tools like Athena, Trino, Presto, Spark SQL, and DuckDB read data directly from object storage through the table format.
 
-### Mermaid Diagram
-
+ 
 ```mermaid
 flowchart TD
 
-A[Producers (Kafka, DB CDC)] --> B[Ingestion Layer]
+A["Producers (Kafka, DB CDC)"] --> B[Ingestion Layer]
 B --> C[Object Storage - S3/GCS/ADLS]
 
 C --> D[Table Formats - Iceberg/Delta/Hudi]
