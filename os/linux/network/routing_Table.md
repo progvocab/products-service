@@ -1,4 +1,4 @@
-Perfect question 👏 — the **Linux routing table** is at the heart of how your system decides **which network interface (NIC)** and **next hop** to use when sending packets.
+ the **Linux routing table** is at the heart of how your system decides **which network interface (NIC)** and **next hop** to use when sending packets.
 
 Let’s break it down clearly — from **concept → structure → commands → examples → packet flow**.
 
@@ -197,3 +197,135 @@ ping 8.8.8.8
 ---
 
 Would you like me to draw a **Mermaid diagram** showing how Linux decides which interface or gateway to use when multiple routes match (host, network, default)? It makes the decision process visually clear.
+
+
+In Linux, subnets are not defined in a single “subnet file.”
+Instead, they are defined as part of the network interface IP configuration and stored inside the Linux kernel's routing table and interface configuration.
+
+Here is exactly where they live:
+
+
+---
+
+✅ 1. Subnets are defined on network interfaces (NICs)
+
+When you assign an IP to an interface, you also assign its subnet mask.
+
+Example:
+
+ip addr add 192.168.1.10/24 dev eth0
+
+Here:
+
+IP: 192.168.1.10
+
+Subnet: /24 (255.255.255.0)
+
+Interface: eth0
+
+
+This defines the subnet for that interface.
+
+You can view all subnets Linux knows using:
+
+ip addr show
+
+Linux does not keep a separate “subnet table.”
+The interface configuration implicitly defines the subnets.
+
+
+---
+
+✅ 2. Subnets are also reflected in the Routing Table
+
+Whenever you configure an IP/subnet on an interface, Linux automatically adds a route for that subnet.
+
+Example:
+
+ip route show
+
+You will see:
+
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10
+
+This line tells Linux:
+
+Subnet 192.168.1.0/24 is reachable directly via eth0
+
+
+So routing table = where Linux stores subnet routes.
+
+
+---
+
+✅ 3. Persistent definitions are stored in OS network configuration files
+
+📌 On Ubuntu/Debian:
+
+/etc/netplan/*.yaml
+
+Example:
+
+addresses:
+  - 192.168.1.10/24
+gateway4: 192.168.1.1
+
+📌 On old Debian systems:
+
+/etc/network/interfaces
+
+📌 On RedHat/CentOS/Rocky:
+
+/etc/sysconfig/network-scripts/ifcfg-eth0
+
+Contains:
+
+IPADDR=192.168.1.10
+PREFIX=24
+
+These files make the IP + subnet persistent across reboots.
+
+
+---
+
+🧠 Where exactly is the subnet stored?
+
+There is no separate “subnet table.”
+
+Subnets in Linux are stored in two places:
+
+✔ Interface configuration
+
+(ip addr → stores IP + prefix length)
+
+✔ Kernel routing table
+
+(ip route → stores local subnet routes)
+
+This combination tells Linux:
+
+Which subnets local interfaces belong to
+
+Which subnets are directly reachable
+
+
+
+---
+
+📝 Simple Answer
+
+Linux defines subnets as part of the IP configuration on each network interface, and these become entries in the kernel routing table. There is no separate subnet database.
+
+
+---
+
+If you want, I can also explain:
+
+How Linux decides if a destination IP is in the same subnet
+
+How ARP interacts with subnets
+
+How AWS EC2 Linux handles subnet configuration
+
+
+Just tell me!
