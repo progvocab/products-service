@@ -146,4 +146,115 @@ How OS chooses the correct gateway
 Gateway vs NAT Gateway vs Internet Gateway
 
 
+Just tell me!Yes — a Gateway works at Layer 3 (Network Layer) of the OSI model.
+
+
+---
+
+✅ Why Gateway is a Layer 3 Device
+
+A gateway is responsible for:
+
+Reading the destination IP address
+
+Checking the routing table
+
+Forwarding packets to another network
+
+Changing the next hop
+
+Decrementing the TTL (Time To Live)
+
+
+All these tasks belong to Layer 3 responsibilities.
+
+So a default gateway is simply a router, and routers are Layer 3 devices.
+
+
+---
+
+🧠 Key Points
+
+✔ Gateways operate at Layer 3 = IP Layer
+
+Because routing is based on:
+
+IP addresses
+
+Routing tables
+
+Next-hop decisions
+
+
+✔ Switches operate at Layer 2
+
+Because switching is based on:
+
+MAC addresses
+
+CAM table
+
+
+✔ Routers/Gateways interconnect different networks (L3)
+
+Switches interconnect devices within the same network (L2).
+
+
+---
+
+🧩 Example (Laptop communicating with Internet)
+
+Your laptop:
+
+Default Gateway = 192.168.1.1
+
+Your OS checks destination IP (say 8.8.8.8):
+
+It’s not in your local subnet
+
+So OS sends packet to gateway
+
+
+Gateway:
+
+Reads IP header
+
+Matches routing table
+
+Forwards packet to ISP
+
+
+This is layer 3 routing.
+
+
+---
+
+🚫 Correction: A Gateway is Not Layer 2
+
+A Layer 2 device (switch) cannot act as a gateway
+
+It does not read or understand IP addresses
+
+Therefore cannot route across networks
+
+
+
+---
+
+📝 Simple Answer
+
+✔ Yes, a gateway is a Layer 3 device (router).
+
+
+---
+
+If you want, I can also explain:
+
+Why gateways can't exist at Layer 2
+
+Gateway vs Router vs NAT Gateway
+
+Gateway in AWS VPC vs physical network
+
+
 Just tell me!
