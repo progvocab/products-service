@@ -1,3 +1,285 @@
+
+Hashing is a **big foundational topic** in security, cryptography, data structures, and distributed systems. Beyond “hash” and “salt”, there are many important concepts that matter depending on the use case (security, databases, blockchain, Python dicts, etc.).
+
+Here is the complete list of important hashing concepts **every engineer should know**, explained simply.
+
+---
+
+# 🔥 **1. Hash Function**
+
+A function that takes input → produces a fixed-size output (hash).
+
+### Properties:
+
+* **Deterministic**
+* **Fast**
+* **Fixed output size**
+* **Hard to reverse** (one-way function)
+
+Examples:
+
+* SHA-256
+* SHA-512
+* MD5 (broken)
+* Keccak (SHA-3)
+
+---
+
+# 🔥 **2. Salt**
+
+A random value added to input before hashing to prevent identical inputs from producing identical hashes.
+
+✔ Stops rainbow table attacks
+✔ Makes each password hash unique
+
+---
+
+# 🔥 **3. Pepper**
+
+A second secret added to the password, but stored **separately** (usually in environment variable or HSM).
+
+### Difference from Salt:
+
+| Salt            | Pepper                      |
+| --------------- | --------------------------- |
+| Stored in DB    | Stored as secret key        |
+| Unique per user | One value for entire system |
+| Non-secret      | Secret                      |
+
+---
+
+# 🔥 **4. Key Stretching**
+
+Makes hashing intentionally slow so attackers cannot brute-force passwords fast.
+
+Techniques:
+
+* PBKDF2
+* bcrypt
+* scrypt
+* Argon2 (best modern)
+
+---
+
+# 🔥 **5. HMAC (Hash-based Message Authentication Code)**
+
+Used to verify **data integrity + authenticity**.
+
+Formula:
+
+```
+HMAC = HASH(secret_key + message)
+```
+
+Used in:
+
+* JWT
+* AWS Signature Version 4
+* Payment gateways
+* API request signing
+
+Python example:
+
+```python
+import hmac, hashlib
+signature = hmac.new(b'secret', b'message', hashlib.sha256).hexdigest()
+```
+
+---
+
+# 🔥 **6. Collision Resistance**
+
+A good hash function should make it *extremely* hard to find:
+
+* **Two different inputs with the same hash** (collision)
+* **Another input with the same hash** (second preimage)
+
+SHA-1 is broken → collisions possible
+SHA-256 still safe
+
+---
+
+# 🔥 **7. Avalanche Effect**
+
+Changing **one bit** in input leads to a **completely different** hash.
+
+Example:
+
+```
+hash("hello") != hash("Hello")
+```
+
+This property is important for cryptographic functions.
+
+---
+
+# 🔥 **8. Hash Tables (Data Structures)**
+
+Used in:
+
+* Python `dict`
+* Python `set`
+* Java HashMap
+* C++ unordered_map
+
+Hashing determines:
+
+* bucket location
+* collision resolution
+* time complexity (O(1))
+
+Concepts:
+
+* Load factor
+* Rehashing
+* Open addressing
+* Separate chaining
+
+---
+
+# 🔥 **9. Hash Collision Handling**
+
+When two inputs map to same bucket.
+
+Techniques:
+
+* Chaining (linked list)
+* Open addressing (linear probing, quadratic probing)
+* Robin Hood hashing
+
+---
+
+# 🔥 **10. Consistent Hashing**
+
+Designed for **distributed systems**.
+
+Used in:
+
+* AWS DynamoDB
+* Cassandra
+* Kafka partitioning
+* CDN load balancing
+
+Ensures minimal re-distribution of keys when nodes are added or removed.
+
+---
+
+# 🔥 **11. Merkle Trees**
+
+A tree of hashes used to efficiently verify large datasets.
+
+Used in:
+
+* Blockchain (Bitcoin, Ethereum)
+* Git
+* Certificate transparency logs
+
+---
+
+# 🔥 **12. Hashing Algorithms for Different Purposes**
+
+### **Cryptographic hashing** (secure)
+
+* SHA-256
+* SHA-3
+* BLAKE2
+* BLAKE3
+
+### **Non-cryptographic hashing** (fast, not secure)
+
+* MurmurHash
+* xxHash
+* CityHash
+
+Used in:
+
+* Databases
+* Distributed systems
+* Hash tables
+
+---
+
+# 🔥 **13. Fingerprinting**
+
+Hash used to detect *changes* in files, data, objects.
+
+Examples:
+
+* Git commit hash
+* File checksum (SHA-256)
+* Detect MV table changes (your use case)
+
+---
+
+# 🔥 **14. Checksums**
+
+Simple error-detecting hash values.
+
+Examples:
+
+* CRC32
+* Adler-32
+
+Used in:
+
+* Network packets
+* Data transmission
+* Storage systems
+
+---
+
+# 🔥 **15. Rainbow Tables**
+
+Large precomputed hash tables for cracking unsalted passwords.
+
+Salt completely prevents this.
+
+---
+
+# 🔥 **16. Hash Salting Best Practices**
+
+* Use **unique random salt per user**
+* Use strong KDF: PBKDF2, bcrypt, scrypt, Argon2
+* Never use SHA-256 alone for passwords
+* Store: **salt + hash**
+
+---
+
+# 🚀 Full Summary Table
+
+| Concept                  | Purpose                           |
+| ------------------------ | --------------------------------- |
+| Hash Function            | Create fixed-size fingerprint     |
+| Salt                     | Prevent duplicate hashes          |
+| Pepper                   | Secret system-level key           |
+| Key Stretching           | Slow hashing for security         |
+| HMAC                     | Verify integrity/authenticity     |
+| Collision Resistance     | Hard to find two identical hashes |
+| Avalanche Effect         | Small change → big hash change    |
+| Hash Table               | Fast O(1) lookup                  |
+| Collision Handling       | Manage hash conflicts             |
+| Consistent Hashing       | Distributed system load balancing |
+| Merkle Tree              | Datasets verification             |
+| Cryptographic Hash       | Secure purposes                   |
+| Non-Crypto Hash          | Fast indexing, partitioning       |
+| Fingerprint              | Detect changes                    |
+| Checksums                | Error detection                   |
+| Rainbow Tables           | Attack unsalted hashes            |
+| Hash Salt Best Practices | Security checklist                |
+
+---
+
+If you want, I can provide:
+
+✔ Python examples for every one of these concepts
+✔ How hashing is used inside Python dictionaries
+✔ How distributed systems use consistent hashing
+✔ Password hashing best practices (with PBKDF2/bcrypt/argon2)
+
+Just tell me!
+
+
+
 In Python, the **`hash()` function** is used to compute a **fixed-size integer value (a hash)** for an object. This hash is used internally by many data structures and algorithms for fast lookups, comparisons, and data integrity.
 
 Here is a clear explanation:
