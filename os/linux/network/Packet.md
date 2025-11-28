@@ -55,72 +55,70 @@ Below are **two Mermaid diagrams**:
 
 Both diagrams show how the packet is constructed **visually and accurately**.
 
----
-
-# 🧩 **1️⃣ Side-by-Side L2 / L3 / L4 Structure Diagram**
+### L2 / L3 / L4 Structure
 
 ```mermaid
 flowchart TD
 
-subgraph L2[Layer 2 - Data Link (Ethernet Frame)]
-    L2A[Destination MAC (48 bits)]
-    L2B[Source MAC (48 bits)]
-    L2C[EtherType (16 bits)]
-    L2D[Payload (L3 Packet)]
-    L2E[FCS (32 bits)]
+subgraph L2["Layer 2 - Data Link (Ethernet Frame)"]
+    L2A["Destination MAC (48 bits)"]
+    L2B["Source MAC (48 bits)"]
+    L2C["EtherType (16 bits)"]
+    L2D["Payload (L3 Packet)"]
+    L2E["FCS (32 bits)"]
 end
 
-subgraph L3[Layer 3 - Network (IP Packet)]
-    L3A[Version (4)]
-    L3B[IHL (4)]
-    L3C[TOS (8)]
-    L3D[Total Length (16)]
-    L3E[Identification (16)]
-    L3F[Flags (3)]
-    L3G[Fragment Offset (13)]
-    L3H[TTL (8)]
-    L3I[Protocol (8)]
-    L3J[Header Checksum (16)]
-    L3K[Source IP (32)]
-    L3L[Destination IP (32)]
-    L3M[Payload (L4 Segment)]
+subgraph L3["Layer 3 - Network (IP Packet)"]
+    L3A["Version (4)"]
+    L3B["IHL (4)"]
+    L3C["TOS (8)"]
+    L3D["Total Length (16)"]
+    L3E["Identification (16)"]
+    L3F["Flags (3)"]
+    L3G["Fragment Offset (13)"]
+    L3H["TTL (8)"]
+    L3I["Protocol (8)"]
+    L3J["Header Checksum (16)"]
+    L3K["Source IP (32)"]
+    L3L["Destination IP (32)"]
+    L3M["Payload (L4 Segment)"]
 end
 
-subgraph L4[Layer 4 - Transport (TCP Segment)]
-    L4A[Source Port (16)]
-    L4B[Destination Port (16)]
-    L4C[Sequence Number (32)]
-    L4D[Acknowledgment Number (32)]
-    L4E[Data Offset (4)]
-    L4F[Reserved (3)]
-    L4G[Flags (9)]
-    L4H[Window Size (16)]
-    L4I[Checksum (16)]
-    L4J[Urgent Pointer (16)]
-    L4K[Options (Variable)]
-    L4L[Payload (App Data)]
+subgraph L4["Layer 4 - Transport (TCP Segment)"]
+    L4A["Source Port (16)"]
+    L4B["Destination Port (16)"]
+    L4C["Sequence Number (32)"]
+    L4D["Acknowledgment Number (32)"]
+    L4E["Data Offset (4)"]
+    L4F["Reserved (3)"]
+    L4G["Flags (9)"]
+    L4H["Window Size (16)"]
+    L4I["Checksum (16)"]
+    L4J["Urgent Pointer (16)"]
+    L4K["Options (Variable)"]
+    L4L["Payload (App Data)"]
 end
 
 L2D --> L3
 L3M --> L4
 ```
 
----
 
-# 🖥️ **2️⃣ Detailed Ethernet + IP + TCP Packet With Field Sizes**
+
+### Detailed Ethernet + IP + TCP Packet With Field Sizes**
 
 This diagram presents all three headers **top-to-bottom in order of encapsulation**.
 
 ```mermaid
 flowchart TD
 
-subgraph Ethernet_Header[Ethernet II Header (L2)]
+subgraph Ethernet_Header["Ethernet II Header (L2)"]
     E1[Destination MAC<br/>48 bits]
     E2[Source MAC<br/>48 bits]
     E3[EtherType<br/>16 bits]
 end
 
-subgraph IP_Header[IPv4 Header (L3)]
+subgraph IP_Header["IPv4 Header (L3)"]
     I1[Version<br/>4 bits]
     I2[IHL<br/>4 bits]
     I3[DSCP/ECN<br/>8 bits]
@@ -133,21 +131,21 @@ subgraph IP_Header[IPv4 Header (L3)]
     I10[Header Checksum<br/>16 bits]
     I11[Source IP<br/>32 bits]
     I12[Destination IP<br/>32 bits]
-    I13[Options (if IHL>5)<br/>0–320 bits]
+    I13["Options (if IHL>5)<br/>0–320 bits"]
 end
 
-subgraph TCP_Header[TCP Header (L4)]
+subgraph TCP_Header["TCP Header (L4)"]
     T1[Source Port<br/>16 bits]
     T2[Destination Port<br/>16 bits]
     T3[Sequence Number<br/>32 bits]
     T4[Acknowledgment Number<br/>32 bits]
     T5[Data Offset<br/>4 bits]
     T6[Reserved<br/>3 bits]
-    T7[Flags<br/>9 bits (SYN,ACK,FIN,etc.)]
+    T7["Flags<br/>9 bits (SYN,ACK,FIN,etc.)"]
     T8[Window Size<br/>16 bits]
     T9[Checksum<br/>16 bits]
     T10[Urgent Pointer<br/>16 bits]
-    T11[Options (variable)<br/>0–320 bits]
+    T11["Options (variable)<br/>0–320 bits"]
 end
 
 subgraph Payload[Application Data]
@@ -159,9 +157,7 @@ I13 --> TCP_Header
 T11 --> Payload
 ```
 
----
 
-# 📦 **Breakdown Summary Table**
 
 ### **Ethernet Frame (L2)** — *Minimum 14 bytes*
 
@@ -172,7 +168,7 @@ T11 --> Payload
 | EtherType       | 2 bytes           |
 | FCS             | 4 bytes (trailer) |
 
----
+
 
 ### **IPv4 Header (L3)** — *Minimum 20 bytes*
 
@@ -190,7 +186,7 @@ T11 --> Payload
 | Destination IP          | 4 bytes    |
 | Options                 | 0–40 bytes |
 
----
+ 
 
 ### **TCP Header (L4)** — *Minimum 20 bytes*
 
@@ -214,53 +210,51 @@ T11 --> Payload
 ✔ Example with real hex dump + breakdown
 ✔ Diagram for UDP instead of TCP
 ✔ Diagram for IPv6 instead of IPv4
+ 
 
-Here is a **combined full-wire packet diagram** showing **Ethernet (L2) + IPv4 (L3) + TCP (L4) + HTTP (L7)** in a **single packet structure**, side-by-side, using **Mermaid**.
 
----
-
-# 🧩 **Full Packet: Ethernet + IP + TCP + HTTP (Mermaid Diagram)**
+### **Full Packet: Ethernet + IP + TCP + HTTP**
 
 ```mermaid
 flowchart TD
 
 %% ETHERNET FRAME
-subgraph L2[Ethernet Frame (Layer 2)]
+subgraph L2["Ethernet Frame (Layer 2)"]
     E1[Dest MAC\n6 bytes]
     E2[Source MAC\n6 bytes]
-    E3[EtherType = 0x0800 (IPv4)\n2 bytes]
+    E3["EtherType = 0x0800 (IPv4)\n2 bytes"]
 end
 
 %% IP HEADER
-subgraph L3[IPv4 Header (Layer 3)]
-    IP1[Version (4 bits)\nIHL (4 bits)]
-    IP2[DSCP (6 bits)\nECN (2 bits)]
+subgraph L3["IPv4 Header (Layer 3)"]
+    IP1["Version (4 bits)\nIHL (4 bits)"]
+    IP2["DSCP (6 bits)\nECN (2 bits)"]
     IP3[Total Length\n16 bits]
     IP4[Identification\n16 bits]
-    IP5[Flags (3 bits)\nFragment Offset (13 bits)]
+    IP5["Flags (3 bits)\nFragment Offset (13 bits)"]
     IP6[TTL\n8 bits]
-    IP7[Protocol = 6 (TCP)\n8 bits]
+    IP7["Protocol = 6 (TCP)\n8 bits"]
     IP8[Header Checksum\n16 bits]
     IP9[Source IP\n32 bits]
     IP10[Destination IP\n32 bits]
-    IP11[Options (if any)]
+    IP11["Options (if any)"]
 end
 
 %% TCP HEADER
-subgraph L4[TCP Header (Layer 4)]
+subgraph L4["TCP Header (Layer 4)"]
     T1[Source Port\n16 bits]
     T2[Destination Port\n16 bits]
     T3[Sequence Number\n32 bits]
     T4[Acknowledgment Number\n32 bits]
-    T5[Data Offset (4 bits)\nFlags (12 bits)]
+    T5["Data Offset (4 bits)\nFlags (12 bits)"]
     T6[Window Size\n16 bits]
     T7[Checksum\n16 bits]
     T8[Urgent Pointer\n16 bits]
-    T9[Options (if any)]
+    T9["Options (if any)"]
 end
 
 %% HTTP PAYLOAD
-subgraph L7[HTTP Request/Response (Layer 7)]
+subgraph L7["HTTP Request/Response (Layer 7)"]
     H1[HTTP Headers + Body\nVariable length]
 end
 
@@ -270,9 +264,7 @@ IP11 --> T1
 T9 --> H1
 ```
 
----
 
-# 📦 **What This Diagram Represents**
 
 You are seeing a **full on-wire packet** exactly as it appears when captured in Wireshark:
 
@@ -282,10 +274,7 @@ You are seeing a **full on-wire packet** exactly as it appears when captured in 
 +-------------------------------------------------------------+
 ```
 
----
-
-# 🧬 **Sizes Summary (Typical Packet)**
-
+ 
 | Layer | Protocol    | Typical Header Size | Notes                        |
 | ----- | ----------- | ------------------- | ---------------------------- |
 | L2    | Ethernet II | 14 bytes            | +4 bytes if VLAN             |
@@ -299,9 +288,7 @@ Typical bare-minimum overhead:
 Ethernet (14) + IPv4 (20) + TCP (20) = 54 bytes header before HTTP data
 ```
 
----
-
-# 📝 Example Binary Layout
+  Example Binary Layout
 
 ```
 [Ethernet Header]
@@ -320,10 +307,10 @@ User-Agent: ...
 
 More :
 
-✅ A **bit-level** diagram
-✅ The same structure for **IPv6 + TCP + HTTP/2**
-✅ A **POST request** payload example
-✅ A **full TLS packet** (Ethernet + IP + TCP + TLS + HTTP/2)
+- A **bit-level** diagram
+- The same structure for **IPv6 + TCP + HTTP/2**
+- A **POST request** payload example
+- A **full TLS packet** (Ethernet + IP + TCP + TLS + HTTP/2)
 
 
 
