@@ -1,4 +1,4 @@
-explain architecture of hybrid network using aws and on prem
+# Hybrid network - AWS and On prem
 
 A hybrid network architecture using AWS and on-premises involves securely connecting your data center or branch locations with your AWS cloud resources to enable seamless workload and application integration.
 
@@ -18,17 +18,9 @@ A hybrid network architecture using AWS and on-premises involves securely connec
 
 In essence, a robust hybrid network architecture leverages AWS Direct Connect and Transit Gateway to extend on-premises networks into AWS with scalable, segmented, and secure connectivity supplemented by VPNs for backup and encryption[1][2][3][4][7].
 
-Citations:
-[1] Hybrid cloud architectures using AWS Direct Connect ... https://aws.amazon.com/blogs/networking-and-content-delivery/hybrid-cloud-architectures-using-aws-direct-connect-gateway/
-[2] Advanced hybrid routing scenarios with AWS Cloud WAN ... https://aws.amazon.com/blogs/networking-and-content-delivery/advanced-hybrid-routing-scenarios-with-aws-cloud-wan-and-aws-direct-connect/
-[3] VMware Cloud on AWS Hybrid Network Design Patterns https://aws.amazon.com/blogs/apn/vmware-cloud-on-aws-hybrid-network-design-patterns/
-[4] Hybrid connectivity type and design considerations https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/hybrid-connectivity-type-and-design-considerations.html
-[5] Cloud design patterns, architectures, and implementations https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/introduction.html
-[6] Design patterns for interconnecting a telco data center to ... https://aws.amazon.com/blogs/networking-and-content-delivery/design-patterns-for-interconnecting-a-telco-data-center-to-an-amazon-vpc/
-[7] Connectivity models - Hybrid Connectivity https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/connectivity-models.html
 
 
-what is vif
+#### Direct connect VIF 
 
 A **Virtual Interface (VIF)** in AWS is a logical connection that enables routing traffic over AWS Direct Connect between your on-premises network and AWS resources.
 
@@ -41,21 +33,12 @@ VIFs operate over a physical Direct Connect connection and use VLAN tagging (e.g
 
 In summary, a Virtual Interface is a key configuration within AWS Direct Connect that establishes the logical pathways for network traffic between on-premises environments and AWS resources, supporting private, public, or transit connectivity types[1][6][8].
 
-Citations:
-[1] create-transit-virtual-interface https://docs.aws.amazon.com/cli/latest/reference/directconnect/create-transit-virtual-interface.html
-[2] AWS Transit Gateway – Amazon Web Services https://aws.amazon.com/transit-gateway/
-[3] AWS Transit Gateway: Everything You Need to Know https://www.kentik.com/kentipedia/aws-transit-gateway-explained/
-[4] AWS Virtual Private Gateway vs Direct Connect ... https://www.megaport.com/blog/aws-vgw-vs-dgw-vs-tgw/
-[5] aws.directconnect.TransitVirtualInterface https://www.pulumi.com/registry/packages/aws/api-docs/directconnect/transitvirtualinterface/
-[6] Direct Connect virtual interfaces and hosted virtual interfaces https://docs.aws.amazon.com/directconnect/latest/UserGuide/WorkingWithVirtualInterfaces.html
-[7] What is AWS Transit Gateway for Amazon VPC? https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html
-[8] Virtual interfaces (VIF) https://docs.aws.amazon.com/whitepapers/latest/aws-direct-connect-for-amazon-connect/virtual-interfaces-vif.html
-[9] AWS Direct Connect + AWS Transit Gateway https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/aws-direct-connect-aws-transit-gateway.html
+ 
 
 
-can we use site to site vpn
+### Site to Site VPN
 
-Yes, you can use AWS Site-to-Site VPN to securely connect your on-premises network to your AWS environment.
+We can use AWS Site-to-Site VPN to securely connect your on-premises network to your AWS environment.Standard AWS Site-to-Site VPN Uses Public Internet.
 
 ### Overview:
 - **Site-to-Site VPN** establishes IPsec-encrypted tunnels over the public Internet between your on-premises VPN gateway and AWS Virtual Private Gateway or AWS Transit Gateway.
@@ -63,6 +46,92 @@ Yes, you can use AWS Site-to-Site VPN to securely connect your on-premises netwo
 - It is suitable for **smaller workloads, testing, backup, or where cost is a constraint.**
 - Supports **redundancy** by creating two tunnels across multiple Availability Zones to ensure high availability.
 - Offers **up to 1.25 Gbps of encrypted bandwidth**, but performance can vary due to internet conditions, with higher latency and less predictability than Direct Connect.
+
+  
+
+A typical AWS VPN setup:
+
+```
+AWS VPC (VGW/TGW)  ←→  IPsec Tunnel over Internet  ←→  On-premises VPN device
+```
+
+* The path is **public Internet**
+* Traffic is encrypted using **IPsec (IKEv2/IKEv1 + ESP)**
+* Your traffic is **private but not private connectivity** — only encryption is private
+* Source/destination IPs seen are the **public IPs of AWS VPN and on-prem device**
+
+✔ Secure
+✔ Encrypted
+❌ Not private network path (because public Internet is used)
+ 
+
+ 
+
+### When AWS VPN *Does NOT* use the Public Internet**
+
+### **Case A — AWS VPN over Direct Connect (DX + VPN = Private IPsec)**
+
+If you combine:
+
+* Direct Connect (private circuit) **AND**
+* IPsec VPN *inside* the Direct Connect link (so-called “VPN over DX”)
+
+Then your VPN tunnel runs through your **DX private fiber**:
+
+```
+Your Data Center
+   │
+[Direct Connect Private Circuit]
+   │
+AWS Router
+   │
+IPsec VPN Tunnel (inside DX)
+```
+
+- Traffic does **NOT** touch the public Internet
+- Useful for encryption on top of DX
+- Supported using **Transit Gateway + DX + VPN**
+
+This is *expensive* but fully private.
+ 
+
+### **Case B — Corporate MPLS network connecting to AWS via partner network + VPN**
+
+If your on-prem network is a private MPLS network and your AWS VPN tunnels terminate on your MPLS provider’s backbone, traffic **might not traverse the public Internet**.
+
+But this depends on your telecom provider.
+
+ 
+
+| VPN Type                               | Goes through Internet? | Notes                              |
+| -------------------------------------- | ---------------------- | ---------------------------------- |
+| **Standard AWS Site-to-Site VPN**      | **Yes**                | Public Internet + IPsec encryption |
+| **AWS VPN over Direct Connect**        | **No**                 | Runs over DX private circuit       |
+| **MPLS → AWS VPN (provider-specific)** | **Sometimes no**       | Depends on provider routing        |
+| **PrivateLink**                        | **Never**              | Not VPN; AWS internal network      |
+| **DX (no VPN)**                        | **No**                 | Private L2 circuit                 |
+
+
+
+### If requirement is “traffic must never traverse the public Internet”
+
+You **must** use:
+
+###   Direct Connect Private VIF
+
+or
+
+###   DX + VPN (for encryption inside private link)
+
+or
+
+###  PrivateLink (if third party supports it)
+
+A **standard AWS VPN alone is not enough**.
+
+  
+
+
 
 ### When to use Site-to-Site VPN:
 - When secure connectivity is needed but dedicated physical connections (Direct Connect) are unavailable or too costly.
@@ -87,4 +156,22 @@ Citations:
 [7] Site-To-Site VPNs vs. Direct Connect https://sase.checkpoint.com/blog/cloud/site-to-site-vpn-vs-direct-connect
 [8] Between AWS Direct Connect and VPN, which would you ... https://www.reddit.com/r/networking/comments/3im7e4/between_aws_direct_connect_and_vpn_which_would/
 
+ 
+[1] Hybrid cloud architectures using AWS Direct Connect ... https://aws.amazon.com/blogs/networking-and-content-delivery/hybrid-cloud-architectures-using-aws-direct-connect-gateway/
+[2] Advanced hybrid routing scenarios with AWS Cloud WAN ... https://aws.amazon.com/blogs/networking-and-content-delivery/advanced-hybrid-routing-scenarios-with-aws-cloud-wan-and-aws-direct-connect/
+[3] VMware Cloud on AWS Hybrid Network Design Patterns https://aws.amazon.com/blogs/apn/vmware-cloud-on-aws-hybrid-network-design-patterns/
+[4] Hybrid connectivity type and design considerations https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/hybrid-connectivity-type-and-design-considerations.html
+[5] Cloud design patterns, architectures, and implementations https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/introduction.html
+[6] Design patterns for interconnecting a telco data center to ... https://aws.amazon.com/blogs/networking-and-content-delivery/design-patterns-for-interconnecting-a-telco-data-center-to-an-amazon-vpc/
+[7] Connectivity models - Hybrid Connectivity https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/connectivity-models.html
+
+[1] create-transit-virtual-interface https://docs.aws.amazon.com/cli/latest/reference/directconnect/create-transit-virtual-interface.html
+[2] AWS Transit Gateway – Amazon Web Services https://aws.amazon.com/transit-gateway/
+[3] AWS Transit Gateway: Everything You Need to Know https://www.kentik.com/kentipedia/aws-transit-gateway-explained/
+[4] AWS Virtual Private Gateway vs Direct Connect ... https://www.megaport.com/blog/aws-vgw-vs-dgw-vs-tgw/
+[5] aws.directconnect.TransitVirtualInterface https://www.pulumi.com/registry/packages/aws/api-docs/directconnect/transitvirtualinterface/
+[6] Direct Connect virtual interfaces and hosted virtual interfaces https://docs.aws.amazon.com/directconnect/latest/UserGuide/WorkingWithVirtualInterfaces.html
+[7] What is AWS Transit Gateway for Amazon VPC? https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html
+[8] Virtual interfaces (VIF) https://docs.aws.amazon.com/whitepapers/latest/aws-direct-connect-for-amazon-connect/virtual-interfaces-vif.html
+[9] AWS Direct Connect + AWS Transit Gateway https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/aws-direct-connect-aws-transit-gateway.html
 
