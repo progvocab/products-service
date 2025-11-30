@@ -1,14 +1,12 @@
-Understanding the **Java ClassLoader** mechanism — especially in the context of **Spring Boot** and its embedded **Tomcat server** — is crucial for debugging classpath issues, optimizing performance, or developing frameworks/libraries.
 
----
 
-### **1. What is a ClassLoader?**
+# ClassLoader 
 
 The **ClassLoader** is a part of the Java Runtime Environment (JRE) that **dynamically loads Java classes into memory** when required.
 
 Java uses **lazy loading**, so classes are not loaded until they're referenced.
 
----
+ 
 
 ### **2. ClassLoader Hierarchy**
 
@@ -23,7 +21,7 @@ Java uses a **delegation model** where each ClassLoader delegates to its **paren
 | **Application (System) ClassLoader** | Loads from your app’s classpath (`CLASSPATH` env or `-cp`). |
 | **Custom/User ClassLoaders** | You can define custom ClassLoaders in frameworks or applications. |
 
----
+ 
 
 ### **3. ClassLoader in Spring Boot**
 
@@ -44,7 +42,7 @@ Bootstrap
               └── LaunchedURLClassLoader (Spring Boot)
 ```
 
----
+ 
 
 Lets say you have 2 different Java Spring boot applications running on same machine , each will have its own classloader 
 ```mermaid
@@ -55,7 +53,9 @@ graph TD
         C1 --> D1[Spring Boot LaunchedClassLoader - App1]
         D1 --> E1[App1 Classes & Libs]
     end
-
+```
+```mermaid
+graph TD
     subgraph App2
         A2[Bootstrap ClassLoader] --> B2[Platform ClassLoader]
         B2 --> C2[App ClassLoader]
@@ -78,9 +78,8 @@ Tomcat, when embedded in Spring Boot:
 - Uses **shared**, **common**, and **catalina** classloaders for isolation.
 - Can lead to **`ClassCastException`** or `NoClassDefFoundError` if libraries are duplicated.
 
----
+ 
 
-### **5. Summary: ClassLoader Comparison**
 
 | Environment         | ClassLoader Model | Isolation Level | Notes |
 |---------------------|-------------------|------------------|-------|
@@ -88,7 +87,7 @@ Tomcat, when embedded in Spring Boot:
 | Spring Boot         | Custom Boot Loader | Medium           | Fat JAR; all classes in same loader |
 | Standalone Tomcat   | Per-webapp Loader  | High             | Separate classloaders per app |
 
----
+
 
 ### **6. Common Issues Involving ClassLoaders**
 
@@ -97,12 +96,11 @@ Tomcat, when embedded in Spring Boot:
 - `ClassCastException`: Two classes with the same name but different classloaders.
 - Resource loading issues (`getResource()`, `getClassLoader()`) may behave differently based on context.
 
----
 
 
 The **design patterns** used:
 
----
+ 
 
 ### **1. Delegation Pattern**
 
@@ -117,7 +115,7 @@ Each ClassLoader delegates to its **parent** before attempting to load a class i
 - Avoids redundant loading
 - Enables modularization
 
----
+ 
 
 ### **2. Chain of Responsibility**
 
@@ -127,7 +125,7 @@ Used in the **delegation model** as a behavioral chain
 **How:**  
 If the parent cannot find the class, the request passes down to the next ClassLoader in the chain (e.g., application or custom loader)
 
----
+ 
 
 ### **3. Strategy Pattern**
 
@@ -140,7 +138,7 @@ Each ClassLoader can have a different strategy to load classes:
 - From JARs
 - From custom locations (e.g., Spring Boot’s `BOOT-INF`)
 
----
+ 
 
 ### **4. Template Method Pattern**
 
@@ -150,7 +148,7 @@ In the abstract `ClassLoader` class itself
 **How:**  
 Defines the `loadClass()` method with a **fixed algorithm**, but subclasses override specific steps (like `findClass()` or `defineClass()`)
 
----
+ 
 
 ### **5. Singleton Pattern**
 
@@ -160,21 +158,20 @@ Defines the `loadClass()` method with a **fixed algorithm**, but subclasses over
 
 **Why:**  
 Avoids reloading classes and ensures global consistency
-
----
+ 
 
 ### **6. Proxy Pattern (optional use case)**
 
 **Where:**  
 Some frameworks or container plugins may use proxy classloaders to **intercept or virtualize** loading behavior
 
----
+ 
 
 ### **Spring Boot-Specific: Plugin/Extension Use**
 
 - In plugin-based systems (like Spring Boot with plugin modules or IDEs like IntelliJ), classloaders can be used to **isolate dependencies**, achieving the **Module pattern** or even **Microkernel/Plugin Architecture**.
 
----
+ 
 
 ###  Design Patterns Involved
 
@@ -187,6 +184,6 @@ Some frameworks or container plugins may use proxy classloaders to **intercept o
 | **Singleton**            | Core loaders like Bootstrap         | One-time load, globally shared |
 | **Proxy** (advanced)     | ClassLoader wrappers                | Intercept/rescope class loading |
 
----
+ 
 
 
