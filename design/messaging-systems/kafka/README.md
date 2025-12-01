@@ -1,19 +1,20 @@
-## Architecture of Kafka
+# Kafka
 
+Difference between Kafka and Traditional Messaging Systems
 
 ### Storage-Centric vs Queue-Centric Design
 
 Kafka uses a **distributed commit log** stored on disk in an append-only format, allowing linear writes and high throughput. Traditional systems like IBM MQ store messages in **queue structures** where messages are removed after consumption, limiting replay, throughput, and horizontal scaling.
 
-### Consumer Model
+### [Consumer](consumer-group.md) Model
 
 Kafka uses a **pull-based** consumer model where the Consumer client controls fetch rate and offsets. IBM MQ is **push-based**, where the broker decides delivery timing. Kafka allows replay, rewind, and independent offsets for each Consumer Group; IBM MQ removes messages once acknowledged.
 
-### Scaling and Partitioning
+### [Scaling](auto-scaling.md) and [Partitioning](partitions.md)
 
 Kafka partitions each topic across brokers, enabling horizontal scaling. Partition assignment is handled by the **Consumer Group Coordinator** on the broker. IBM MQ relies on **single-queue managers**, scaling vertically rather than horizontally.
 
-### Broker Responsibilities
+### [Broker](Brokers.md) Responsibilities
 
 Kafka Brokers are **dumb storage nodes** that do no message routing or transformation. IBM MQ brokers are **smart brokers** that perform routing, transactions, persistence checks, transformations, and priority scheduling. Kafka offloads most logic to the Producer and Consumer clients.
 
@@ -21,7 +22,7 @@ Kafka Brokers are **dumb storage nodes** that do no message routing or transform
 
 Kafka uses **log replication** with leader–follower architecture and high-throughput replication managed by the Broker replication layer. IBM MQ typically uses **active-passive** or shared-disk failover models, limiting concurrent scaling and throughput.
 
-### Delivery Guarantees
+### [Delivery Guarantees](DeliveryGuarantee.md)
 
 Kafka supports **at-least-once**, **at-most-once**, and **exactly-once** using the Producer client, Broker replication layer, and Transaction Coordinator. IBM MQ provides strict **exactly-once** but at much higher cost and lower throughput due to synchronous persistence and broker-level transactions.
 
@@ -80,6 +81,27 @@ flowchart TD
 
 ```
 
+Data flow to Observer :
+```mermaid
+flowchart TD
+
+    P["Producer<br/>Send Message"] -->|1. Produce Request| L["Leader Replica<br/>(Primary Broker)"]
+
+    L -->|2. Append to Log| L
+
+    %% Normal ISR followers
+    L -->|3. Replicate Log| F1["Follower Replica 1 (ISR)"]
+    L -->|3. Replicate Log| F2["Follower Replica 2 (ISR)"]
+
+    %% Observer replica path
+    L -->|4. Send Log to Observer<br/>Cross-DC Async| O["Observer Replica<br/>(Read-only, Non-ISR)"]
+
+    F1 -->|5. ACK to Leader| L
+    F2 -->|5. ACK to Leader| L
+
+    %% Observers do NOT send ACKs
+    O -. no ACK .-> L
+```
 
  
 
@@ -150,6 +172,9 @@ Followers acknowledge; once they’re up-to-date, they remain in ISR.
 6. Consumer Fetches
 Consumer sends FetchRequest to the same leader.
 
+8. Observer Replicas
+Leader also asynchronously ships log entries to Observer replicas.
+Observers do not ACK — they never block producers.
 
 Internal Components Involved
 
@@ -167,14 +192,15 @@ Controller: manages leader election
 
 Consumer: fetches sequentially from leader
 
-
+Observer : 
+A non-voting, asynchronous replica , Does NOT participate in  ISR , ACKs Leader election
+Used for:  Geo-redundancy , Read scaling  , Cross-AZ / Cross-region replication
   
 
-Kafka looks deceptively simple (“a distributed log system”), but internally it’s a beautifully optimized **high-throughput, fault-tolerant, distributed commit log**.
 
 
 
-###  Architecture 
+## Architecture 
 
 Kafka consists of four core components:
 
@@ -329,6 +355,150 @@ It deletes or compacts them **based on policies**:
 | `compact` | Keep only the **latest value per key**. |
 
 
+ 
+### **“Commit”  in Kafka**
+
+A message is considered **committed** when Kafka guarantees that **it will not be lost**, even if the leader broker crashes.
+
+This requires the message to be:
+
+1. Written to the **Leader** replica
+2. Successfully replicated to **all ISR (In-Sync Replicas)**
+3. Included in the **High Watermark (HW)**
+
+Consumers are **only allowed** to read **up to the HW**, never beyond it.
+
+
+
+Kafka uses three important offsets per partition:
+
+### **1. LEO (Log End Offset)**
+
+* The offset **after** the last written record.
+* For example, if the last record is at offset 9 → LEO = 10.
+
+### **2. Follower LEO**
+
+* Each follower tracks its own log end offset.
+
+### **3. HW (High Watermark)**
+
+* The last committed offset (the last offset replicated to all ISR replicas).
+* Consumers read **only up to this value**.
+
+
+
+` Leader HW = min(leader_log_end_offset, min(follower_log_end_offsets)) `
+
+
+
+* The committed point is the **smallest** LEO among:
+
+  * The leader
+  * All ISR followers
+
+
+Because a record is **not committed** until **every ISR** has it.
+
+
+
+| Replica    | LEO |
+| ---------- | --- |
+| Leader     | 10  |
+| Follower-1 | 9   |
+| Follower-2 | 8   |
+
+Then:
+
+```
+Leader HW = min(10, min(9, 8))
+Leader HW = 8
+```
+
+So offsets **0–7** are committed.
+Offsets **8–9** are uncommitted (consumers cannot read them yet).
+
+ 
+
+### **Why Kafka Uses This Logic**
+
+### **Reason 1: Strong Durability**
+
+A message is only safe if **all ISR replicas** have written it.
+
+### **Reason 2: Leader Failover Safety**
+
+If the leader crashes:
+
+* Kafka elects a new leader **from the ISR**.
+* The new leader must contain all committed messages.
+* Therefore, HW must only include messages present on **all** ISR members.
+
+This prevents data loss after failover.
+
+### **Reason 3: Prevent Consumers From Seeing Uncommitted Data**
+
+Consumers must not read data that could be lost during failover.
+ 
+
+### **How Replication Updates HW Step-by-Step**
+
+1. Producer writes record (offset 10) to leader.
+2. Leader increases its LEO to 11.
+3. Leader sends the record to ISR followers.
+4. ISR followers write it and update their LEO.
+5. Leader compares:
+
+   ```
+   leaderLEO = 11
+   followerLEOs = [11, 11]
+   HW = min(11, 11) = 11
+   ```
+6. HW moves forward (commit point advances).
+7. Consumers are now allowed to read offset 10.
+
+ 
+
+| Term                         | Meaning                                    |
+| ---------------------------- | ------------------------------------------ |
+| **LEO**                      | log end offset; end of log on each replica |
+| **HW**                       | high watermark; commit boundary            |
+| **ISR**                      | replicas that are fully caught up          |
+| **Commit**                   | a record replicated to all ISR replicas    |
+| **Consumer visible offsets** | only offsets ≤ HW                          |
+
+ 
+
+### **Why Leader LEO Is Included in the Formula**
+
+You might wonder:
+
+**Why do we include `leader_log_end_offset` in:**
+
+```
+min(leader_log_end_offset, ...)
+```
+
+Because:
+
+* The leader may temporarily lag behind followers (rare but possible during log truncation or re-election).
+* Kafka ensures HW is always **≤ leader LEO**.
+
+ 
+
+# **Final Interpretation (One Line)**
+
+**Kafka commits a message only when *every* In-Sync Replica has the message; the High Watermark is the smallest LEO among leader and all ISR followers.**
+ 
+
+More :
+
+* A mermaid diagram of commit flow
+* Example with ISR shrink/expand
+* How HW works in KRaft (without ZooKeeper)
+* How unclean leader election affects HW
+ 
+
 
 ### **KRaft Mode (Newer Kafka)**
 
@@ -451,7 +621,6 @@ Kafka uses an **asynchronous replication** model with a **leader-follower** setu
   * If a follower lags > `replica.lag.time.max.ms`, it’s removed from ISR.
   * When caught up, it’s re-added.
 
----
 
 ### 5. Commit and Consistency Algorithm
 
