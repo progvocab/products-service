@@ -160,6 +160,186 @@ This generates a JSON file with new assignments. Apply it:
 ```bash
 bin/kafka-reassign-partitions.sh --bootstrap-server localhost:9092 --execute --reassignment-json-file reassignment.json
 ```
+Below is a **complete list of all strategies** Kafka uses to assign a **message to a partition**, including:
+
+* **Producer-side partitioning strategies**
+* **Broker/Controller involvement**
+* **Default partitioner logic**
+* **Custom partitioner options**
+
+This is 100% accurate per Kafka source code (`DefaultPartitioner`, `UniformStickyPartitioner`).
+
+---
+
+# H3 Producer-Side Partitioning Strategies
+
+Kafka **Controller does *not* assign individual messages to partitions**.
+**The Producer assigns a partition**, and the Controller simply keeps metadata of which broker is leader.
+
+So the strategies below live **inside Kafka Producer**, not the Controller.
+
+---
+
+# H3 1. Key-Based Hash Partitioning (Default When Key Is Present)
+
+If a message has a **key**, Kafka uses:
+
+```
+partition = hash(key) % numPartitions
+```
+
+Properties:
+
+* Deterministic → all messages with same key go to same partition
+* Ensures ordering per key
+* Uses *Murmur2* hash
+
+Common use:
+
+* UserID, AccountID, DeviceID sharding
+
+---
+
+# H3 2. Sticky Partitioning (Default When Key Is Absent)
+
+Since Kafka 2.4+, the default is **UniformStickyPartitioner**.
+
+Rules:
+
+* If no key is provided, producer picks a **random partition** initially.
+* It **sticks** to that partition until the batch is full or partition becomes unavailable.
+* Then it picks a new partition.
+
+Benefits:
+
+* Large batches → higher throughput
+* More even distribution than simple round-robin
+
+Pseudocode:
+
+```java
+if (!hasKey) {
+    if (currentBatchFull)
+        switchToNewPartitionRandomly();
+    return stickyPartition;
+}
+```
+
+---
+
+# H3 3. Round Robin Partitioning (Old Behavior Pre-2.4 or Custom)
+
+Round-robin is still available if you set:
+
+```
+partitioner.class=RoundRobinPartitioner
+```
+
+Behavior:
+
+* Each new message goes to next partition in sequence
+* No batching optimization
+* No awareness of hot partitions
+
+---
+
+# H3 4. Custom Partitioning Strategy
+
+You can plug in your own class:
+
+```
+partitioner.class=my.app.CustomPartitioner
+```
+
+You can implement:
+
+* Geo-based routing
+* Priority routing
+* Time-based sharding
+* Tenant isolation
+
+Example:
+
+```java
+public int partition(String topic, Object key, byte[] keyBytes, 
+                     Object value, byte[] valueBytes, Cluster cluster) {
+    if (tenantId == "gold") return 0;
+    else return 1;
+}
+```
+
+---
+
+# H3 5. Manual Partition Assignment (Override)
+
+Producer can specify partition explicitly:
+
+```java
+new ProducerRecord("orders", 3, key, value);
+```
+
+This bypasses all logic.
+
+Useful for:
+
+* Special routing
+* CQRS event segregation
+* Hot partition isolation
+
+---
+
+# H3 6. Broker/Controller Do NOT Choose Partitions
+
+Important Correction:
+
+* **Kafka Controller decides partition *leadership*, not partition *assignment for messages*.**
+* **Producer decides which partition stores the message.**
+
+Kafka Controller's duties:
+
+* Elect leader replicas
+* Maintain ISR
+* Handle broker failures
+* Manage metadata
+
+Controller **never assigns a record to a partition**.
+
+---
+
+# H3 Consolidated Table
+
+| Strategy                | Who Applies It          | When Used            | Logic                  | Good For                   |
+| ----------------------- | ----------------------- | -------------------- | ---------------------- | -------------------------- |
+| **Hashing (key-based)** | Producer                | Key present          | `hash(key) % N`        | Ordering per key, sharding |
+| **Sticky Partitioner**  | Producer                | No key               | Stick until batch full | High throughput            |
+| **Round Robin**         | Producer                | No key (custom)      | Cycle partitions       | Even distribution          |
+| **Random Partitioner**  | Producer                | Pre–2.4 behavior     | Random pick            | Simple load spreading      |
+| **Manual Partition**    | Producer                | Specific requirement | User-defined partition | Fine-grained routing       |
+| **Custom Partitioner**  | Producer (custom class) | App-specific         | Any logic              | Multi-tenant, geo-routing  |
+
+
+
+
+```mermaid
+flowchart TD
+    P[Producer] --> L{"Has Key?"}
+    L -->|Yes| H[Hash(Key) % N]
+    L -->|No| S[Sticky Partitioner]
+    S --> SS{"Batch Full?"}
+    SS -->|No| SP[Use Same Partition]
+    SS -->|Yes| NP[Pick New Partition Randomly]
+
+    H --> OUT[Final Partition]
+    SP --> OUT
+    NP --> OUT
+```
+
+More:
+
+* Diagram showing **Controller metadata → Producer routing**
+* Side-by-side comparison of *Kafka vs Pulsar* partitioning strategies
+* Example code for **custom partitioners**
+* Explanation of **hot partitions** and mitigation techniques
 
 
 
