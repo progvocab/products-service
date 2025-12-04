@@ -1,8 +1,8 @@
  **Fork/Join** works under the hood when you use a **parallel stream** in Java:
 
----
 
-### **Example:**
+
+
 
 ```java
 import java.util.List;
@@ -24,12 +24,15 @@ public class ParallelStreamExample {
 }
 ```
 
----
 
-### **How it works :**
 
 1. `parallelStream()` divides the data source (here, 1–10) into **subtasks**.
 2. These subtasks are submitted to the **ForkJoinPool.commonPool()**, which uses multiple worker threads (usually equal to CPU cores).
+> worker thread count is configured by -Djava.util.concurrent.ForkJoinPool.common.parallelism=8
+
+by default the value is `Runtime.availableProcessors() - 1`
+
+one less than the number of CPU cores
 3. Each worker thread **processes part of the stream** concurrently.
 4. The **Fork/Join Framework** automatically **splits (fork)** the work and **combines (join)** results efficiently.
 5. Finally, `sum()` (a terminal operation) **aggregates** the partial results into a single output.
@@ -40,15 +43,16 @@ public class ParallelStreamExample {
 
 
 
-## **same example rewritten using the ForkJoinTask / RecursiveTask API** manually
- (to see what happens under the hood)
+##  ForkJoinTask 
+rewrite the code using ForkJoinTask or RecursiveTask API manually
+
 
 
 - the **manual Fork/Join version** 
 
----
 
-### ⚙️ **Code Example:**
+
+
 
 ```java
 import java.util.concurrent.*;
@@ -89,17 +93,17 @@ public class ForkJoinExample {
 > Essentially, this manual version is what `parallelStream()` does internally — split work, execute in parallel, and merge results.
 
 
----
 
-## 🔹 **Fork/Join Pool in Java**
+
+### **Fork/Join Pool in Java**
 
 * Introduced in **Java 7** (`java.util.concurrent` package).
 * It’s a **special thread pool** designed to efficiently execute tasks that can be **split (forked)** into smaller subtasks and then **combined (joined)** to get the final result.
 * Implements the **Fork/Join framework**, which is ideal for **parallelism** (e.g., divide-and-conquer algorithms).
 
----
 
-## 🔹 **Core Idea**
+
+### **Core Idea**
 
 1. A **big task** is recursively split into **smaller subtasks** (using `fork()`).
 2. Subtasks run in parallel on different worker threads.
@@ -107,9 +111,9 @@ public class ForkJoinExample {
 
 This follows the **Divide and Conquer** strategy.
 
----
 
-## 🔹 **Key Classes**
+
+### **Key Classes**
 
 1. **`ForkJoinPool`**
 
@@ -126,7 +130,7 @@ This follows the **Divide and Conquer** strategy.
 
 ---
 
-## 🔹 **Simple Example**
+## 🔹 **Simple Exam
 
 ### Sum of an array using Fork/Join
 
@@ -182,9 +186,9 @@ public class ForkJoinExample {
 }
 ```
 
----
 
-## 🔹 **Why ForkJoinPool is Efficient**
+
+### **Why ForkJoinPool is Efficient**
 
 * **Work-stealing algorithm:**
   Each worker thread has its own deque (double-ended queue).
@@ -193,7 +197,7 @@ public class ForkJoinExample {
   * If idle, it steals tasks from the **opposite end** of another thread’s deque.
 * This reduces contention and maximizes CPU usage.
 
----
+
 
 ## 🔹 **Comparison with ThreadPoolExecutor**
 
@@ -204,11 +208,9 @@ public class ForkJoinExample {
 | **Work-stealing**   | Yes                                     | No                                        |
 | **Performance**     | Better for parallel computation         | Better for general-purpose task execution |
 
----
-
-✅ **In short:**
+ 
 `ForkJoinPool` = A high-performance thread pool specialized for **parallel divide-and-conquer tasks** with a **work-stealing scheduler**.
 
----
 
-👉 Do you want me to also explain how **`parallelStream()` in Java 8** internally uses a **ForkJoinPool**?
+
+More :  Do you want me to also explain how **`parallelStream()` in Java 8** internally uses a **ForkJoinPool**?
