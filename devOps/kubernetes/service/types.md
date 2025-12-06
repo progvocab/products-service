@@ -150,3 +150,153 @@ spec:
 - **ExternalName** → When connecting Kubernetes to an external service.
 
 Would you like more details on any type?
+
+
+Yes — in almost all Kubernetes implementations (including AWS EKS), a Service of type LoadBalancer is essentially:
+
+> An AWS Load Balancer automatically created on top of a NodePort Service.
+
+
+
+But let’s break it down clearly so you understand exactly what happens internally.
+
+
+---
+
+✅ 1. What happens when you create a Service of type LoadBalancer
+
+You write:
+
+type: LoadBalancer
+
+Kubernetes does two things automatically:
+
+(1) Creates a NodePort service under the hood
+
+Even though you didn’t specify it, Kubernetes assigns NodePorts.
+
+Example:
+
+NodePort: 30080
+Port: 80
+ClusterIP: 10.96.1.20
+
+(2) Tells the cloud provider (AWS) to create a real external Load Balancer
+
+In AWS EKS:
+
+It creates an NLB (Network Load Balancer) by default
+
+ALB only if you use AWS Load Balancer Controller with annotations
+
+
+The NLB forwards traffic to:
+
+<NodeIP>:<NodePort>
+
+So the real flow becomes:
+
+Client → AWS NLB → NodePort → kube-proxy → Pod
+
+
+---
+
+✅ 2. Why does Kubernetes need the NodePort underneath?
+
+Because: AWS NLB must send traffic to nodes, not directly into Pods.
+
+Nodes expose the NodePort so that:
+
+Traffic entering a node → kube-proxy → correct Pod
+
+NodePort is the mechanism that exposes the node’s port for the LB to use.
+
+
+---
+
+🧠 3. So the relationship is:
+
+✔ LoadBalancer = NodePort + cloud load balancer
+
+✔ NodePort exists inside the cluster
+
+✔ AWS Load Balancer is outside the cluster
+
+
+---
+
+🖼️ 4. Visual Diagram
+
++-----------------------------+
+          |     AWS Network LB (NLB)    |
+          |  Listeners: 80 → NodePort   |
+          +-----------------------------+
+                     |
+                     v
+          +-----------------------------+
+          |    Kubernetes Node          |
+          |   NodePort (30080)          |
+          +-----------------------------+
+                     |
+                     v
+            kube-proxy Load Balancing
+                     |
+                     v
+             Backend Pods (ClusterIP)
+
+
+---
+
+🎯 5. Important Clarifications
+
+🔹 Is a LoadBalancer service just a wrapper over NodePort?
+
+Yes — LoadBalancer builds on top of NodePort, but adds:
+
+External IP
+
+Cloud LB provisioning
+
+Health checks
+
+Target registration
+
+Cross-zone balancing
+
+
+🔹 Can LoadBalancer work without NodePort?
+
+No — not in standard Kubernetes.
+Some CNI implementations like Cilium L2 Service LB avoid NodePort, but EKS default does not.
+
+🔹 Can AWS LB send traffic directly to Pods?
+
+Not with classic Kubernetes.
+But possible with:
+
+AWS Load Balancer Controller + ALB → Pod mode
+
+Cilium + Pod ENI mode
+These bypass NodePort.
+
+
+
+---
+
+📌 Final Answer (Interview-level)
+
+> Yes. A Kubernetes Service of type LoadBalancer is fundamentally a NodePort Service plus an automatically provisioned cloud load balancer (an AWS NLB in EKS).
+The AWS LB forwards traffic to the NodePort on each node, which kube-proxy or CNI then load-balances to the actual Pods.
+
+
+
+
+---
+
+If you want, I can also explain:
+
+How ALB Ingress Controller differs
+
+How traffic flows with Istio Gateway vs LoadBalancer
+
+How Pod-level load balancing works using AWS Pod ENI mode (bypassing NodePort)
