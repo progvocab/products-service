@@ -24,7 +24,7 @@ Kafka uses **log replication** with leader–follower architecture and high-thro
 
 ### [Delivery Guarantees](DeliveryGuarantee.md)
 
-Kafka supports **at-least-once**, **at-most-once**, and **exactly-once** using the Producer client, Broker replication layer, and Transaction Coordinator. IBM MQ provides strict **exactly-once** but at much higher cost and lower throughput due to synchronous persistence and broker-level transactions.
+Kafka supports **at-least-once**, **at-most-once**, and **exactly-once** using the Producer client, Broker replication layer, and [Transaction](transactions.md) Coordinator.[Streams](streams.md) are also useful in ensuring EOS. IBM MQ provides strict **exactly-once** but at much higher cost and lower throughput due to synchronous persistence and broker-level transactions.
 
 ### Data Retention and Replay
 

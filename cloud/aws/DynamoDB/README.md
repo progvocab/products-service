@@ -1,19 +1,19 @@
-### ### DynamoDB Terminology (With Clear, Concise Examples)
+### DynamoDB Terminology (With Clear, Concise Examples)
 
 Below are **all important DynamoDB terms**, each with **2–3 line explanations** and **relevant examples**.
 
----
+ 
 
-### ### Table
+### Table
 
 A collection of items (similar to a table in relational DB) but **schema-less** except for PK/SK.
 
 **Example:**
 A table named `Ecommerce` storing Users, Orders, Products—all in one table.
 
----
+ 
 
-### ### Item
+### Item
 
 A single record inside a DynamoDB table.
 
@@ -23,18 +23,18 @@ A single record inside a DynamoDB table.
 { "PK": "USER#1", "SK": "USER#1", "Name": "John" }
 ```
 
----
+ 
 
-### ### Attribute
+### Attribute
 
 A field inside an item. DynamoDB allows **string, number, map, list, binary**, etc.
 
 **Example:**
 `Name`, `Age`, `Address.zip` are attributes.
 
----
+ 
 
-### ### Primary Key (PK)
+### Primary Key (PK)
 
 Uniquely identifies an item. Two types:
 
@@ -44,9 +44,9 @@ Uniquely identifies an item. Two types:
 **Example:**
 `PK = USER#1`.
 
----
+ 
 
-### ### Partition Key (Hash Key)
+### Partition Key (Hash Key)
 
 Determines the **physical partition** the item goes into.
 Items with the same PK are grouped together.
@@ -54,9 +54,9 @@ Items with the same PK are grouped together.
 **Example:**
 All `PK = USER#1` items stored contiguously.
 
----
+ 
 
-### ### Sort Key (Range Key)
+### Sort Key (Range Key)
 
 Defines **ordering** inside a partition.
 
@@ -67,9 +67,9 @@ PK = USER#1
 SK = ORDER#202501
 ```
 
----
+ 
 
-### ### Composite Key
+### Composite Key
 
 PK + SK together uniquely identify an item.
 
@@ -80,24 +80,24 @@ PK = USER#1
 SK = ORDER#1001
 ```
 
----
+ 
 
-### ### Partition
+### Partition
 
 Underlying storage units managed by DynamoDB to distribute data and workload.
 
 **Example:**
 If you have heavy writes, DynamoDB automatically splits your partitions.
 
----
+ 
 
-### ### Secondary Index (GSI & LSI)
+### Secondary Index (GSI & LSI)
 
 Alternate key structures for additional query patterns.
 
----
+ 
 
-### ### Global Secondary Index (GSI)
+### Global Secondary Index (GSI)
 
 Index with **different PK and SK** from the main table.
 
@@ -108,58 +108,58 @@ GSI1PK = EMAIL#john@example.com
 GSI1SK = USER#1
 ```
 
----
+ 
 
-### ### Local Secondary Index (LSI)
+### Local Secondary Index (LSI)
 
 Shares the same **PK**, but uses a **different SK**.
 
 **Example:**
 Sort orders by `OrderDate` instead of `SK`.
 
----
+ 
 
-### ### Provisioned Capacity
+### Provisioned Capacity
 
 You configure **RCU** and **WCU** manually. Good for predictable traffic.
 
----
+ 
 
-### ### On-Demand Capacity
+### On-Demand Capacity
 
 DynamoDB auto-scales capacity. Best for unpredictable traffic.
 
----
+ 
 
-### ### Read Capacity Unit (RCU)
+### Read Capacity Unit (RCU)
 
 1 strongly consistent read of 4 KB per second.
 
 **Example:** Reading an item of 8 KB = **2 RCUs**.
 
----
+ 
 
-### ### Write Capacity Unit (WCU)
+### Write Capacity Unit (WCU)
 
 1 write of 1 KB per second.
 
 **Example:** Writing a 2 KB item = **2 WCUs**.
 
----
+ 
 
-### ### Strongly Consistent Read
+### Strongly Consistent Read
 
 Reads the **latest** committed value.
 
----
+ 
 
-### ### Eventually Consistent Read
+### Eventually Consistent Read
 
 May return stale data but is **2× cheaper**.
 
----
+ 
 
-### ### Query
+### Query
 
 Fetches items by **PK** and optional **SK condition**.
 
@@ -171,143 +171,143 @@ PK = USER#1
 SK begins_with ORDER#
 ```
 
----
+ 
 
-### ### Scan
+### Scan
 
 Reads **every item** in the table or index. Costly.
 
 **Example:**
 Scan table to find all products with price < 100.
 
----
+ 
 
-### ### Filter Expression
+### Filter Expression
 
 Filters results **after** query/scan—extra cost.
 
 **Example:**
 `price < 100` applied after reading items.
 
----
+ 
 
-### ### Projection Expression
+### Projection Expression
 
 Selects only specific attributes to reduce cost.
 
 **Example:**
 `Name, Email`.
 
----
+ 
 
-### ### Expression Attribute Names
+### Expression Attribute Names
 
 Used when attribute names conflict with reserved keywords.
 
 **Example:**
 `#name = "John"` where `#name` refers to the Name attribute.
 
----
+ 
 
-### ### Expression Attribute Values
+### Expression Attribute Values
 
 Placeholders for attribute values.
 
 **Example:**
 `:status = "PAID"`.
 
----
+ 
 
-### ### TTL (Time To Live)
+### TTL (Time To Live)
 
 Automatically deletes items after a timestamp.
 
 **Example:**
 `ttl = 1700000000` (expires at this UNIX time).
 
----
+ 
 
-### ### DynamoDB Streams
+### DynamoDB Streams
 
 Captures **real-time changes** (insert, update, delete) for processing via **AWS Lambda**.
 
----
+ 
 
-### ### BatchGetItem
+### BatchGetItem
 
 Reads up to **100 items** across multiple tables in a single request.
 
----
+ 
 
-### ### BatchWriteItem
+### BatchWriteItem
 
 Writes/deletes up to **25 items** in one request.
 
----
+ 
 
-### ### Conditional Writes
+### Conditional Writes
 
 Writes occur only if a condition is satisfied.
 
 **Example:**
 Only deduct inventory if `stock > 0`.
 
----
+ 
 
-### ### Optimistic Concurrency Control (OCC)
+### Optimistic Concurrency Control (OCC)
 
 Uses a version attribute to prevent overwriting newer updates.
 
----
+ 
 
-### ### Item Collection
+### Item Collection
 
 All items with the same PK.
 
 **Example:**
 All `USER#1` items (orders, addresses, etc.).
 
----
+ 
 
-### ### Single Table Design (STD)
+### Single Table Design (STD)
 
 Storing multiple entity types in one table using PK/SK strategies.
 
----
+ 
 
-### ### Hot Partition
+### Hot Partition
 
 A partition receiving disproportionate traffic → throttle.
 DynamoDB uses internal auto-splitting to reduce this.
 
----
+ 
 
-### ### Throttling
+### Throttling
 
 Occurs when RCU/WCU limits exceed. SDK returns `ProvisionedThroughputExceededException`.
 
----
+ 
 
-### ### Auto Scaling
+### Auto Scaling
 
 DynamoDB automatically adjusts RCU/WCU based on demand.
 
----
+ 
 
-### ### S3 Export / Import
+### S3 Export / Import
 
 Move DynamoDB data to/from S3 without writing custom code.
 
----
+ 
 
-### ### Transactions
+### Transactions
 
 ACID-compliant operations across multiple items.
 
 **Example:**
 Decrease inventory **and** increase order count atomically.
 
----
+ 
 
 If you want, I can prepare a **one-page cheat sheet table (markdown)** with all DynamoDB terms, examples, and purpose.
 
@@ -363,7 +363,7 @@ On the surface, it looks like a hot partition should only affect that partition 
 Here is the precise explanation that AWS expects:
 
 
----
+ 
 
 ✅ Why does a hot partition (noisy neighbor) impact other tenants?
 
@@ -371,7 +371,7 @@ Although DynamoDB partitions are isolated for storage, they share table-level th
 So a single hot partition can affect the entire table in three ways:
 
 
----
+ 
 
 1️⃣ Table-level WCU/RCU is shared across all partitions
 
@@ -392,7 +392,7 @@ Remaining 9 partitions must now share only 2,000 WCUs
 This is the #1 cause of cross-tenant impact.
 
 
----
+ 
 
 2️⃣ Adaptive Capacity helps, but only AFTER throttling starts
 
@@ -409,7 +409,7 @@ It cannot exceed hard per-partition limits (like ~1,000 WCUs)
 ➡ So if the noisy tenant exhausts the table's unused capacity, others see throttling before adaptive capacity stabilizes.
 
 
----
+ 
 
 3️⃣ Internal DynamoDB resources are shared (workers, request queues, partitions placement)
 
@@ -439,7 +439,7 @@ Even AWS re:Invent talks explicitly say:
 "One hot partition can impact the performance of the entire table."
 
 
----
+ 
 
 4️⃣ GSIs make it worse (hot GSI partitions = global throttling)
 
@@ -460,7 +460,7 @@ Which then throttle writes on the main table
 ➡ This cascades throttling to everyone.
 
 
----
+ 
 
 5️⃣ Large spikes cause request-routing imbalances at the front-end fleet
 
@@ -475,7 +475,7 @@ Returns throttling (ProvisionedThroughputExceeded)
 
 
 
----
+ 
 
 🧠 Simplified answer for interviews
 
@@ -488,7 +488,7 @@ Therefore, a hot partition always risks degrading performance for the entire tab
 
 
 
----
+ 
 
 If you want, I can also explain:
 
@@ -504,7 +504,7 @@ Great follow-up — this is exactly where DynamoDB design clicks.
 Let’s go deeper and make it crystal clear.
 
 
----
+ 
 
 ✅ Why adding a shardId to the partition key helps (even though the table has limited partitions)
 
@@ -522,7 +522,7 @@ DynamoDB will then split these keys across many physical partitions, giving you:
 Let’s break it down.
 
 
----
+ 
 
 ✅ 1) DynamoDB partitions are created based on key cardinality + throughput pressure
 
@@ -549,7 +549,7 @@ Suddenly the table has 10× more partition key values, so DynamoDB spreads these
 ➡ More physical partitions means more total available throughput.
 
 
----
+ 
 
 ✅ 2) Writes get evenly distributed across partitions instead of hitting one partition
 
@@ -570,7 +570,7 @@ Now your workload is spread across multiple backend partitions.
 ➡ Instead of 1 partition hitting 1,000 WCUs limit, you now have 10 partitions → ~10,000 WCUs potential capacity.
 
 
----
+ 
 
 ✅ 3) Adaptive capacity can now work properly
 
@@ -593,7 +593,7 @@ No throttles to other tenants
 
 
 
----
+ 
 
 ✅ 4) Even though the table is “one logical table,” partitions scale up underneath it
 
@@ -611,7 +611,7 @@ Sharding increases N.
 More partitions = More write queues, more storage isolation, more request capacity.
 
 
----
+ 
 
 ✅ 5) Adding a shardId multiplies the per-tenant maximum throughput
 
@@ -641,7 +641,7 @@ Sharding takes you from a physics limit (1 partition ≈ 1,000 WCUs)
 to a scalable model (N partitions ≈ N * 1,000 WCUs).
 
 
----
+ 
 
 ✔ Concise Interview Answer
 
@@ -656,7 +656,7 @@ That’s why synthetic sharding eliminates hot partitions.”
 
 
 
----
+ 
 
 If you want, I can also explain:
 
@@ -678,7 +678,7 @@ table, partition, GSI, LSI, and account-level.
 This is a topic AWS loves asking because people confuse the “per-partition” vs “per-table” limits.
 
 
----
+ 
 
 ✅ 1. Partition-Level Limits (hard physical limits)
 
@@ -697,7 +697,7 @@ These limits are why hot partitions cause throttling.
 No matter how much table capacity you provision, each partition cannot exceed these numbers.
 
 
----
+ 
 
 ✅ 2. Table-Level Throughput Limits (soft / scalable)
 
@@ -729,7 +729,7 @@ Table will scale partitions accordingly.
 But a single partition key stays limited to the partition-level limits above.
 
 
----
+ 
 
 ✅ 3. GSI-Level Throughput Limits
 
@@ -756,7 +756,7 @@ B) GSI scaling is independent of table scaling
 GSIs scale their partitions separately from table partitions.
 
 
----
+ 
 
 ✅ 4. LSI-Level Limits (Local Secondary Index)
 
@@ -779,7 +779,7 @@ Meaning:
 LSIs cannot exceed these limits or scale independently.
 
 
----
+ 
 
 ✅ 5. Item-Level Limits (not throughput, but important)
 
@@ -792,7 +792,7 @@ Eventually consistent read	1 RCU = 8KB read
 
 
 
----
+ 
 
 ✅ 6. Account-Level Limits (Soft Limits)
 
@@ -809,7 +809,7 @@ Number of tables	~256	Request increase
 These are easy to increase with AWS Support.
 
 
----
+ 
 
 🔥 Putting Everything Together (Exam Summary)
 
@@ -824,7 +824,7 @@ Account-level limits cap the maximum provisioned capacity unless increased by AW
 
 
 
----
+ 
 
 Want a diagram?
 
