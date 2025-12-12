@@ -3,13 +3,13 @@
 AWS services are regional 
 
 ### List of [Global Services](GlobalServices.md)
-  1. IAM
+  1. [IAM](iam/) Access Management
   2. Organizations
   3. Control Tower
   4. Artifact
   5. Support Center
   6. Account Manager
-  7. Billing 
+  7. [Billing](billing/) cost tracking, cost optimization, forecasting, budgeting 
   8. Marketplace
   9. AWS IQ
   10. Cloudfront
@@ -25,6 +25,13 @@ AWS services are regional
   4. Operational Excellence
   5. Cost Optimization
   6. Performance Efficiency
+
+#### [Multi Tenant Design](standards/multi_tenant/)
+####  [Disaster Recovery](disaster_recovery/)
+####  [Networking](network/)
+####  [System Design](system-design/)
+####  [Migration Strategies](migration/)
+
 
 ## Serverless
  a **completely serverless, highly available, and massively burst-tolerant application on AWS**.
@@ -53,8 +60,10 @@ B --> C[CloudFront CDN + WAF + Shield]
 %% API LAYER
 %% ================================
 C --> D[API Gateway]
-
-D -->|Auth via| E[Cognito User Pools / Federated Identity]
+```
+```mermaid
+flowchart LR
+D[API Gateway] -->|Auth via| E[Cognito User Pools / Federated Identity]
 
 %% ================================
 %% REQUEST HANDLING
@@ -68,11 +77,24 @@ D -->|Async Heavy Ops| I["SQS Queue (Absorb Bursts)"]
 I --> J["Lambda Consumer (Scales Automatically)"]
 J --> G
 J --> H
+ 
+ 
 
+
+%% ================================
+%% OBSERVABILITY
+%% ================================
+J --> P[CloudWatch Logs/Metrics/Alarms]
+F --> P
+D --> P
+```
+
+```mermaid
+flowchart LR
 %% ================================
 %% STREAMING / EVENTS
 %% ================================
-G -.-> K[DynamoDB Streams]
+G["DynamoDB (On-Demand)"] -.-> K[DynamoDB Streams]
 K -.-> L[Lambda Stream Processor]
 L -.-> M[EventBridge / SNS Fan-out]
 
@@ -81,13 +103,6 @@ L -.-> M[EventBridge / SNS Fan-out]
 %% ================================
 M --> N[Kinesis Stream / Firehose]
 N --> O[S3 Data Lake / Redshift]
-
-%% ================================
-%% OBSERVABILITY
-%% ================================
-J --> P[CloudWatch Logs/Metrics/Alarms]
-F --> P
-D --> P
 ```
 
 
@@ -316,7 +331,11 @@ flowchart LR
 
   %% API layer
   D --> E["API Servers (EKS Pods / ECS Tasks / EC2 ASG)"]
-  E -->|Auth via| F[Cognito / OIDC]
+```
+
+```mermaid
+flowchart LR
+  E["API Servers (EKS Pods / ECS Tasks / EC2 ASG)"] -->|Auth via| F[Cognito / OIDC]
   E -->|Sync reads/writes| G["Aurora (RDS) / DynamoDB"]
   E -->|Reads fast| H["ElastiCache (Redis)"]
 
@@ -401,7 +420,7 @@ flowchart LR
 
   * Terraform / AWS CDK / CloudFormation + GitHub Actions / CodePipeline / Argo CD for GitOps (if EKS).
 
-# 2) Data-flow (write + burst-safe path)
+### 2) Data-flow (write + burst-safe path)
 
 Client → Route53 → CloudFront → ALB → API servers (EKS/ECS/EC2)
 
@@ -423,11 +442,10 @@ Asynchronous (heavy / bursty):
 Analytics:
 
 * Use Kafka topics and Kafka Connect / Kinesis Firehose to route events to S3/Redshift/OpenSearch.
+ 
 
-# 3) Mermaid data-flow diagram
 
-
-# 4) Scaling & HA patterns (to handle bursts)
+### 4) Scaling & HA patterns (to handle bursts)
 
 * Use **autoscaling** all the way:
 
@@ -459,7 +477,7 @@ Analytics:
 
   * Increase partitions for higher throughput; ensure consumers scale to match.
 
-# 5) Resilience & Disaster Recovery
+### 5) Resilience & Disaster Recovery
 
 * Multi-AZ for all managed services (Aurora multi-AZ, MSK multi-AZ, ElastiCache with replication, S3 cross-region replication for critical data).
 * Active-passive or active-active across regions:
@@ -472,7 +490,7 @@ Analytics:
   * Automated snapshots for Aurora & MSK; S3 lifecycle + replication.
 * Recovery runbooks and automated failover tests.
 
-# 6) Security & networking
+### 6) Security & networking
 
 * Run workloads in a VPC with private subnets for app & worker nodes, public subnets only for ALB.
 * Use Security Groups + NACLs + IAM least privilege.
@@ -480,14 +498,14 @@ Analytics:
 * Use RDS Proxy and IAM authentication for DB access.
 * Rotate secrets via Secrets Manager; encrypt with KMS.
 
-# 7) Observability & troubleshooting
+### 7) Observability & troubleshooting
 
 * Metrics: CloudWatch + Managed Prometheus (or self-hosted Prometheus) for app & infra metrics. Monitor queue depth, Kafka consumer lag, DB connections, CPU, memory.
 * Logging: Centralize logs in CloudWatch or push to OpenSearch. Use structured logging.
 * Tracing: OpenTelemetry -> X-Ray or Jaeger (deployed in EKS) to visualize request spans across ALB → API → workers → DB.
 * Alerts: CloudWatch alarms + SNS → PagerDuty/Slack.
 
-# 8) Deployment & infra-as-code
+### 8) Deployment & infra-as-code
 
 * Use Terraform or CDK to provision:
 
@@ -501,13 +519,7 @@ Analytics:
   * Use Helm charts and Kustomize for environment diffs.
   * Use feature flags for traffic shaping and gradual rollouts.
 
-# 9) Trade-offs & guidance (serverful vs serverless)
-
-* Serverful (EKS/ECS/EC2) gives finer control (better for complex networking, long-lived connections, binary dependencies, advanced stateful stream processing) but requires more ops effort (cluster management, patching, capacity planning).
-* Managed services (MSK, Aurora, ElastiCache) reduce ops burden but still require capacity planning (partitions, instance sizes).
-* Use a hybrid approach: keep streaming / heavy processing on managed distributed systems (MSK + EKS consumers), keep simple job-queuing via SQS and simple stateless workloads on Fargate if you want less infra friction.
-
-# 10) Practical configuration recommendations for bursts (starting point)
+### 10) Practical configuration recommendations for bursts (starting point)
 
 * MSK: start with 3 broker nodes across AZs, 12 partitions for hot topics (adjust based on throughput). Enable encryption in transit & at rest.
 * SQS: standard queue with DLQ; visibility timeout slightly larger than max processing time; monitor ApproximateNumberOfMessagesVisible.
@@ -516,6 +528,13 @@ Analytics:
 * ElastiCache Redis: multi-AZ with replica and cluster-mode enabled for sharding if needed.
 * RDS Proxy: enable for connection pooling.
 
+### Trade-offs & guidance (serverful vs serverless)
+
+* Serverful (EKS/ECS/EC2) gives finer control (better for complex networking, long-lived connections, binary dependencies, advanced stateful stream processing) but requires more ops effort (cluster management, patching, capacity planning).
+* Managed services (MSK, Aurora, ElastiCache) reduce ops burden but still require capacity planning (partitions, instance sizes).
+* Use a hybrid approach: keep streaming / heavy processing on managed distributed systems (MSK + EKS consumers), keep simple job-queuing via SQS and simple stateless workloads on Fargate if you want less infra friction.
+
+ 
 
 
 
