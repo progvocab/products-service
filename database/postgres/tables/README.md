@@ -1,3 +1,251 @@
+# Schemas
+
+PostgreSQL ships with **multiple internal system schemas** that store metadata, catalogs, statistics, extensions, background worker info, TOAST data, temp tables, and more.
+These schemas are created automatically and should generally **never be modified manually**.
+
+Below is the full, accurate list of internal schemas and what each one contains.
+ 
+
+# **1. `pg_catalog` (Most Important – Core System Catalogs)**
+
+This is the **heart** of PostgreSQL’s metadata system.
+
+Contains:
+
+* Tables about tables (`pg_class`)
+* Columns (`pg_attribute`)
+* Data types (`pg_type`)
+* Constraints (`pg_constraint`)
+* Index metadata (`pg_index`)
+* Functions & procedures (`pg_proc`)
+* Namespaces (`pg_namespace`)
+* Users & roles (`pg_authid`)
+* Statistics (`pg_statistic`)
+* Settings (`pg_settings`)
+
+Every object you create (tables, indexes, functions) has a row in `pg_catalog`.
+
+**Always present. Always queried by the optimizer.**
+ 
+
+# **2. `information_schema` (ANSI SQL Standard View Layer)**
+
+A standards-compliant “view” layer over `pg_catalog`.
+
+Used for:
+
+* Tool compatibility
+* Generic SQL reporting
+* Cross-DB portability
+
+Contains views like:
+
+* `tables`
+* `columns`
+* `key_column_usage`
+* `constraint_table_usage`
+* `routines`
+* `sequences`
+ 
+
+# **3. `pg_toast` (Stores Oversized Columns)**
+
+TOAST = **The Oversized Attribute Storage Technique**
+
+When a row has:
+
+* Large `text`
+* `bytea`
+* `jsonb`
+* `xml`
+* `geometry`
+
+Postgres stores them in separate TOAST tables located in this schema.
+
+Each table with toastable attributes will have a corresponding:
+
+```
+pg_toast.pg_toast_<oid>
+```
+
+Never query manually unless debugging storage.
+ 
+
+# **4. `pg_temp_<N>` (Per-session Temporary Schemas)**
+
+Created automatically when a session uses temporary tables.
+
+Each backend gets:
+
+```
+pg_temp_3
+pg_temp_12
+pg_temp_42
+```
+
+Contains:
+
+* Temporary tables
+* Temporary indexes
+* Temporary sequences
+
+Destroyed automatically when the session disconnects.
+
+Also:
+
+`pg_toast_temp_<N>` → TOAST tables for temp objects.
+ 
+
+# **5. `pg_logical` (Logical Replication Metadata)**
+
+Stores internal info for:
+
+* Logical decoding slots
+* Publication/subscription metadata
+
+Tables include:
+
+* `pg_logical_slot`
+* `pg_logical_origin`
+
+Used heavily in logical replication, Debezium, CDC pipelines, etc.
+ 
+
+# **6. `pg_replication_slots` (Replication Slot Disk Data)**
+
+Not always visible as schema but internal catalog entries store:
+
+* Slot state
+* Restart LSN
+* Confirmed flush LSN
+
+Used by streaming replication & logical replication.
+ 
+
+# **7. `pg_catalog`-related "statistics schemas" (`pg_stat_*`)**
+
+These are *views*, not physical schemas, but critical internal namespaces.
+
+They come from:
+
+* `pg_statistic`
+* Background worker stats
+* WAL stats
+* Replication stats
+
+Important ones:
+
+* `pg_stat_activity`
+* `pg_stat_replication`
+* `pg_stat_user_tables`
+* `pg_stat_all_tables`
+* `pg_stat_database`
+* `pg_stat_bgwriter`
+* `pg_stat_wal`
+* `pg_stat_progress_vacuum`
+* `pg_stat_progress_analyze`
+
+These are views over internal shared memory and catalog tables.
+
+ 
+
+# **8. Internal "system functions" schemas**
+
+Postgres also includes:
+
+### `pg_catalog` (functions for system operations)
+
+Contains built-in:
+
+* Operators
+* Functions
+* Internal helper routines
+
+Examples:
+
+```
+pg_backend_pid()
+pg_current_wal_lsn()
+pg_table_size()
+```
+
+### `pg_internal` (hidden)
+
+Used for internal manipulation, rarely exposed.
+ 
+
+# **9. `pgagent` (if pgAdmin job scheduler is installed)**
+
+Only appears if pgAgent extension is installed.
+
+Contains:
+
+* Job metadata
+* Scheduled tasks
+* Logs
+
+Not part of vanilla PostgreSQL.
+ 
+
+# **10. `pg_hint_plan`, `pgcrypto`, `postgis` etc. (Extension schemas)**
+
+When you install extensions, they often create their own schemas:
+
+Examples:
+
+* `pgcrypto`
+* `pg_buffercache`
+* `pg_stat_statements`
+* `postgis`
+* `pg_trgm`
+* `hstore`
+* `citext`
+
+These are not built-in but common.
+
+ 
+
+# **11. `public` (Default User Schema)**
+
+The default schema where user objects are created unless otherwise specified.
+
+Includes:
+
+* Tables
+* Views
+* Functions
+* Extensions (when installed into public)
+
+Most organizations restrict its usage for security.
+
+ 
+
+# **Summary Table**
+
+Below is a clean summary.
+
+| Schema                             | Purpose                                                       |
+| ---------------------------------- | ------------------------------------------------------------- |
+| **pg_catalog**                     | Core system catalogs (tables, columns, types, indexes, roles) |
+| **information_schema**             | ANSI SQL standardized views                                   |
+| **pg_toast**                       | Oversized values storage                                      |
+| **pg_temp_n**                      | Per-backend temp objects                                      |
+| **pg_toast_temp_n**                | TOAST for temp tables                                         |
+| **pg_logical**                     | Logical decoding + replication metadata                       |
+| **pg_catalog views (`pg_stat_*`)** | Statistics + system monitoring views                          |
+| **pg_internal**                    | Hidden internal routines                                      |
+| **public**                         | Default user schema                                           |
+| **extension schemas**              | Created by extensions (postgis, pgcrypto, etc.)               |
+
+ 
+
+# If you want, I can also provide:
+
+* ER Diagram of all internal schemas
+* ER Diagram specifically for `pg_stat_activity`
+* Catalog relationships for `pg_class`, `pg_attribute`, `pg_type`
+* Explanation of how optimizer uses `pg_statistic`
+ 
 
 ## Catalog and Statistics Tables
 
