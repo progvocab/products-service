@@ -1,11 +1,11 @@
- **MongoDB architecture** perspectives:
+ # Mongo DB
 
-1. **Logical View** → How data is organized (databases, collections, documents, indexes).
-2. **Physical View** → How MongoDB is deployed (replica sets, shards, config servers, query routers).
+1. **Logical View** → How data is organized/modeled (databases, collections, documents, indexes).
+2. **Physical View** → How MongoDB is deployed and scaled (replica sets, shards, config servers, query routers).
+ 
 
----
 
-#  Logical Architecture (Data Model)
+##  Logical Architecture (Data Model)
 
 ```mermaid
 graph TD
@@ -27,9 +27,9 @@ graph TD
 * **Fields**: Key-value pairs.
 * **Indexes**: Improve query performance.
 
----
+ 
 
-# Physical Architecture (Deployment Model)
+## Physical Architecture (Deployment Model)
 
 ```mermaid
 graph TD
@@ -64,31 +64,19 @@ graph TD
     M2 --> C2
 ```
 
- Explanation:
 
+[Node and Shard](Nodes.md)
 * **Replica Set**: Primary + Secondaries (HA + failover).
 * **Sharding**: Distributes data across shards.
 * **Config Servers**: Store metadata for sharding.
 * **MongoS Routers**: Clients connect here; they route queries to the right shard.
 
----
+ 
 
-###  Key Takeaway
+### Logical + Physical Architecture
 
-* **Logical View** → how data is modeled.
-* **Physical View** → how MongoDB is deployed and scaled.
-
----
-
-## **Combined view (logical + physical)** - how documents flow through routers, shards, and replicas
-
----
-
-## **combined view of MongoDB architecture** in one diagram showing how the **logical data model (database → collection → document)** maps onto the **physical deployment (shards, replica sets, routers, config servers)**.
-
----
-
-## Combined MongoDB Logical + Physical Architecture
+how a query from the **client** flows through **MongoS**, gets routed to the correct **shard**, and finally resolves to a **collection/document** inside the logical database.
+ 
 
 ```mermaid
 graph TD
@@ -151,19 +139,21 @@ graph TD
     C2 --> IDX
 ```
 
----
+- [CAP](CAP.md)
+  MongoDB acts as AP , prioritize availability over correctness
 
-## Explanation
+
+
+### Operations 
+- [Basic Queries](basic.md)
+- [Map Reduce Queries](MapReduce.md)
+ 
 
 1. **Client Layer** → Applications talk to MongoDB through **MongoS routers**.
 2. **Router Layer (MongoS)** → Handles query routing, talks to config servers for shard metadata.
 3. **Config Servers** → Store cluster metadata (shard mappings).
 4. **Shards** → Each shard is a **replica set** (HA, scaling).
 5. **Logical View inside Shards** → Each replica set stores **databases → collections → documents → indexes**.
+ 
 
----
-
- This diagram shows how a query from the **client** flows through **MongoS**, gets routed to the correct **shard**, and finally resolves to a **collection/document** inside the logical database.
-
-Do you want me to extend this further and show a **query execution flow** (e.g., how a `find()` query moves across routers → shards → documents → response)?
 
