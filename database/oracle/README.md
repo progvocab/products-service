@@ -1,15 +1,4 @@
-- [Up](..)
-
-# Oracle 
-- [Joins](joins.md)
-- [Cursor](cursor)
-- [Indexes](indexes)
-- [Procedure](procedure)
-- [Objects](objects.md)
-- [ORA files](ora_files.md)
-- [DB Link](db_link.md)
-
-
+ 
 # Oracle Database 
 
 
@@ -29,16 +18,13 @@ flowchart TD
     SGA --> IM["In-Memory Column Store<br/>(Optional)"]
 
 ```
+ 
 
-mapping of Oracle logical storage to physical storage using text/ASCII style. You can also represent it visually later.
-
-
-
-### What Is an OS-Level Block in Linux
+ 
 
 An **OS-level block** is the **smallest unit of data the operating system reads from or writes to a block device** (SSD, HDD, EBS, NVMe). It is managed by the **Linux Virtual File System (VFS)** and the **block layer** of the kernel, not by the database.
 
-### Key Characteristics of OS-Level Block
+ 
 
 1. **Physical Sector Size Based on Hardware**
 
@@ -59,7 +45,7 @@ An **OS-level block** is the **smallest unit of data the operating system reads 
 
    * A database like Oracle may use 8K blocks, but the OS still writes in 4K physical blocks.
 
-### OS-Level Block vs File System Block vs Database Block
+ 
 
 | Layer                               | Example Size | Managed By               | Purpose                      |
 | ----------------------------------- | ------------ | ------------------------ | ---------------------------- |
@@ -87,17 +73,10 @@ An **OS-level block** is the **smallest unit of data the operating system reads 
 * Incorrect block alignment causes **extra I/O**.
 * Understanding block sizes helps optimize **IOPS**, **throughput**, and **latency**.
 * Databases perform better when DB block size aligns with file system and OS block sizes.
-
-If you want, I can also explain:
-
-* Difference between logical block size and physical block size
-* How Linux caches blocks in the page cache
-* Why cloud storage (EBS) internally uses 4 KB sectors even if abstracted as 512 bytes
-
----
+ 
 
 Oracle Storage Hierarchy
-
+```txt
 Physical Storage (Disk)
  ├── Datafiles (store tablespace data)
  │    ├── File: users01.dbf
@@ -121,7 +100,7 @@ Logical Storage (within the database)
       └── Another Segment ...
 
 
----
+```
 
 Explanation
 
@@ -140,15 +119,22 @@ Explanation
 5. Blocks are the smallest unit of I/O; they store rows/data.
 
 
+### Reads
 
-
----
-
-Difference Between Logical Read and Physical Read in Oracle
+- Logical read = from memory (fast).
 
 A logical read (consistent get) occurs when Oracle accesses a block that is already available in the Buffer Cache (SGA). No disk I/O happens. Oracle may also reconstruct an older version of the block using undo to maintain read consistency.
 
+- Physical read = from disk (slow).
+
 A physical read happens when the required block is not found in the Buffer Cache, so Oracle must read the block from disk into memory. This is slower and done by the DBWR and OS I/O subsystem.
+
+
+> Oracle always tries logical read first; physical read only when needed.
+  
+
+
+
 
 
 The Buffer Cache is a component of the Oracle SGA that stores recently accessed database blocks in memory to avoid repeated disk I/O. When a query needs data, Oracle first checks the Buffer Cache; if the block is found, it performs a fast logical read, and if not, it triggers a physical read from disk and loads the block into the cache. The Buffer Cache improves performance by caching frequently used blocks, supports consistent reads using undo data, and is managed by Oracle using an LRU-like algorithm to decide which blocks remain in memory.
@@ -189,27 +175,16 @@ For consistent reads, Oracle may use undo segments to reconstruct the block imag
 
 
 
----
-
-Summary
-
-Logical read = from memory (fast).
-
-Physical read = from disk (slow).
-
-Oracle always tries logical read first; physical read only when needed.
 
 
+## Operations 
+- [Query](query/)
 
----
+ 
 
+ 
 
-
----
-
-
-
-### **Oracle SELECT Query — Internal Execution Steps**
+### **SELECT Query — Internals**
 
 When you run:
 
@@ -246,7 +221,7 @@ If a similar statement already exists in the shared pool (same text + same binds
 
 ### Components:
 
-* **Cost-Based Optimizer (CBO)**
+* [Cost-Based Optimizer  CBO](cost_of_query.md) 
 * **Statistics subsystem**
 * **Metadata: histograms, indexes, partition metadata**
 
@@ -442,7 +417,7 @@ The chosen plan becomes the **execution plan** stored with the cursor.
 📌 How cardinality misestimation happens
 📌 How adaptive plans fix the wrong choice
 
----
+
 
 
 ### **3. Row Source Generation (Plan → Operators)**
@@ -550,11 +525,11 @@ This is the full lifecycle of a SELECT query inside Oracle.
 
 
 
-If you want, I can also explain:
-🔸 How Oracle chooses between index scan vs full table scan
-🔸 How joins are executed internally (hash/merge/nested loop)
-🔸 How Oracle pipelines row sources during execution
-🔸 What happens during a *hard parse* vs *soft parse*
+More:
+- How Oracle chooses between index scan vs full table scan
+- How joins are executed internally (hash/merge/nested loop)
+- How Oracle pipelines row sources during execution
+- What happens during a *hard parse* vs *soft parse*
 
 
 
