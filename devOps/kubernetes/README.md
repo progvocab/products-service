@@ -1,6 +1,8 @@
+# Kubernetes
+
 **Kubernetes** (often abbreviated as **K8s**) is an open-source container orchestration platform designed to automate the deployment, scaling, and management of containerized applications. Initially developed by Google and now maintained by the **Cloud Native Computing Foundation (CNCF)**, Kubernetes simplifies managing clusters of containers across multiple environments, including cloud, on-premises, and hybrid setups.
 
----
+
 
 ### **Key Features of Kubernetes**
 
@@ -37,11 +39,8 @@
 10. **Storage Orchestration**  
     - Provides persistent storage to containers via integration with cloud providers, NFS, or custom storage solutions.
 
----
-# Design 
- **Kubernetes architecture** — separating **Control Plane (logical)** and **Worker Nodes (physical)** components
-
----
+ 
+ 
 
 ### Kubernetes Architecture — Control Plane and Nodes
 
@@ -99,10 +98,7 @@ graph TD
     Proxy --> POD2
     Metrics --> API
 ```
-
----
-
-###  Explanation
+ 
 
 | Layer                       | Components                                      | Role                                       |
 | --------------------------- | ----------------------------------------------- | ------------------------------------------ |
@@ -111,7 +107,7 @@ graph TD
 | **Add-ons**                 | CoreDNS, Kube Proxy, Metrics Server             | Provide networking, DNS, and observability |
 | **User**                    | kubectl                                         | Interacts with cluster via API Server      |
 
----
+ 
 
 ### Architecture
 
@@ -135,7 +131,7 @@ Kubernetes operates as a **cluster** of nodes. Each node runs containers and is 
    - **Kube-proxy**: Manages networking and ensures connectivity between containers and services.  
    - **Container Runtime**: Software like Docker or containerd that runs the containers.  
 
----
+3. [Other Planes](Plane.md)
 
 ### **Key Concepts in Kubernetes**
 
@@ -151,7 +147,7 @@ Kubernetes operates as a **cluster** of nodes. Each node runs containers and is 
    - Manages the deployment of pods.
    - Handles rolling updates and rollbacks.
 
-4. **Namespaces**:  
+4. [**Namespaces**](namespaces/):  
    - Logical partitions within a cluster to isolate resources and applications.
 
 5. **ConfigMaps and Secrets**:  
@@ -173,7 +169,7 @@ Kubernetes operates as a **cluster** of nodes. Each node runs containers and is 
     - **Jobs**: Run a task until completion.
     - **CronJobs**: Schedule tasks to run periodically.
 
----
+ 
 
 ### **Why Use Kubernetes?**
 
@@ -192,7 +188,7 @@ Kubernetes operates as a **cluster** of nodes. Each node runs containers and is 
 5. **Extensibility**  
    Supports custom extensions using APIs and plugins for networking, storage, and monitoring.
 
----
+ 
 
 ### **Use Cases of Kubernetes**
 
@@ -210,16 +206,14 @@ Kubernetes operates as a **cluster** of nodes. Each node runs containers and is 
 
 5. **High-Traffic Applications**  
    - Handle fluctuating traffic by auto-scaling pods dynamically.
-
----
-
+ 
 ### **Comparison with Alternatives**
 
 - **Docker Swarm**: Easier to set up but less feature-rich compared to Kubernetes.
 - **OpenShift**: Built on Kubernetes with additional enterprise features.
 - **Nomad**: Lightweight and simpler but lacks advanced features like service discovery and autoscaling.
 
----
+ 
 
 ### **Getting Started with Kubernetes**
 
@@ -245,8 +239,7 @@ Kubernetes operates as a **cluster** of nodes. Each node runs containers and is 
 
 4. **Explore Tools**:  
    - Use tools like Helm (package manager), Kustomize (templating), and Prometheus (monitoring).
-
----
+ 
 
 Kubernetes is the de facto standard for managing containerized applications, offering scalability, portability, and automation. It is a critical tool for modern DevOps and cloud-native architectures.
 
