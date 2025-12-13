@@ -14,7 +14,6 @@ John Doe,john@example.com,Engineering
 Jane Smith,jane@example.com,Marketing
 ```
 
----
 
 ### 2. Spring Batch Configuration
 
@@ -81,7 +80,7 @@ public class BatchConfig {
 }
 ```
 
----
+
 
 ### 3. Domain Class
 
@@ -96,7 +95,6 @@ public class EmployeeInput {
 }
 ```
 
----
 
 ### 4. Triggering the Job
 
@@ -126,7 +124,6 @@ public class FileUploadController {
 }
 ```
 
----
 
 ### 5. Auto-generated Tables
 
@@ -141,9 +138,179 @@ Spring Batch auto-creates the following tables (if `JdbcJobRepository` is used):
 
 Make sure your schema is initialized from the Spring Batch SQL files (available in the Spring Batch GitHub repo or starter JAR).
 
----
+Below is the **correct Spring Batch metadata ER diagram** for the tables you listed.
+These tables are generated automatically when you enable **Spring Batch JDBC JobRepository**.
 
-Let me know if you want to use in-memory DB like H2 or a persistent DB, or if you'd like Docker/Helm setup for this.
+All diagrams are provided in **Mermaid ER format**, matching your preferred style.
+
+ 
+
+### **Spring Batch Metadata ER Diagram**
+
+```mermaid
+erDiagram
+
+    BATCH_JOB_INSTANCE {
+        BIGINT JOB_INSTANCE_ID PK
+        VARCHAR JOB_NAME
+        VARCHAR JOB_KEY
+    }
+
+    BATCH_JOB_EXECUTION {
+        BIGINT JOB_EXECUTION_ID PK
+        BIGINT JOB_INSTANCE_ID FK
+        TIMESTAMP CREATE_TIME
+        TIMESTAMP START_TIME
+        TIMESTAMP END_TIME
+        VARCHAR STATUS
+        VARCHAR EXIT_CODE
+        VARCHAR EXIT_MESSAGE
+        TIMESTAMP LAST_UPDATED
+        BIGINT VERSION
+    }
+
+    BATCH_JOB_EXECUTION_PARAMS {
+        BIGINT JOB_EXECUTION_ID FK
+        VARCHAR TYPE_CD
+        VARCHAR KEY_NAME
+        VARCHAR STRING_VAL
+        BIGINT LONG_VAL
+        DATE DATE_VAL
+        DOUBLE DOUBLE_VAL
+        VARCHAR IDENTIFYING
+    }
+
+    BATCH_STEP_EXECUTION {
+        BIGINT STEP_EXECUTION_ID PK
+        BIGINT JOB_EXECUTION_ID FK
+        VARCHAR STEP_NAME
+        TIMESTAMP START_TIME
+        TIMESTAMP END_TIME
+        VARCHAR STATUS
+        VARCHAR EXIT_CODE
+        VARCHAR EXIT_MESSAGE
+        BIGINT READ_COUNT
+        BIGINT WRITE_COUNT
+        BIGINT COMMIT_COUNT
+        BIGINT ROLLBACK_COUNT
+        BIGINT READ_SKIP_COUNT
+        BIGINT WRITE_SKIP_COUNT
+        BIGINT PROCESS_SKIP_COUNT
+        BIGINT VERSION
+    }
+
+    BATCH_STEP_EXECUTION_CONTEXT {
+        BIGINT STEP_EXECUTION_ID FK
+        CLOB SHORT_CONTEXT
+        CLOB SERIALIZED_CONTEXT
+    }
+
+    BATCH_JOB_EXECUTION_CONTEXT {
+        BIGINT JOB_EXECUTION_ID FK
+        CLOB SHORT_CONTEXT
+        CLOB SERIALIZED_CONTEXT
+    }
+
+    BATCH_JOB_SEQ {
+        bigint ID
+    }
+
+    BATCH_STEP_EXECUTION_SEQ {
+        bigint ID
+    }
+
+    %% RELATIONSHIPS
+
+    BATCH_JOB_INSTANCE ||--o{ BATCH_JOB_EXECUTION : "1 job instance → many job executions"
+
+    BATCH_JOB_EXECUTION ||--o{ BATCH_JOB_EXECUTION_PARAMS : "1 execution → many params"
+
+    BATCH_JOB_EXECUTION ||--o{ BATCH_STEP_EXECUTION : "1 job execution → many step executions"
+
+    BATCH_STEP_EXECUTION ||--|| BATCH_STEP_EXECUTION_CONTEXT : "1 step execution → 1 step context"
+
+    BATCH_JOB_EXECUTION ||--|| BATCH_JOB_EXECUTION_CONTEXT : "1 job execution → 1 job context"
+```
+
+
+
+### **1. `BATCH_JOB_INSTANCE`**
+
+Represents a logical job instance:
+
+* Identified by: **jobName + jobParameters**
+* E.g., “importEmployeesJob with parameter date=2024-01-01”
+
+A new row is created only when the **job parameters change**.
+
+
+### **2. `BATCH_JOB_EXECUTION`**
+
+Represents **one run** of a job instance.
+
+Example:
+
+* First attempt → status STARTED → COMPLETED
+* Retry after failure → NEW execution record
+
+Relations:
+
+* `JOB_INSTANCE_ID` → belongs to one job instance
+
+
+### **3. `BATCH_JOB_EXECUTION_PARAMS`**
+
+Stores the **actual job parameters** as passed on execution.
+
+Includes type codes:
+
+* STRING
+* LONG
+* DATE
+* DOUBLE
+
+
+### **4. `BATCH_STEP_EXECUTION`**
+
+Represents the execution of a **Step** within a Job execution.
+
+Contains all counters:
+
+* read_count
+* write_count
+* skip_count
+* commit_count
+
+Relations:
+
+* One job execution → many step executions
+
+
+
+### **5. `BATCH_STEP_EXECUTION_CONTEXT`**
+
+Attributes stored via:
+
+```java
+chunkContext.getStepContext().getStepExecution().getExecutionContext()
+```
+
+One-to-one with StepExecution.
+
+### **6. `BATCH_JOB_EXECUTION_CONTEXT`**
+
+Attributes stored at job level via:
+
+```java
+jobExecution.getExecutionContext()
+```
+
+One-to-one with JobExecution.
+
+
+### BATCH_JOB_SEQ and BATCH_STEP_EXECUTION_SEQ 
+are simple sequence tables used by Spring Batch’s Jdbc*Dao implementations to generate primary keys.
+
 
 
 Here's a `curl` command to call the `/upload` endpoint and upload the `employees.csv` file:
@@ -164,4 +331,288 @@ curl -X POST http://localhost:8080/upload \
   -F "file=@employees.csv"
 ```
 
-Let me know if your Spring Boot app is running on a different port or behind a proxy like Nginx.
+ 
+### Built-in Error Handling in Spring Batch
+
+Spring Batch provides **multiple, layered error-handling mechanisms** out of the box. These work at **step**, **chunk**, **item**, **job**, and **infrastructure** levels and are designed so you rarely need custom try/catch logic.
+
+
+
+
+### 1. Chunk-Oriented Error Handling (Most Important)
+
+Spring Batch processes data in **chunks**:
+
+```
+read → process → write → commit
+```
+
+If an error occurs, Spring Batch can **retry**, **skip**, or **fail** automatically.
+
+#### Retry (Transient errors)
+
+Used for:
+
+* DB deadlocks
+* Network glitches
+* Temporary service failures
+
+```java
+.step("step1")
+.<Input, Output>chunk(100)
+.faultTolerant()
+.retry(SQLException.class)
+.retryLimit(3)
+```
+
+Behavior:
+
+* Same item retried up to `retryLimit`
+* Transaction rolled back and retried
+ 
+
+#### Skip (Bad data / poison records)
+
+Used for:
+
+* Invalid data
+* Parsing errors
+* Business validation failures
+
+```java
+.faultTolerant()
+.skip(ParseException.class)
+.skipLimit(10)
+```
+
+Behavior:
+
+* Item is skipped
+* Step continues
+* Counted in `SKIP_COUNT`
+ 
+
+### 2. Combined Retry + Skip (Common Pattern)
+
+```java
+.faultTolerant()
+.retry(DeadlockLoserDataAccessException.class)
+.retryLimit(3)
+.skip(FlatFileParseException.class)
+.skipLimit(100)
+```
+
+Meaning:
+
+* Retry transient DB issues
+* Skip bad input records
+* Fail only if limits exceeded
+
+ 
+
+### 3. Skip & Retry Listeners (Observability)
+
+Spring Batch gives listeners to **react** to failures.
+
+#### SkipListener
+
+```java
+public class MySkipListener implements SkipListener<Input, Output> {
+
+    public void onSkipInRead(Throwable t) {}
+    public void onSkipInProcess(Input item, Throwable t) {}
+    public void onSkipInWrite(Output item, Throwable t) {}
+}
+```
+
+Use cases:
+
+* Write skipped records to error table
+* Send alerts
+* Audit failures
+ 
+
+#### RetryListener
+
+```java
+public class MyRetryListener extends RetryListenerSupport {
+
+    @Override
+    public <T, E extends Throwable> void onError(
+        RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
+    }
+}
+```
+ 
+
+### 4. Step-Level Error Handling
+
+#### StepExecutionListener
+
+```java
+public class MyStepListener implements StepExecutionListener {
+
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        if (stepExecution.getFailureExceptions().size() > 0) {
+            return ExitStatus.FAILED;
+        }
+        return ExitStatus.COMPLETED;
+    }
+}
+```
+
+Used to:
+
+* Override exit status
+* Trigger compensation logic
+ 
+
+### 5. Job-Level Error Handling
+
+#### JobExecutionListener
+
+```java
+public class MyJobListener implements JobExecutionListener {
+
+    public void afterJob(JobExecution jobExecution) {
+        if (jobExecution.getStatus() == BatchStatus.FAILED) {
+            // notify / rollback / alert
+        }
+    }
+}
+```
+ 
+
+### 6. Item-Level Error Handling Hooks
+
+Spring Batch lets you intercept failures at each stage.
+
+#### ItemReadListener
+
+```java
+onReadError(Exception ex)
+```
+
+#### ItemProcessListener
+
+```java
+onProcessError(Input item, Exception ex)
+```
+
+#### ItemWriteListener
+
+```java
+onWriteError(Exception ex, List<? extends Output> items)
+```
+ 
+
+### 7. Skip Policy (Advanced Control)
+
+Instead of listing exceptions:
+
+```java
+.step("step1")
+.faultTolerant()
+.skipPolicy((throwable, skipCount) -> {
+    return throwable instanceof ValidationException && skipCount < 10;
+})
+```
+
+Gives full programmatic control.
+ 
+
+### 8. Retry Policy (Advanced Control)
+
+```java
+.retryPolicy(new SimpleRetryPolicy(3,
+    Map.of(SQLException.class, true)))
+```
+
+Or backoff:
+
+```java
+.backOffPolicy(new FixedBackOffPolicy())
+```
+ 
+### 9. Transaction Rollback Rules
+
+By default:
+
+* Any `RuntimeException` → rollback
+* Any `Error` → fail job
+
+You can customize:
+
+```java
+.noRollback(ValidationException.class)
+```
+ 
+
+### 10. Restart & Recovery (Built-in Safety Net)
+
+Spring Batch automatically supports **restartability**.
+
+If a job fails:
+
+* State is stored in metadata tables
+* Job can restart from last committed chunk
+
+```java
+preventRestart() // disables this
+```
+
+ 
+### 11. Built-in Failure Metadata Tracking
+
+Spring Batch automatically records:
+
+* Failure exceptions
+* Exit codes
+* Retry counts
+* Skip counts
+* Read/write counts
+
+Stored in:
+
+* `BATCH_STEP_EXECUTION`
+* `BATCH_JOB_EXECUTION`
+
+No custom code required.
+
+ 
+ 
+
+| Level         | Mechanism              |
+| ------------- | ---------------------- |
+| Item          | Skip, Retry            |
+| Chunk         | Transaction rollback   |
+| Step          | Listeners, ExitStatus  |
+| Job           | JobExecutionListener   |
+| Infra         | Restart, persistence   |
+| Observability | Skip & Retry listeners |
+
+ 
+
+* Use **Retry** for transient infra issues
+* Use **Skip** for data issues
+* Never use try/catch inside ItemReader/Processor/Writer
+* Always enable **restartability**
+* Log skipped items via SkipListener
+
+ 
+
+
+
+
+### More
+
+✔ ER diagram including all Spring Batch metadata tables (including `BATCH_JOB_SEQ`, `BATCH_STEP_EXECUTION_SEQ`)
+✔ A full architecture diagram of Spring Batch flow (`Job → Step → Chunk → Reader/Processor/Writer`)
+✔ Example queries for monitoring job runs
+✔ Queries to find stuck batch jobs
+✔ Example Spring Batch code with ItemReader, ItemProcessor, ItemWriter
+
+* Real production configuration examples
+* How to send failed records to DLQ / error table
+* How Spring Batch handles DB deadlocks
+* How to debug stuck batch jobs
