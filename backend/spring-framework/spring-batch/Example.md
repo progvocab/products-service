@@ -616,3 +616,165 @@ No custom code required.
 * How to send failed records to DLQ / error table
 * How Spring Batch handles DB deadlocks
 * How to debug stuck batch jobs
+
+
+Good question — this is a fundamental Spring Batch concept, and interviewers often use it to check whether you understand the framework internals or just usage.
+
+
+---
+
+Short, crisp answer (start with this)
+
+> ItemReader is a Spring Batch abstraction that reads one logical item at a time,
+while a LineReader reads raw lines of text from a file and is usually an internal, lower-level component.
+
+
+
+
+---
+
+Detailed explanation
+
+1️⃣ ItemReader
+
+Level: Spring Batch API (high level)
+
+Core interface in Spring Batch:
+
+
+public interface ItemReader<T> {
+    T read() throws Exception;
+}
+
+Responsibilities:
+
+Reads one item at a time (row, record, object)
+
+Knows where to resume on restart
+
+Integrates with:
+
+Chunk processing
+
+Transactions
+
+ExecutionContext
+
+
+
+Examples:
+
+FlatFileItemReader<Employee>
+
+JdbcPagingItemReader<Order>
+
+JpaPagingItemReader<Task>
+
+PoiItemReader<ExcelRow>
+
+
+
+📌 From Spring Batch’s point of view:
+
+> Everything is an Item.
+
+
+
+
+---
+
+2️⃣ LineReader
+
+Level: Lower-level / internal abstraction
+
+Not commonly used directly in job configuration
+
+Reads raw text lines from a file
+
+No knowledge of:
+
+Chunks
+
+Transactions
+
+Job restartability
+
+Item mapping
+
+
+Common usage:
+
+Inside FlatFileItemReader
+
+Reads String lines from file
+
+Then passes them to:
+
+LineTokenizer
+
+FieldSetMapper
+
+
+
+
+📌 LineReader just answers:
+
+> “Give me the next line.”
+
+
+
+
+---
+
+How they work together (very important)
+
+File
+ ↓
+LineReader  → reads raw text line
+ ↓
+LineTokenizer → splits columns
+ ↓
+FieldSetMapper → maps to object
+ ↓
+ItemReader<T> → returns domain object
+ ↓
+Chunk processing
+
+👉 LineReader is an implementation detail of ItemReader.
+
+
+---
+
+Interview-level comparison table
+
+Aspect	ItemReader	LineReader
+
+Abstraction level	High (Spring Batch API)	Low (file I/O)
+Returns	Domain object (T)	Raw String
+Chunk-aware	✅ Yes	❌ No
+Restartable	✅ Yes	❌ No
+Used directly in jobs	✅ Yes	❌ Rarely
+Example	FlatFileItemReader	BufferedReader
+
+
+
+---
+
+Strong closing line (Bar Raiser signal)
+
+> In Spring Batch, ItemReader defines what is read and participates in job lifecycle, while LineReader defines how raw data is read. We work with ItemReader directly; LineReader is an internal building block.
+
+
+
+
+---
+
+If you want next, I can:
+
+Ask a Bar Raiser follow-up like “How does restartability actually work in ItemReader?”
+
+Compare FlatFileItemReader vs PoiItemReader
+
+Explain why ItemReader.read() must return null at EOF
+
+Map this to AWS S3-based ingestion
