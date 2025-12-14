@@ -107,6 +107,14 @@ graph TD
 | **Add-ons**                 | CoreDNS, Kube Proxy, Metrics Server             | Provide networking, DNS, and observability |
 | **User**                    | kubectl                                         | Interacts with cluster via API Server      |
 
+ - [API Versions](api_version.md)
+ - [Resources](kind/)
+ - [Scope of Resources](scope.md)
+ - [Authentication](Authentication.md)
+ - [Monitoring](logging/logging.md)
+ - [Networking](networking/)
+ - [Service Mesh](service-mesh/)  Internal API Communication and External Endpoint 
+ - [Internal Operations](operations/)
  
 
 ### Architecture
@@ -120,18 +128,19 @@ Kubernetes operates as a **cluster** of nodes. Each node runs containers and is 
 
 #### Core Components:
 
-1. **Control Plane**:  
+1. [**Control Plane**](control_plane/)  
    - **API Server**: Handles communication between users and the cluster.  
    - **Scheduler**: Assigns workloads to available nodes based on resource availability.  
    - **Controller Manager**: Manages cluster state and enforces desired configurations.  
    - **etcd**: A distributed key-value store that stores cluster state.  
 
-2. **Worker Nodes**:  
+2. [**Worker Nodes**](worker_node/)
    - **Kubelet**: Runs on each node and ensures containers are running as specified.  
    - **Kube-proxy**: Manages networking and ensures connectivity between containers and services.  
    - **Container Runtime**: Software like Docker or containerd that runs the containers.  
 
 3. [Other Planes](Plane.md)
+4. [Other Nodes](nodes.md)
 
 ### **Key Concepts in Kubernetes**
 
