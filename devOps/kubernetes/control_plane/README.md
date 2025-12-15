@@ -15,12 +15,13 @@ The control plane is the **brain** of the Kubernetes cluster. It manages and orc
    - A distributed key-value store that stores the entire state of the cluster.
    - Includes information about Pods, Services, ConfigMaps, Secrets, and more.
    - Critical for cluster functionality—if `etcd` is lost, the cluster state is lost.
+   - All updates done via API server
 
 3. **`kube-scheduler`**:
    - Assigns Pods to appropriate worker nodes based on resource availability, constraints, and policies.
    - Ensures efficient resource utilization.
 
-4. **`kube-controller-manager`**:
+4.  [kube-controller-manager](kube-controller-manager.md):
    - Runs various controllers that maintain the desired state of the cluster.
    - Examples:
      - Node Controller: Handles node availability.
@@ -29,8 +30,74 @@ The control plane is the **brain** of the Kubernetes cluster. It manages and orc
 
 5. **Cloud Controller Manager (optional)**:
    - Manages cloud-provider-specific resources, such as load balancers and persistent volumes.
+> Deployment Controller
+```mermaid
+flowchart TD
+    A[kubectl] -->|REST request| B[API Server]
 
----
+    B -->|Validate & AuthZ| B
+    B -->|Persist desired state| C[etcd]
+
+    C -->|Watch / Change Stream| D[Kube Controller Manager]
+
+    D -->|Reconciliation Loop| E[Deployment Controller]
+
+    E -->|Create / Update| F[ReplicaSet]
+
+    F -->|Create Pods| G[Pod Objects]
+
+    G -->|Scheduling Needed| H[Kube Scheduler]
+
+    H -->|Bind Pod to Node| B
+
+    B -->|Updated State| C
+
+    C -->|Watch| I[Kubelet]
+
+    I -->|Create Containers| J[Container Runtime]
+
+    J -->|Running Pods| K[Application Running]
+```
+
+> Job Controller
+```mermaid
+flowchart TD
+    A[kubectl] -->|REST| B[API Server]
+
+    B -->|AuthN/AuthZ + Validation| B
+    B -->|Store desired state| C[etcd]
+
+    %% Change stream
+    C -->|Watch events| D[Kube Controller Manager]
+
+    %% CronJob flow
+    D -->|Reconcile loop| E[CronJob Controller]
+    E -->|Create Job| F[Job Object]
+
+    %% Job flow
+    F -->|Watch| G[Job Controller]
+    G -->|Create Pods| H[Pod Objects]
+
+    %% Deployment flow
+    D -->|Reconcile loop| I[Deployment Controller]
+    I -->|Create / Update| J[ReplicaSet]
+
+    %% ReplicaSet flow
+    J -->|Watch| K[ReplicaSet Controller]
+    K -->|Create / Maintain Pods| H
+
+    %% Scheduling
+    H -->|Unsheduled Pods| L[Kube Scheduler]
+    L -->|Bind Pod to Node| B
+
+    %% Node execution
+    B -->|Assigned Pod Spec| M[Kubelet]
+    M -->|Create Containers| N[Container Runtime]
+
+    %% Feedback loop
+    N -->|Pod Status| B
+    B -->|Persist state| C
+```
 
 #### **Responsibilities of the Control Plane:**
 - Scheduling Pods to worker nodes.
@@ -61,16 +128,14 @@ The worker plane consists of **worker nodes** that run the actual containerized 
    - The smallest deployable unit in Kubernetes.
    - Runs one or more containers with shared storage and networking.
 
----
+ 
 
 #### **Responsibilities of Worker Nodes:**
 - Run application workloads (containers inside Pods).
 - Report resource usage and status to the control plane.
 - Ensure network traffic flows correctly between services, Pods, and external clients.
 
----
-
-### **Key Differences**
+ 
 
 | **Aspect**                 | **Control Plane**                                     | **Worker Plane (Nodes)**                       |
 |----------------------------|-----------------------------------------------------|-----------------------------------------------|
@@ -82,7 +147,7 @@ The worker plane consists of **worker nodes** that run the actual containerized 
 | **Interaction**            | Interfaces with users/admins via `kubectl`.          | Executes tasks assigned by the control plane.  |
 | **Scaling**                | Typically fewer nodes (1-3 for HA).                  | Scales horizontally to support workloads.      |
 
----
+ 
 
 ### **How They Work Together**
 1. **Control Plane Responsibilities**:
@@ -95,21 +160,46 @@ The worker plane consists of **worker nodes** that run the actual containerized 
    - The `kubelet` ensures the Pods are running and healthy.
    - `kube-proxy` routes network traffic for the Pods.
 
----
-
-### **Analogy**
-Think of Kubernetes as a factory:
-- The **control plane** is the **management office**: it oversees operations, assigns tasks, and tracks progress.
-- The **worker nodes** are the **workshop floors**: they perform the actual tasks assigned by the management.
-
----
+ 
 
 ### **High Availability (HA) Considerations**
 - **Control Plane**:
   - For production clusters, it is recommended to run multiple control plane nodes (HA setup) to avoid a single point of failure.
 - **Worker Nodes**:
   - The number of worker nodes can scale horizontally to meet workload demands.
+ 
+ 
 
----
+```
+Controller
+   ↓ (REST call)
+API Server
+   ↓ (persist)
+etcd
+```
 
-Let me know if you'd like to dive deeper into any specific aspect!
+
+
+### What controllers actually do
+
+Controllers (CronJob, Deployment, ReplicaSet, Job, etc.):
+
+1. **Watch** resources via the API Server (which streams changes from etcd)
+2. **Compare** actual state vs desired state (reconciliation loop)
+3. **Make changes** by sending **REST requests to the API Server**
+4. API Server **validates + authorizes**
+5. API Server **writes updates to etcd**
+
+
+
+### Example: ReplicaSet Controller
+
+```
+1. Watches ReplicaSet and Pods
+2. Sees desired replicas = 3, actual = 2
+3. Sends POST /api/v1/pods to API Server
+4. API Server stores Pod spec in etcd
+```
+ 
+
+ 
