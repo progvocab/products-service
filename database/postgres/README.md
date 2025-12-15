@@ -36,6 +36,38 @@
   Multi-Version Concurrency Control 
   support many concurrent readers and writers without blocking
 
+```mermaid
+flowchart TD
+    %% Client and Query
+    A[Client Query] --> B[PostgreSQL Backend Process]
+
+    %% Memory
+    B --> C[Shared Buffers]
+    B --> D[Work Mem]
+    B --> E[Maintenance Work Mem]
+
+    %% Index interaction
+    C --> F[B-Tree Index Pages]
+    F --> C
+
+    %% Heap table
+    C --> G[Heap Table Pages]
+
+    %% Disk layer
+    G --> H[Data Files on Disk]
+    F --> H
+
+    %% WAL
+    B --> I[WAL Buffers]
+    I --> J[WAL Files on Disk]
+
+    %% Background processes
+    K[Checkpointer] --> H
+    L[Background Writer] --> C
+    M[Autovacuum] --> G
+```
+
+
 ## Design
 - [Read Operation](read.md)
 - [Write Operation](write.md)
