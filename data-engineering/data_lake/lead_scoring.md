@@ -280,6 +280,38 @@ CloudWatch: Monitors ETL job health, latency, and failures.
 
 > “I’d use a Data Lake to store all raw and processed lead events for long-term analytics and ML training. The real-time scoring system remains operational and low-latency, while the Data Lake enables historical analysis, score tuning, and model retraining without impacting production traffic.”
 
+Why S3 for Spark (and not EFS), and why object storage over file storage
+
+1. Massive scalability – S3 scales virtually without limits in storage and throughput; EFS scales but has practical throughput and cost constraints.
+
+
+2. Cost efficiency – S3 is significantly cheaper per GB than EFS, especially for large analytical datasets.
+
+
+3. Decoupled compute & storage – Spark clusters can be created, terminated, or autoscaled independently while data safely lives in S3.
+
+
+4. High parallelism – Spark can read thousands of S3 objects in parallel, which fits perfectly with distributed processing.
+
+
+5. Durability & availability – S3 provides 11-9s durability with multi-AZ replication by default; EFS durability is lower.
+
+
+6. Optimized analytics formats – Columnar object formats (Parquet, ORC) on S3 enable predicate pushdown and faster Spark queries.
+
+
+7. Eventual file semantics are acceptable – Spark workloads are batch/analytic and don’t need POSIX file locking guarantees that EFS provides.
+
+
+8. Ecosystem integration – Glue, Athena, EMR, Redshift Spectrum, and QuickSight natively work on S3 objects.
+
+
+9. Security & governance – S3 offers fine-grained IAM, bucket policies, object versioning, and lifecycle rules for data lakes.
+
+
+10. Object vs file advantage – Objects are immutable and append-free, making pipelines more reliable, reproducible, and easier to partition at scale.
+
+
 
 
 
