@@ -1,6 +1,5 @@
-Data Lake is very relevant here, but it should be used for learning & optimization, not for real-time scoring.
+Data Lake is very relevant for lead scoring , but it should be used for learning & optimization, not for real-time scoring.
 
-I’ll explain where it fits, why it’s needed, and how it integrates with your lead-scoring system in a clear system-design way.
 
 
 
@@ -24,10 +23,10 @@ Score tuning
 Cross-source behavior analysis
 
 
-👉 Data Lake solves this.
+Data Lake solves this.
 
 
----
+
 
 2. What Goes Into the Data Lake
 
@@ -35,10 +34,12 @@ Raw Events (Immutable)
 
 Store everything as-is, source-wise.
 
+```txt
 s3://lead-datalake/raw/
    ├── roadshow/
    ├── webinar/
    └── online/
+```
 
 Example raw event:
 
@@ -60,7 +61,7 @@ Re-train ML models
 
 
 
----
+
 
 3. Processed / Curated Layer
 
@@ -68,9 +69,9 @@ ETL / ELT (Glue / Spark / Flink)
 
 Transform raw data into clean, unified schema:
 
-s3://lead-datalake/curated/leads/
+`s3://lead-datalake/curated/leads/`
 
-Example:
+```json
 
 {
   "lead_id": "UUID",
@@ -80,7 +81,7 @@ Example:
   "final_score": 85,
   "converted": true
 }
-
+```
 This is what:
 
 Analysts query
@@ -89,7 +90,7 @@ ML models train on
 
 
 
----
+
 
 4. Feature Store (Optional but Powerful)
 
@@ -97,15 +98,15 @@ Create derived features:
 
 Feature	Example
 
-avg_webinar_time	38 mins
-past_event_count	3
-location_conversion_rate	12%
-device_model_interest	iPhone Pro
+- avg_webinar_time	38 mins
+- past_event_count	3
+- location_conversion_rate	12%
+- device_model_interest	iPhone Pro
 
 
 Stored as:
 
-s3://lead-datalake/features/
+`s3://lead-datalake/features/`
 
 Used by:
 
@@ -115,28 +116,28 @@ Online inference
 
 
 
----
 
-5. Real-Time vs Data Lake (Clear Separation)
+
+5. Real-Time vs Data Lake 
 
 Concern	Real-Time System	Data Lake
 
-Lead scoring	✅ Yes	❌ No
-CRM push	✅ Yes	❌ No
-Historical analysis	❌ No	✅ Yes
-ML training	❌ No	✅ Yes
-Score optimization	❌ No	✅ Yes
+- Lead scoring	✅ Yes	❌ No
+- CRM push	✅ Yes	❌ No
+- Historical analysis	❌ No	✅ Yes
+- ML training	❌ No	✅ Yes
+- Score optimization	❌ No	✅ Yes
 
 
 👉 Never query Data Lake in the scoring API.
 
 
----
+
 
 6. ML Feedback Loop (This Is Key)
 
 This is where Data Lake shines.
-
+```txt
 Lead → Score → Sales Action → Conversion Result
                        ↓
                   Data Lake
@@ -144,26 +145,87 @@ Lead → Score → Sales Action → Conversion Result
                Model Training
                        ↓
                New Scoring Model
-
+```
 Store conversion outcome
 
 Correlate with:
 
-Source
+- Source
 
-Score
+- Score
 
-Time
-
-
-Retrain models weekly/monthly
+- Time
 
 
+## Retrain models weekly/monthly
 
----
+1. Amazon S3 (Raw/Processed/Features buckets) stores historical training data and newly generated features.
 
-7. AWS Reference Architecture (Since you often ask AWS)
 
+2. AWS Glue ETL jobs prepare clean, deduplicated, and feature-ready datasets for retraining.
+
+
+3. AWS Glue Data Catalog manages evolving schemas used during training and validation.
+
+
+4. Amazon EventBridge schedules weekly or monthly retraining triggers.
+
+
+5. AWS Step Functions orchestrate the end-to-end retraining workflow (ETL → train → validate → deploy).
+
+
+6. Amazon SageMaker Training Jobs retrain the model using data from the Features bucket.
+
+
+7. SageMaker Experiments / Model Registry tracks model versions, metrics, and approvals.
+
+
+8. Amazon CloudWatch captures training metrics, failures, and performance trends.
+
+
+9. SageMaker Endpoint or Batch Transform deploys the newly approved model.
+
+
+10. IAM & KMS secure data access and encrypt training artifacts and models.
+
+
+1. Data drift detection using SageMaker Model Monitor to decide whether retraining is actually needed.
+
+
+2. Feature versioning in S3 to ensure training and inference use consistent feature definitions.
+
+
+3. Automated model validation with baseline comparison before promotion to production.
+
+
+4. Blue/green or canary deployment for new models to reduce risk.
+
+
+5. Audit and lineage tracking using S3 object versioning and metadata tags.
+
+
+1. Backfill support to retrain models using historical windows when scoring logic changes.
+
+
+2. Cost controls using SageMaker training job quotas and Spot instances.
+
+
+3. Failure recovery with Step Functions retries and Glue job checkpoints.
+
+
+4. Feature freshness checks to prevent training on stale data.
+
+
+5. Business KPI feedback loop to validate model impact on conversions and revenue.
+
+
+
+
+
+
+### 7. AWS Reference Architecture
+
+```txt
 S3 → Data Lake
 
 Glue → ETL & catalog
@@ -175,8 +237,13 @@ Redshift Spectrum → BI
 SageMaker → ML training
 
 Kinesis / Kafka → Streaming ingest
+```
 
-KPI : 
+> Amazon S3 supports schema-on-read by storing raw data without enforcing a schema.
+> AWS Glue Data Catalog defines schemas at query time rather than write time.
+> Amazon Athena applies the schema from Glue when reading data for analysis.
+
+### KPI 
 
 1. Lead Volume KPI measures the total number of leads ingested into the raw bucket from all events.
 
