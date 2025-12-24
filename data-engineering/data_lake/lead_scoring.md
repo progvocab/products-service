@@ -179,6 +179,58 @@ Correlate with:
 
 7. SageMaker Experiments / Model Registry tracks model versions, metrics, and approvals.
 
+```python 
+
+import sagemaker
+from sagemaker.estimator import Estimator
+from sagemaker.inputs import TrainingInput
+from sagemaker.session import Session
+
+# SageMaker session and role
+session = Session()
+role = "arn:aws:iam::123456789012:role/SageMakerExecutionRole"
+
+# S3 location of features data
+features_s3_path = "s3://features-bucket/training-data/"
+
+# Define the training container (example: built-in XGBoost)
+image_uri = sagemaker.image_uris.retrieve(
+    framework="xgboost",
+    region=session.boto_region_name,
+    version="1.7-1"
+)
+
+# Create Estimator
+estimator = Estimator(
+    image_uri=image_uri,
+    role=role,
+    instance_count=1,
+    instance_type="ml.m5.xlarge",
+    volume_size=50,
+    max_run=3600,
+    output_path="s3://model-artifacts-bucket/output/",
+    sagemaker_session=session
+)
+
+# Set hyperparameters
+estimator.set_hyperparameters(
+    objective="binary:logistic",
+    num_round=200,
+    max_depth=6,
+    eta=0.2,
+    subsample=0.8
+)
+
+# Define training input from Features bucket
+training_input = TrainingInput(
+    s3_data=features_s3_path,
+    content_type="text/csv"
+)
+
+# Launch retraining job
+estimator.fit({"train": training_input}, job_name="lead-scoring-retrain-job")
+
+```
 
 8. Amazon CloudWatch captures training metrics, failures, and performance trends.
 
