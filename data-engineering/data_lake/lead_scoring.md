@@ -176,7 +176,103 @@ SageMaker → ML training
 
 Kinesis / Kafka → Streaming ingest
 
+KPI : 
 
+1. Lead Volume KPI measures the total number of leads ingested into the raw bucket from all events.
+
+
+2. Data Quality KPI tracks missing, duplicate, or invalid fields detected during raw-to-processed transformation.
+
+
+3. Processing Success Rate shows the percentage of raw leads successfully converted into the processed bucket.
+
+
+4. Lead Source Distribution KPI compares leads from roadshows, webinars, and online events after processing.
+
+
+5. Enrichment Coverage KPI measures how many processed leads have complete demographic and behavioral data.
+
+
+6. Lead Score Accuracy KPI checks alignment between processed lead scores and actual conversions.
+
+
+7. High-Intent Lead Ratio tracks the percentage of processed leads above a scoring threshold.
+
+
+8. Processing Latency KPI measures time taken to move data from raw to processed buckets.
+
+
+9. Duplicate Reduction KPI shows how many duplicate leads were eliminated during processing.
+
+
+10. Conversion Rate by Score Band validates whether higher-scored processed leads convert better.
+
+
+1. Store incoming event data (roadshow, webinar, online) in Amazon S3 Raw bucket with source-based partitions.
+
+
+2. Use AWS Glue / Spark ETL to clean, deduplicate, and validate data into the Processed bucket.
+
+
+3. Generate derived attributes (engagement score, source weight, recency) and store them in the Features bucket.
+
+
+4. Maintain KPI aggregation tables in Amazon Redshift or Athena using processed and features data.
+
+
+5. Use Glue Data Catalog to track schemas for raw, processed, and features datasets.
+
+
+6. Calculate Lead Volume and Source KPIs using Athena SQL on raw bucket partitions.
+
+
+7. Compute Data Quality and Processing Success KPIs during Glue job metrics and store results in S3.
+
+
+8. Track Processing Latency using CloudWatch metrics emitted from Glue jobs.
+
+
+9. Build Lead Score and Conversion KPIs by joining features data with CRM outcomes in Redshift.
+
+
+10. Visualize all KPIs using Amazon QuickSight dashboards with scheduled refreshes.
+
+
+flowchart LR
+    A[Event Sources] --> B[S3 Raw Bucket]
+    B --> C[AWS Glue ETL]
+    C --> D[S3 Processed Bucket]
+    D --> E[Feature Engineering Job]
+    E --> F[S3 Features Bucket]
+    D --> G[Glue Data Catalog]
+    F --> G
+    B --> H[Athena]
+    D --> H
+    F --> I[Redshift]
+    I --> J[QuickSight]
+    C --> K[CloudWatch]
+
+Event Sources: Generate lead data from roadshows, webinars, and online events.
+
+S3 Raw Bucket: Stores ingested lead data in its original, unprocessed form.
+
+AWS Glue ETL: Cleans, validates, and transforms raw data into structured datasets.
+
+S3 Processed Bucket: Holds standardized, deduplicated lead records.
+
+Feature Engineering Job: Derives scoring attributes like engagement and recency.
+
+S3 Features Bucket: Stores final features used for lead scoring and KPIs.
+
+Glue Data Catalog: Maintains schemas and metadata for all S3 datasets.
+
+Athena: Runs ad-hoc SQL queries to compute volume and quality KPIs.
+
+Redshift: Stores aggregated KPI and scoring analytics at scale.
+
+QuickSight: Visualizes KPIs and lead performance dashboards.
+
+CloudWatch: Monitors ETL job health, latency, and failures.
 
 ---
 
