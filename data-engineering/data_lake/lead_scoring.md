@@ -431,7 +431,134 @@ Why S3 for Spark (and not EFS), and why object storage over file storage
 10. Object vs file advantage – Objects are immutable and append-free, making pipelines more reliable, reproducible, and easier to partition at scale.
 
 
+Scaling of SageMaker built-in models
 
+1. Built-in models (XGBoost, Linear Learner, Factorization Machines) support native distributed training.
+
+
+2. Training data is automatically sharded across multiple training instances.
+
+
+3. Models use data parallelism, where each instance processes a subset of data.
+
+
+4. Instances communicate using high-performance networking (EFA for some types).
+
+
+5. You scale by increasing instance_count in the training job.
+
+
+6. Parameter synchronization is handled internally by the algorithm container.
+
+
+7. Large datasets benefit from multiple instances + larger instance types.
+
+
+8. Training jobs scale horizontally, not by manual code changes.
+
+
+9. For inference, endpoints support auto-scaling based on traffic and latency.
+
+
+10. This makes built-in models easier to scale than custom frameworks.
+
+
+Below is a minimal, end-to-end example showing endpoint autoscaling config, deployment code, and client inference code.
+
+
+---
+
+1️⃣ Endpoint deployment (SageMaker)
+
+import sagemaker
+from sagemaker.estimator import Estimator
+
+session = sagemaker.Session()
+role = "arn:aws:iam::123456789012:role/SageMakerExecutionRole"
+
+estimator = Estimator(
+    image_uri="683313688378.dkr.ecr.us-east-1.amazonaws.com/xgboost:1.7-1",
+    role=role,
+    instance_count=1,
+    instance_type="ml.m5.large",
+    output_path="s3://model-artifacts-bucket/output/",
+    sagemaker_session=session
+)
+
+predictor = estimator.deploy(
+    initial_instance_count=1,
+    instance_type="ml.m5.large",
+    endpoint_name="lead-scoring-endpoint"
+)
+
+
+---
+
+2️⃣ Auto Scaling configuration (traffic + latency)
+
+import boto3
+
+client = boto3.client("application-autoscaling")
+
+resource_id = "endpoint/lead-scoring-endpoint/variant/AllTraffic"
+
+client.register_scalable_target(
+    ServiceNamespace="sagemaker",
+    ResourceId=resource_id,
+    ScalableDimension="sagemaker:variant:DesiredInstanceCount",
+    MinCapacity=1,
+    MaxCapacity=5
+)
+
+client.put_scaling_policy(
+    PolicyName="LatencyScalingPolicy",
+    ServiceNamespace="sagemaker",
+    ResourceId=resource_id,
+    ScalableDimension="sagemaker:variant:DesiredInstanceCount",
+    PolicyType="TargetTrackingScaling",
+    TargetTrackingScalingPolicyConfiguration={
+        "TargetValue": 100.0,  # 100 ms latency
+        "PredefinedMetricSpecification": {
+            "PredefinedMetricType": "SageMakerVariantInvocationsPerInstance"
+        },
+        "ScaleInCooldown": 300,
+        "ScaleOutCooldown": 60
+    }
+)
+
+
+---
+
+3️⃣ Client inference code
+
+import boto3
+import json
+
+runtime = boto3.client("sagemaker-runtime")
+
+payload = "0.2,1,35,webinar,5"  # example feature vector
+
+response = runtime.invoke_endpoint(
+    EndpointName="lead-scoring-endpoint",
+    ContentType="text/csv",
+    Body=payload
+)
+
+result = response["Body"].read().decode()
+print("Lead score:", result)
+
+
+---
+
+🔑 Key behavior
+
+High traffic → scales out instances
+
+High latency → scales out faster
+
+Low traffic → scales in automatically
+
+No code change needed for scaling logic
 
 
 ---
