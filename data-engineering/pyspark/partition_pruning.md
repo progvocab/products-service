@@ -10,6 +10,10 @@ Partition pruning is a database optimization technique where the query optimizer
 4. Effective pruning requires **explicit filters on partition columns**, not derived expressions.
 5. In AWS Glue, partition metadata from the **Glue Data Catalog** enables Spark to skip non-relevant partitions automatically.
 
+1. **AWS Glue Data Catalog** stores table schemas and partition key–to–S3 path mappings used by Spark during query planning.
+2. Spark’s **Catalyst optimizer** consults the catalog to identify only the S3 partitions matching filter predicates.
+3. As a result, **Spark executors (JVM)** read only relevant partition paths, skipping unnecessary data scans.
+
 
 
 How it works 
