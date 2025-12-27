@@ -160,6 +160,18 @@ Here are AWS components commonly used for data processing in an ML pipeline:
 
 15. AWS Lake Formation (optional) – data lake governance
 
-
+### Optimization 
 
 These components together handle cleaning, transformation, scaling, and splitting of data.
+
+The loss function only measures how wrong the model’s predictions are.
+The optimization step uses that loss value to decide how to change the model parameters.
+Without computing loss first, the optimizer has no signal to know which direction to improve the model.
+
+```python 
+optimizer.zero_grad()     # reset gradients
+loss.backward()           # compute gradients from loss
+optimizer.step()          # update model parameters
+
+```
+This is the optimization step that minimizes the loss.
