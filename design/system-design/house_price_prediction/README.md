@@ -88,3 +88,78 @@ y_train → labels (actual house prices)
 y_pred → model output
 
 loss_fn (e.g., MSE) → measures how wrong the prediction is
+
+
+### Data Processing 
+
+Data processing prepares raw data so the model can learn correctly.
+
+Steps involved:
+
+1. Clean data – remove duplicates, fix incorrect values, handle missing data.
+
+
+2. Feature selection – keep only useful columns (area, bedrooms, etc.).
+
+
+3. Encoding – convert categorical data (location, property type) to numbers.
+
+
+4. Scaling/normalization – bring features to similar ranges.
+
+
+5. Split data – divide into training and test datasets.
+
+### Components used in Data Processing 
+
+Without proper data processing, even a good model performs poorly.
+
+Here are AWS components commonly used for data processing in an ML pipeline:
+
+1. Amazon S3 – store raw, processed, and cleaned datasets
+
+
+2. AWS Glue – serverless ETL for cleaning and transforming data
+
+
+3. AWS Glue Data Catalog – metadata store for datasets
+
+
+4. Amazon Athena – SQL queries on data in S3 for exploration
+
+
+5. AWS Lambda – lightweight preprocessing (small datasets)
+
+
+6. Amazon EMR – Spark-based large-scale data processing
+
+
+7. AWS Step Functions – orchestrate preprocessing steps
+
+
+8. Amazon SageMaker Processing Jobs – scalable ML data preprocessing
+
+
+9. Amazon SageMaker Feature Store – store processed features
+
+
+10. IAM – access control for data and jobs
+
+
+11. CloudWatch – monitor preprocessing jobs and logs
+
+
+12. VPC – network isolation for secure data processing
+
+
+13. AWS KMS – encryption of data at rest
+
+
+14. Amazon Redshift (optional) – structured data preprocessing
+
+
+15. AWS Lake Formation (optional) – data lake governance
+
+
+
+These components together handle cleaning, transformation, scaling, and splitting of data.
