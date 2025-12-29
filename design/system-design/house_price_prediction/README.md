@@ -3,6 +3,10 @@ You train a model on past house sizes and prices to learn a straight-line relati
 Given a new house size, the model predicts its price.
 
 
+we use supervised machine learning → because the model is trained using labels (house prices).
+
+ it is not classification → it is regression, since the output is a continuous value, not categories.
+
 1. Dataset – historical house size and price data (CSV/table).
 
 
