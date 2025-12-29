@@ -179,3 +179,32 @@ optimizer.step()          # update model parameters
 
 ```
 This is the optimization step that minimizes the loss.
+
+### Model
+The model used in this example is Linear Regression.
+
+It learns a linear relationship between input features (like house size) and a continuous output (house price).
+
+
+### Hyperparameter 
+For Linear Regression, common hyperparameters are:
+
+1. Learning rate – step size for gradient descent
+
+
+2. Number of epochs/iterations – how many times to update weights
+
+
+3. Regularization type – L1 (Lasso) or L2 (Ridge)
+
+
+4. Regularization strength (λ / alpha) – penalty weight
+
+
+5. Batch size – number of samples per update (if using SGD)
+
+
+
+Basic linear regression has very few hyperparameters compared to complex models.
+
+
