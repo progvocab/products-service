@@ -64,7 +64,16 @@ works with Labelled Data
 - Unlabelled Data
 - Feedbacks , Rewards
 
- 
+###  Foundation Models 
+
+* A **foundation model** is a large pre-trained model that learns general knowledge from massive data and can be adapted to many tasks.
+
+### Multi Model 
+
+
+* A **multimodal model** is a model that can process and relate multiple data types (text, image, audio, video).
+* A foundation model can be unimodal or multimodal; multimodality is a **capability**, not a category.
+
 
 
 
