@@ -1,3 +1,5 @@
+## *Example-based prompting*
+
 ### 1. Zero-shot prompting
 
 * No examples provided
@@ -37,3 +39,24 @@
 * Easy to maintain
 * Works well with LLMs
 * Business-friendly
+
+
+
+
+
+**Reason based prompts**
+
+* **Chain of Thought (CoT):** Ask model to reason step-by-step.
+* **Tree of Thought (ToT):** Explore multiple reasoning paths before choosing.
+* **Self-Consistency:** Sample multiple CoTs and pick the best.
+* **Role Prompting:** Assign a persona (e.g., “act as an auditor”).
+* **Contextual Prompting:** Provide background/domain context.
+* **Multi-modal Prompting:** Combine text + image/audio inputs.
+
+
+
+
+
+* **Chain of Thought (CoT)** and **Tree of Thought (ToT)** focus on *how the model reasons*, not just how examples are given.
+* Zero-shot / few-shot describe **example provisioning**, while CoT/ToT describe **reasoning control**.
+
