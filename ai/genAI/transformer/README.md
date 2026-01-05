@@ -33,7 +33,39 @@ A transformer has two main parts:
 
 Each part consists of multiple **layers of self-attention + feed-forward networks**.
 
----
+Below is a **concise list of major Transformer architectures / variants**, each with a **one-line explanation**:
+
+* **Transformer (Encoder–Decoder)** – Original architecture for sequence-to-sequence tasks like translation.
+* **Encoder-only Transformer** – Learns rich representations; used for understanding tasks (e.g., BERT).
+* **Decoder-only Transformer** – Autoregressive text generation; predicts next token (e.g., GPT).
+* **BERT** – Bidirectional encoder for deep language understanding.
+* **GPT** – Decoder-only model optimized for text generation.
+* **T5** – Treats every NLP task as text-to-text using encoder–decoder.
+* **ViT (Vision Transformer)** – Applies Transformers to image patches instead of pixels.
+* **CLIP** – Joint image–text Transformer for cross-modal understanding.
+* **Longformer** – Efficient Transformer for very long sequences using sparse attention.
+* **Performer** – Scales attention efficiently using kernel approximations.
+
+If you want, I can also list **Transformer components (attention, embeddings, FFN)** or **vision-specific Transformers only**.
+
+
+Below are the **core components of a Transformer architecture**, with brief explanations:
+
+* **Input Embeddings** – Convert tokens (words, patches, pixels) into dense vectors.
+* **Positional Encoding** – Injects sequence order information into embeddings.
+* **Multi-Head Self-Attention** – Allows the model to focus on different parts of the input simultaneously.
+* **Scaled Dot-Product Attention** – Computes attention scores between queries, keys, and values.
+* **Feed-Forward Network (FFN)** – Applies non-linear transformations independently to each position.
+* **Residual Connections** – Helps gradient flow by adding input back to output.
+* **Layer Normalization** – Stabilizes and speeds up training.
+* **Dropout** – Prevents overfitting by randomly dropping connections.
+* **Encoder Stack** – Repeated layers for representation learning.
+* **Decoder Stack** – Generates outputs step-by-step with masking and cross-attention.
+
+
+
+
+
 
 ## 💬 3. Famous Transformer Models
 
