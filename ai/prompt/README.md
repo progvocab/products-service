@@ -75,3 +75,25 @@
 * **Role / Persona** – perspective the model should adopt
 * **Evaluation Signals** – confidence thresholds, scoring rules, or labels
 
+
+### Trade off
+
+**Hard Prompt** and **Soft Prompt** are two ways to guide large language models, with different trade-offs.
+
+**Hard Prompt**
+
+* Uses **fixed, human-written text instructions** (natural language).
+* Examples: “Classify this image as phone or box”, “Summarize the text”.
+* Easy to create, no training required.
+* Changes require **manual rewriting**.
+
+**Soft Prompt**
+
+* Uses **learned embeddings (virtual tokens)** instead of words.
+* Trained via backpropagation while keeping the base model frozen.
+* More **parameter-efficient** and task-specific.
+* Not human-readable but often more accurate.
+
+**In short:** hard prompts are *written instructions*; soft prompts are *learned instructions*.
+
+
