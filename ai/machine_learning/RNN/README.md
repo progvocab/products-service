@@ -443,3 +443,189 @@ If you want, I can explain this with:
 * **Why Transformers remove explicit memory but still model long-term context**
 
 
+**No. `torch.nn.LSTM` is NOT only for classification.**
+
+It is a **sequence model** and can be used for **both regression and classification**, and even sequence generation.
+
+---
+
+## What `nn.LSTM` actually does
+
+`nn.LSTM` **outputs sequence representations**, not labels.
+
+Output:
+
+* Hidden states for each time step
+* Final hidden & cell state
+
+What you do **after LSTM** decides the task.
+
+---
+
+## LSTM for different tasks
+
+### 1. Classification (binary / multi-class)
+
+```python
+fc = nn.Linear(hidden_size, num_classes)
+```
+
+Examples:
+
+* Fraud detection
+* Sentiment analysis
+
+---
+
+### 2. Regression (continuous output)
+
+```python
+fc = nn.Linear(hidden_size, 1)
+loss = nn.MSELoss()
+```
+
+Examples:
+
+* Stock price prediction
+* Time series forecasting
+
+---
+
+### 3. Sequence-to-sequence
+
+```python
+fc = nn.Linear(hidden_size, vocab_size)
+```
+
+Examples:
+
+* Machine translation
+* Text generation
+
+---
+
+## Why confusion happens
+
+Many tutorials show:
+
+```
+LSTM → FC → Sigmoid → Class
+```
+
+So people assume LSTM = classifier.
+
+---
+
+## Correct mental model
+
+> **LSTM is a feature extractor for sequences, not a classifier or regressor by itself.**
+
+---
+
+## One-line interview answer
+
+> **`nn.LSTM` can be used for classification, regression, or sequence generation depending on the output layer and loss function.**
+
+If you want, I can show:
+
+* Same LSTM used for **both regression & classification**
+* **Time-series forecasting example**
+* **Seq2Seq LSTM**
+
+
+**`nn.LSTM` itself is neither supervised nor unsupervised.**
+It’s just a **model architecture**.
+
+---
+
+## How LSTM is used in practice
+
+### ✅ Supervised learning (most common)
+
+* Trained with **labeled data**
+* Examples:
+
+  * Fraud detection (label = fraud / not fraud)
+  * Time-series regression (predict next value)
+* Loss functions: `CrossEntropyLoss`, `BCELoss`, `MSELoss`
+
+---
+
+### ✅ Self-supervised / Unsupervised
+
+* No human labels
+* Labels are **derived from the data itself**
+* Examples:
+
+  * Next-step prediction
+  * Language modeling
+  * Anomaly detection using reconstruction error
+
+---
+
+## Summary table
+
+| Training type   | Can LSTM be used? |
+| --------------- | ----------------- |
+| Supervised      | ✅ Yes             |
+| Unsupervised    | ✅ Yes             |
+| Self-supervised | ✅ Yes             |
+
+---
+
+## Key intuition
+
+> **LSTM learns sequence patterns; supervision comes from how you define the loss and targets.**
+
+---
+
+## One-line interview answer
+
+> **LSTMs can be trained in supervised, unsupervised, or self-supervised settings depending on how targets and loss functions are defined.**
+
+
+**FC stands for *Fully Connected layer*** (also called a **Linear layer**).
+
+---
+
+## What FC means in this context
+
+In LSTM-based models, the **FC layer comes after the LSTM** and is used to **map LSTM outputs to the final prediction**.
+
+Example:
+
+```python
+fc = nn.Linear(hidden_size, output_size)
+```
+
+* **Input**: features learned by LSTM (hidden state)
+* **Output**: prediction (class score or continuous value)
+
+---
+
+## Why FC is needed
+
+LSTM learns **temporal features**, not decisions.
+
+So:
+
+```
+Sequence → LSTM → FC → Output
+```
+
+---
+
+## Task examples
+
+* **Classification**:
+  `FC → Sigmoid / Softmax`
+* **Regression**:
+  `FC → raw value`
+* **Seq-to-seq**:
+  `FC → vocabulary size`
+
+---
+
+## One-line interview answer
+
+> **FC is the fully connected layer that converts LSTM’s learned sequence representation into the final output.**
