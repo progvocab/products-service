@@ -91,7 +91,14 @@ Transformer attention focuses on:
 * reduced time gap
 * behavior change vs earlier steps
 
----
+
+* `self.fc` is a **fully connected (Linear) layer**.
+* It converts learned feature vectors into a **single output value**.
+* Input size = model feature size (`d_model`).
+* Output = fraud score (logit).
+* After `sigmoid`, it becomes a **fraud probability**.
+
+
 
 ## LSTM vs Transformer (fraud context)
 
