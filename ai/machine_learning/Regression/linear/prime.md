@@ -148,3 +148,115 @@ If you want, I can:
 * Show the effect of noise
 * Visualize intercept changes
 * Explain bias in neural networks vs regression
+
+
+Let’s explain **variance of a linear regression model using the SAME context** you used earlier:
+
+> **X = first 20 prime numbers**
+> **y = 2x**
+
+---
+
+## 1️⃣ Our original model (recap)
+
+We trained:
+
+[
+y = wx + b
+]
+
+and obtained:
+
+[
+y = 2x + 0
+]
+
+This is a **perfect linear relationship**.
+
+---
+
+## 2️⃣ What variance means *here*
+
+In linear regression, variance usually refers to **how much the model’s predictions vary due to data noise**.
+
+There are **two relevant variances**:
+
+---
+
+## 3️⃣ Residual variance (error variance)
+
+Residuals:
+[
+\varepsilon_i = y_i - \hat{y}_i
+]
+
+In our case:
+[
+y_i = 2x_i \quad \text{and} \quad \hat{y}_i = 2x_i
+]
+
+So:
+[
+\varepsilon_i = 0
+]
+
+### ✅ Residual Variance
+
+[
+\text{Var}(\varepsilon) = 0
+]
+
+**Why?**
+Because the model fits the data **perfectly** (no noise).
+
+---
+
+## 4️⃣ Variance of the model parameters (w, b)
+
+This measures **how much `w` and `b` would change** if we retrained on different samples.
+
+* Data is perfectly linear
+* No randomness
+* No noise
+
+### ✅ Parameter Variance
+
+[
+\text{Var}(w) = 0,\quad \text{Var}(b) = 0
+]
+
+---
+
+## 5️⃣ What if we add noise (important intuition)
+
+```python
+y = 2 * X.flatten() + np.random.normal(0, 5, size=len(X))
+```
+
+Now:
+
+* Residual variance > 0
+* `w` and `b` vary across datasets
+* Model variance increases
+
+---
+
+## 6️⃣ Key takeaway in THIS context
+
+| Scenario          | Model Variance        |
+| ----------------- | --------------------- |
+| y = 2x (no noise) | **Zero variance**     |
+| y = 2x + noise    | **Non-zero variance** |
+
+---
+
+## 7️⃣ Interview one-liner (context-specific)
+
+> **In our prime-number linear regression example, the model variance is zero because the data follows a perfect linear relationship with no noise.**
+
+If you want next:
+
+* Numeric computation of variance
+* Bias–variance tradeoff using this dataset
+* Ridge regression effect on variance
+
