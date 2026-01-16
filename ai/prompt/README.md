@@ -129,3 +129,41 @@ Here are the **main parts of a GPT (Transformer) model**, each explained in **on
 
 > *GPT is a tokenizer-driven, attention-based neural network that predicts the next token using stacked transformer layers.*
 
+
+### One-liner for LLM
+
+> **LLM (Large Language Model):** A neural network trained on massive text data to understand, reason, and generate human-like language using probability over tokens.
+
+---
+
+### Important LLMs (one-liner each)
+
+* **GPT (OpenAI)** – Decoder-only Transformer optimized for generative, conversational, and reasoning tasks.
+* **GPT-4 / GPT-4o / GPT-5** – Advanced GPT models with stronger reasoning, multimodal understanding, and tool use.
+* **BERT (Google)** – Encoder-only model designed for deep language understanding, not text generation.
+* **T5 (Google)** – Encoder-decoder model that converts every NLP task into a text-to-text format.
+* **PaLM (Google)** – Large-scale generative model focused on reasoning and multilingual tasks.
+* **Gemini (Google DeepMind)** – Multimodal LLM designed for text, image, audio, and code understanding.
+* **LLaMA (Meta)** – Efficient open-weight LLM optimized for research and fine-tuning.
+* **LLaMA-2 / LLaMA-3** – Improved open-source generative models with strong instruction following.
+* **Mistral** – Lightweight, high-performance open LLM optimized for efficiency and speed.
+* **Mixtral** – Sparse Mixture-of-Experts LLM for better performance with fewer active parameters.
+* **Claude (Anthropic)** – Safety-focused conversational LLM trained with Constitutional AI.
+* **Falcon** – Open LLM optimized for high-quality English and multilingual text generation.
+* **BLOOM** – Open multilingual LLM trained collaboratively across many languages.
+* **Cohere Command** – Enterprise-focused LLM for retrieval, classification, and generation tasks.
+* **DeepSeek** – Reasoning-optimized LLM focused on math, coding, and logical tasks.
+
+
+
+
+
+> **LLMs differ mainly by architecture (encoder/decoder), training objective, scale, openness, and target use cases.**
+
+More :
+
+* **Top LLMs for RAG**,
+* **LLMs best for coding**,
+* **Open vs closed LLM comparison**,
+
+
