@@ -97,3 +97,35 @@
 **In short:** hard prompts are *written instructions*; soft prompts are *learned instructions*.
 
 
+### GPT Model
+
+The **GPT (Generative Pre-trained Transformer) model was created by OpenAI**.
+
+More specifically:
+
+* The **Transformer architecture** was introduced by **Google researchers** in the 2017 paper *“Attention Is All You Need”*.
+* **OpenAI** adapted and extended this architecture to create **GPT**, first released as **GPT-1 in 2018**, followed by GPT-2, GPT-3, GPT-4, and later versions.
+
+**One-line answer:**
+
+> *GPT was created by OpenAI, based on the Transformer architecture originally proposed by Google researchers.*
+
+
+
+Here are the **main parts of a GPT (Transformer) model**, each explained in **one line**:
+
+1. **Tokenizer** – Converts raw text into discrete tokens the model can process.
+2. **Token Embeddings** – Maps each token to a high-dimensional vector representing its meaning.
+3. **Positional Embeddings** – Encodes the position of each token to preserve word order.
+4. **Transformer Blocks** – Stacked layers that iteratively refine token representations.
+5. **Self-Attention Mechanism** – Determines which tokens are most relevant to each other for context.
+6. **Feed-Forward Networks (MLP)** – Applies non-linear transformations to enrich representations.
+7. **Layer Normalization** – Stabilizes training by normalizing activations in each layer.
+8. **Residual Connections** – Helps gradients flow and preserves information across layers.
+9. **Output (LM) Head** – Projects hidden states to vocabulary logits for next-token prediction.
+10. **Softmax Layer** – Converts logits into probabilities over the vocabulary.
+
+**One-line takeaway:**
+
+> *GPT is a tokenizer-driven, attention-based neural network that predicts the next token using stacked transformer layers.*
+
