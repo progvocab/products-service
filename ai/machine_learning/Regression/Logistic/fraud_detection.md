@@ -285,3 +285,230 @@ More :
 * explain **why this would fail in production**
 
 
+Yes — and this is a **great question**, because it shows you actually understand what logistic regression is doing under the hood.
+
+I’ll walk you **step by step**, numerically, for **your exact example**, using **gradient descent** (conceptually what solvers optimize).
+
+We’ll simplify slightly to make the math readable.
+
+---
+
+## 1️⃣ Model setup
+
+**Logistic regression model**
+
+[
+\hat{y} = \sigma(z) = \frac{1}{1 + e^{-z}}, \quad z = wx + b
+]
+
+**Loss (binary cross-entropy)**
+
+[
+L = -[y \log(\hat{y}) + (1-y)\log(1-\hat{y})]
+]
+
+---
+
+## 2️⃣ Your training data (simplified)
+
+We’ll use **one positive and one negative** first to see the mechanics:
+
+| x (amount) |  y |
+| ---------: | -: |
+|      5,000 |  0 |
+|     50,000 |  1 |
+
+---
+
+## 3️⃣ Initialize parameters
+
+Logistic regression usually starts small:
+
+[
+w = 0,\quad b = 0
+]
+
+Learning rate:
+
+[
+\alpha = 0.000001
+]
+
+---
+
+## 4️⃣ Forward pass (iteration 1)
+
+### For x = 5,000 (y = 0)
+
+[
+z = 0 \cdot 5000 + 0 = 0
+]
+
+[
+\hat{y} = \sigma(0) = 0.5
+]
+
+### For x = 50,000 (y = 1)
+
+[
+z = 0
+\Rightarrow \hat{y} = 0.5
+]
+
+---
+
+## 5️⃣ Compute gradients
+
+### Gradient formulas
+
+[
+\frac{\partial L}{\partial w} = (\hat{y} - y)x
+]
+
+[
+\frac{\partial L}{\partial b} = (\hat{y} - y)
+]
+
+---
+
+### For x = 5,000 (y = 0)
+
+[
+\hat{y} - y = 0.5
+]
+
+[
+\frac{\partial L}{\partial w} = 0.5 \times 5000 = 2500
+]
+
+[
+\frac{\partial L}{\partial b} = 0.5
+]
+
+---
+
+### For x = 50,000 (y = 1)
+
+[
+\hat{y} - y = -0.5
+]
+
+[
+\frac{\partial L}{\partial w} = -0.5 \times 50000 = -25000
+]
+
+[
+\frac{\partial L}{\partial b} = -0.5
+]
+
+---
+
+### Average gradient (batch)
+
+[
+\frac{\partial L}{\partial w} =
+\frac{2500 - 25000}{2} = -11250
+]
+
+[
+\frac{\partial L}{\partial b} =
+\frac{0.5 - 0.5}{2} = 0
+]
+
+---
+
+## 6️⃣ Update weights
+
+Gradient descent update rule:
+
+[
+w_{new} = w - \alpha \frac{\partial L}{\partial w}
+]
+
+[
+b_{new} = b - \alpha \frac{\partial L}{\partial b}
+]
+
+---
+
+### Apply update
+
+[
+w = 0 - (0.000001 \times -11250) = 0.01125
+]
+
+[
+b = 0
+]
+
+✅ Weight increases → higher amounts push prediction toward fraud.
+
+---
+
+## 7️⃣ Iteration 2 (see direction clearly)
+
+### Forward pass
+
+For **5,000**:
+
+[
+z = 0.01125 \times 5000 = 56.25
+\Rightarrow \hat{y} \approx 1.0 \quad ❌ too high
+]
+
+For **50,000**:
+
+[
+z = 562.5
+\Rightarrow \hat{y} \approx 1.0 \quad ✅
+]
+
+🚨 Now small amount is wrongly predicted as fraud → gradients will push weight **down**.
+
+---
+
+## 8️⃣ Why scaling matters (important insight)
+
+Your `x` values are **huge**, so:
+
+* Gradients explode
+* Learning rate must be tiny
+* Optimization becomes unstable
+
+That’s why in practice we do:
+
+```text
+x' = log(x) or standard scaling
+```
+
+---
+
+## 9️⃣ How solvers actually differ
+
+| Solver | What it does                 |
+| ------ | ---------------------------- |
+| GD     | Uses full gradient           |
+| SGD    | One sample at a time         |
+| LBFGS  | Uses curvature approximation |
+| Newton | Uses Hessian                 |
+
+They all minimize the **same loss**, just faster & more stably.
+
+---
+
+## 🔟 One-line takeaway (interview gold)
+
+> Logistic regression updates weights by pushing them in the direction that increases predicted probability for positive samples and decreases it for negatives, scaled by feature magnitude.
+
+---
+
+If you want next, I can:
+
+* redo this with **scaled features**
+* show **Hessian / Newton step**
+* visualize **loss vs iteration**
+* show **why LBFGS converges faster**
+
+Just say the word.
+
+
