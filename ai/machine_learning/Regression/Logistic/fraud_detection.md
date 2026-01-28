@@ -176,9 +176,107 @@ This model works **only because**:
 
 > Logistic regression learns a single weight that monotonically increases fraud probability with transaction amount, with a decision boundary near the smallest fraudulent example.
 
+
+### Hyperparameters 
+
+**Solver**
+The optimization algorithm used to minimize the logistic loss and find the best weights.
+Different solvers trade off speed, memory usage, and support for penalties and dataset size.
+
+**Penalty**
+Defines the type of regularization applied to the model weights to prevent overfitting.
+Common options include L1 (sparsity) and L2 (small, evenly distributed weights).
+
+**C**
+Inverse of regularization strength that controls how strongly weights are penalized.
+Smaller C means stronger regularization; larger C allows the model to fit the data more closely.
+
+Below are the **other commonly available Logistic Regression hyperparameters (scikit-learn)**, with **2-line explanations** and **why they weren’t used** in your example.
+
 ---
 
-If you want next, I can:
+### **max_iter**
+
+Controls the maximum number of optimization iterations allowed for convergence.
+Not specified because the default is sufficient for a tiny, well-separated dataset.
+
+---
+
+### **tol**
+
+Tolerance for stopping criteria; training stops when improvement falls below this value.
+Defaults work well here since convergence is fast and stable.
+
+---
+
+### **class_weight**
+
+Adjusts importance of classes to handle class imbalance during training.
+Not used because the training sample is tiny and already perfectly separable.
+
+---
+
+### **fit_intercept**
+
+Determines whether a bias (intercept) term is added to the model.
+Kept enabled by default since the decision boundary is not forced through the origin.
+
+---
+
+### **intercept_scaling**
+
+Scales the intercept term when using certain solvers like `liblinear`.
+Not used because the chosen solver (`lbfgs`) ignores this parameter.
+
+---
+
+### **multi_class**
+
+Specifies how multiclass classification is handled (one-vs-rest or multinomial).
+Not applicable since this is a binary classification problem.
+
+---
+
+### **warm_start**
+
+Reuses previous model coefficients as initialization for new training runs.
+Not needed because the model is trained only once.
+
+---
+
+### **n_jobs**
+
+Controls parallelism during training for supported solvers.
+Not used since the dataset is extremely small and training is instantaneous.
+
+---
+
+### **l1_ratio**
+
+Mixing parameter between L1 and L2 regularization for elastic-net penalty.
+Not used because only pure L2 regularization was applied.
+
+---
+
+### **random_state**
+
+Controls randomness for solvers with stochastic behavior.
+Not required because `lbfgs` is deterministic for this setup.
+
+
+
+> Most Logistic Regression hyperparameters control convergence, regularization, or scaling, and were unnecessary here due to the tiny, clean, and linearly separable dataset.
+
+
+
+* **Which hyperparameters matter at scale**
+* **Which ones matter for imbalanced fraud data**
+* **Which ones matter for online learning**
+
+
+
+
+More :
 
 * show **why scaling changes the weight**
 * plot the **sigmoid curve**
@@ -186,4 +284,4 @@ If you want next, I can:
 * compare with **decision tree**
 * explain **why this would fail in production**
 
-Just tell me.
+
