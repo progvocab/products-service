@@ -171,6 +171,492 @@
 - Isolation Forest
 - One-Class SVM
 - Local Outlier Factor (LOF)
+### Semi-Supervised Learning
+- Self-Training
+- Label Propagation
+- Co-Training
+### Reinforcement Learning
+- Q-Learning
+- SARSA
+- Deep Q Network (DQN)
+- Policy Gradient
+- Actor-Critic
+- PPO
+- A3C
+## Deep Learning
+### Neural Network Types
+- Feedforward Neural Network (ANN)
+- Convolutional Neural Network (CNN)
+- Recurrent Neural Network (RNN)
+- LSTM
+- GRU
+- Transformer
+### Generative Models (Density Estimation)
+
+#### Explicit Density Models (Tractable)
+- Autoregressive Models (PixelRNN, PixelCNN)
+- Normalizing Flows (RealNVP, Glow)
+- NADE
+- MADE
+
+#### Latent Variable Models
+- Variational Autoencoders (VAE)
+- Hierarchical VAE
+
+#### Implicit Density Models
+- Generative Adversarial Networks (GAN)
+- Conditional GAN
+- CycleGAN
+- StyleGAN
+
+#### Energy-Based Models
+- Boltzmann Machines
+- Restricted Boltzmann Machines (RBM)
+- Deep Energy-Based Models
+
+#### Diffusion Models
+- DDPM
+- Score-Based Models
+- Stable Diffusion
+- Imagen
+- DALL·E (diffusion-based)
+
+# ML Lifecycle
+
+##  Data Collection
+- Databases (SQL / NoSQL)
+- APIs
+- Logs
+- Sensors / IoT
+- Web Scraping
+- Data Streams (Kafka, Kinesis)
+
+##   Data Cleaning (Cleansing)
+- Handling Missing Values
+- Removing Duplicates
+- Outlier Detection
+- Noise Removal
+- Data Type Conversion
+- Consistency Checks
+- Data Validation
+
+
+##   Exploratory Data Analysis (EDA)
+- Summary Statistics
+- Distribution Analysis
+- Correlation Analysis
+- Visualization (histograms, boxplots, scatter plots)
+- Data Drift Detection
+
+
+##   Feature Engineering
+- Feature Creation
+- Feature Selection
+- Feature Encoding
+  - One-Hot Encoding
+  - Label Encoding
+  - Target Encoding
+- Feature Transformation
+  - Log Transform
+  - Binning
+- Interaction Features
+- Text Features (TF-IDF, Embeddings)
+- Image Features (CNN embeddings)
+
+##   Data Preprocessing
+
+### Normalization / Scaling
+- Min-Max Scaling
+- Standardization (Z-score)
+- Robust Scaling
+- Log Scaling
+
+### Sampling
+- Train / Test Split
+- Cross Validation
+- Stratified Sampling
+- Oversampling / Undersampling (SMOTE)
+
+##   Model Training
+
+### Algorithms
+- Linear Models
+- Tree-based Models
+- Ensemble Models
+- Neural Networks
+- Generative Models
+
+### Hyperparameters
+- Batch Size
+- Epochs
+- Learning Rate
+- Optimizer (SGD, Adam, RMSProp)
+- Regularization (L1, L2, Dropout)
+- Number of Layers
+- Hidden Units
+
+##   Model Validation & Evaluation
+
+### Metrics (Regression)
+- RMSE
+- MAE
+- R²
+
+### Metrics (Classification)
+- Accuracy
+- Precision
+- Recall
+- F1 Score
+- AUC-ROC
+- Log Loss
+
+### Validation Techniques
+- Holdout Validation
+- K-Fold Cross Validation
+- Time Series Split
+
+##   Explainability & Interpretability
+
+- Feature Importance
+- Model Coefficients (Weights & Parameters)
+- SHAP
+- LIME
+- Partial Dependence Plot (PDP)
+- ICE Plots
+
+### Bias & Variance
+- Bias Detection
+- Variance Analysis
+- Fairness Metrics
+- Model Robustness
+
+##  Model Artifacts & Versioning
+
+### Serialization
+- Joblib
+- Pickle
+- ONNX
+- TorchScript
+
+### Experiment Tracking
+- MLflow
+- Weights & Biases
+- TensorBoard
+
+### Model Registry
+- Model Versioning
+- Metadata
+- Lineage
+
+##   Deployment
+
+### Serving Patterns
+- Batch Inference
+- Real-time Inference
+- Streaming Inference
+
+### Platforms
+- Kubeflow
+- Docker
+- Kubernetes
+- AWS SageMaker
+- Azure ML
+- GCP Vertex AI
+
+### APIs
+- FastAPI
+- Flask
+- gRPC
+
+##   Inference
+
+### Frameworks
+- TensorFlow Lite
+- TensorRT
+- ONNX Runtime
+- PyTorch Serve
+
+### Applications
+- Web Apps
+- Mobile Apps
+- Edge Devices
+- IoT
+
+### Inference Parameters (Generative Models)
+- Top-K
+- Top-P (Nucleus Sampling)
+- Temperature
+- Max Tokens
+- Beam Search
+
+##   Monitoring & Maintenance
+
+- Data Drift Monitoring
+- Concept Drift Monitoring
+- Model Performance Monitoring
+- Latency Monitoring
+- Error Tracking
+- Alerting
+
+##  Retraining & Feedback Loop
+- Scheduled Retraining
+- Trigger-based Retraining
+- Human-in-the-loop Feedback
+- Active Learning
+
+##   Governance & Security
+- Data Privacy
+- Access Control
+- Audit Logs
+- Compliance (GDPR, HIPAA)
+- Model Risk Management
+
+# LLM Lifecycle
+
+##  Data Preparation
+- Data Collection
+- Data Cleaning & Deduplication
+- Filtering (toxicity, quality, language)
+- Tokenization
+- Data Mixing & Curriculum
+- Synthetic Data Generation
+
+## Pretraining
+
+### Uncontrolled Pretraining
+- Web-scale corpora
+- Books
+- Code
+- Wikipedia
+- Multimodal data (text, image, audio)
+
+### Controlled Pretraining
+- Curated datasets
+- Domain-specific corpora (medical, legal, finance)
+- Instruction-style data
+- Safety-filtered data
+
+### Objectives
+- Next Token Prediction (Causal LM)
+- Masked Language Modeling (MLM)
+- Multimodal Objectives (CLIP-style)
+- Contrastive Learning
+
+##  Mid-Training (Continual / Domain Adaptation)
+- Domain adaptation (code, math, biomedical, legal)
+- Long-context training
+- Tool-use training
+- Multilingual training
+- Reasoning datasets (math, logic, chain-of-thought)
+- Synthetic data augmentation
+
+
+##  Benchmarking & Evaluation
+### Offline Evaluation 
+#### Academic Benchmarks
+- MMLU
+- HellaSwag
+- ARC
+- GSM8K
+- HumanEval
+- BIG-Bench
+
+
+#### Custom Task Datasets
+- Domain QA
+- RAG Evaluation Sets
+- Tool-Use Datasets
+- Reasoning Datasets
+- Conversation Datasets
+- Safety & Policy Datasets
+- Edge Case Datasets
+- Adversarial Datasets
+- Golden Datasets
+- Regression Test Sets
+
+#### Prompt Evaluation
+- Prompt Variants
+- A/B Testing
+- Prompt Templates
+- Few-Shot Prompts
+- Zero-Shot Prompts
+- Chain-of-Thought Prompts
+- Structured Output Prompts (JSON / Schema)
+- System vs User Prompts
+- Prompt Regression Tests
+
+#### LLM-as-a-Judge
+- Pairwise Comparison
+- Scoring (1–5, 1–10)
+- Rubric-Based Evaluation
+- Faithfulness Scoring
+- Relevance Scoring
+- Correctness Scoring
+- Helpfulness Scoring
+- Safety Scoring
+- Hallucination Detection
+- Self-Consistency Checks
+
+
+### Safety Benchmarks
+- Toxicity
+- Bias
+- Hallucination
+- Jailbreak resistance
+
+### Performance Metrics - Automated
+- Perplexity
+- Accuracy
+- BLEU / ROUGE (for generation)
+- Win-rate vs baseline
+
+### Human Evaluation
+- Helpfulness
+- Harmlessness
+- Honesty
+- Annotation UI
+- Pairwise Comparison
+- Preference Scoring
+  
+### Capability Evaluation
+- Reasoning (GSM8K, ARC)
+- Coding (HumanEval)
+- Knowledge (MMLU)
+  
+### Long-Context & Retrieval Evaluation
+- Needle-in-a-Haystack (NIAH)
+- LongBench
+- RULER
+- InfiniteBench
+### Tooling
+- LangSmith
+- Weights & Biases (LLM eval)
+- OpenAI Evals
+- TruLens
+- Promptfoo
+- DeepEval
+
+##  Fine-Tuning
+
+### Supervised Fine-Tuning (SFT)
+- Instruction tuning
+- Chat datasets
+- Question–Answer datasets
+- Task-specific fine-tuning
+
+### Parameter-Efficient Fine-Tuning (PEFT)
+- LoRA
+- QLoRA
+- Adapters
+- Prefix Tuning
+- Prompt Tuning
+- BitFit
+
+#### Quantization 
+- INT8
+- INT4
+- GPTQ
+- AWQ
+
+
+##  Alignment & Safety Training
+
+### RLHF (Reinforcement Learning from Human Feedback)
+- Reward Model Training
+- Preference Data Collection
+- PPO / DPO / RLAIF
+
+### Alternatives to RLHF
+- DPO (Direct Preference Optimization)
+- RLAIF (AI Feedback)
+- Constitutional AI
+- Self-Refinement
+
+
+##   Grounding & Tool Integration
+
+### Retrieval-Augmented Generation (RAG)
+- Vector Databases
+- Embeddings
+- Document Chunking
+- Re-ranking
+
+### Tool Use
+- Function Calling
+- Code Interpreter
+- Web Search
+- Database Queries
+- APIs
+
+### Knowledge Grounding
+- Enterprise Knowledge Bases
+- Ontologies
+- Structured Data (SQL, Graph DB)
+
+ 
+
+##  Compression & Optimization
+
+- Distillation
+- Pruning
+- Quantization
+- Sparse Models
+- Low-rank Factorization
+
+ 
+
+##   Deployment & Serving
+
+- Model Packaging
+- ONNX / TensorRT
+- vLLM / TGI / Triton
+- GPU / TPU / Edge Devices
+- Load Balancing
+- Caching
+
+ 
+
+##  Inference & Decoding
+
+### Decoding Strategies
+- Greedy Decoding
+- Beam Search
+- Top-K
+- Top-P (Nucleus Sampling)
+- Temperature
+- Repetition Penalty
+
+ 
+
+##   Monitoring & Feedback Loop
+
+### Usage Analytics
+
+
+
+### Feedback Collection
+- User Ratings
+- Human Review
+- Dataset Expansion
+### Tracing & Observability
+- LangSmith
+- OpenTelemetry
+- Logs & Metrics
+### Production Evaluation
+- Drift Detection
+- Hallucination Detection
+- Safety Evaluation
+- Cost & Latency Tracking
+
+
+##   Continuous Improvement
+- Data Flywheel
+- Active Learning
+- Periodic Re-training
+- Model Versioning
+
+  
+
 
 
 
