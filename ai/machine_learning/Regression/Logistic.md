@@ -269,3 +269,30 @@ Hyperparameters are things like regularization and solver settings that you conf
 ---
 
 Would you like me to also explain this in terms of **scikit-learn’s LogisticRegression** (which attributes are parameters vs hyperparameters)?
+
+
+
+In **Logistic Regression**, the following loss functions are commonly used 👇
+
+1. **Log Loss / Binary Cross-Entropy** – Standard loss for binary classification; penalizes confident wrong predictions.
+2. **Categorical Cross-Entropy** – Used for multinomial (softmax) logistic regression.
+3. **Negative Log-Likelihood (NLL)** – Probabilistic form of log loss derived from maximum likelihood estimation.
+4. **Regularized Log Loss** – Log loss augmented with **L1 (Lasso)** or **L2 (Ridge)** penalty terms.
+
+👉 In practice, **binary or categorical cross-entropy** is what logistic regression optimizes.
+
+
+Regularization is applied **during each optimization step**, where the penalty term is added to the loss function while updating model weights.
+
+
+Yes — **regularization is an integral part of the optimization process**, because it directly modifies the loss function that the optimizer minimizes.
+
+
+**Lasso (L1) vs Ridge (L2) regularization**
+
+* **Lasso (L1):** Adds the *absolute value* of weights to the loss, which can drive some weights exactly to **zero** → does **feature selection**.
+* **Ridge (L2):** Adds the *squared value* of weights to the loss, which shrinks weights smoothly but **never makes them zero** → keeps all features.
+
+**Intuition:**
+Lasso simplifies the model by removing features; Ridge stabilizes the model by reducing weight magnitude.
+
