@@ -1,3 +1,33 @@
+# Logistic Regression 
+
+- When the model is fitted, it initializes the feature weights (usually to small values or zeros) and the bias (often zero). 
+- For each optimization step, it computes the **logit** as a weighted sum of input features plus bias, applies the **sigmoid function** to obtain predicted probabilities, and evaluates the **log-loss** using the true labels.
+
+- The gradients of the loss with respect to the weights and bias are then computed over the training data (full batch or mini-batch, depending on the solver). 
+
+- The optimizer updates the parameters in the direction that minimizes the loss, and this process repeats iteratively until convergence or the maximum number of iterations is reached.
+
+A **solver** in Logistic Regression is the **optimization algorithm** used to minimize the loss function and find the optimal weights and bias.
+
+Examples include **liblinear, lbfgs, newton-cg, sag, and saga**, each differing in how they compute gradients, handle regularization, and scale with data size.
+
+
+* **Solver** is the term used in classical ML (e.g., Logistic Regression) for the numerical method that *solves* the optimization problem (LBFGS, Newton-CG, liblinear).
+* **Optimizer** is the term used in deep learning for algorithms that *iteratively update parameters* (SGD, Adam, RMSProp).
+
+**Key difference in practice:**
+Solvers often use **second-order or quasi-Newton methods** and aim for fast convergence, while optimizers typically use **first-order gradient updates** and explicit epochs/batches.
+
+Think of it as: *same goal, different tooling and abstraction level*.
+
+
+
+* Error is **not prediction − label**; it is measured via **log-loss**.
+* Logistic regression does **not explicitly separate forward/backward passes** like neural networks, though the math is equivalent.
+* Iterations are controlled by **optimizer convergence**, not explicit epochs (in libraries like scikit-learn).
+
+
+
  Let’s walk through a **real-world simple use case of Logistic Regression** step by step, with explanation, math (logit), and Python code.
 
 ---
