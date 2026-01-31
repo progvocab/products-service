@@ -230,6 +230,7 @@
 - Sensors / IoT
 - Web Scraping
 - Data Streams (Kafka, Kinesis)
+- Data Lake
 
 ##   Data Cleaning (Cleansing)
 - Handling Missing Values
@@ -239,6 +240,10 @@
 - Data Type Conversion
 - Consistency Checks
 - Data Validation
+- Apache Spark
+  - Spark SQL
+  - DataFrames
+  - ETL Jobs
 
 
 ##   Exploratory Data Analysis (EDA)
@@ -247,6 +252,9 @@
 - Correlation Analysis
 - Visualization (histograms, boxplots, scatter plots)
 - Data Drift Detection
+- Apache Spark
+   - Spark SQL
+   - Spark MLlib (stats)
 
 
 ##   Feature Engineering
@@ -262,6 +270,10 @@
 - Interaction Features
 - Text Features (TF-IDF, Embeddings)
 - Image Features (CNN embeddings)
+- Feature Pipelines
+- Feature Store
+  - Feast
+
 
 ##   Data Preprocessing
 
@@ -285,7 +297,8 @@
 - Ensemble Models
 - Neural Networks
 - Generative Models
-
+### Distributed Training
+#### Spark ML Lib
 ### Hyperparameters
 - Batch Size
 - Epochs
@@ -294,6 +307,8 @@
 - Regularization (L1, L2, Dropout)
 - Number of Layers
 - Hidden Units
+####  Hyperparameter Tuning
+- Spark and Ray
 
 ##   Model Validation & Evaluation
 
@@ -363,12 +378,22 @@
 - Azure ML
 - GCP Vertex AI
 
+### Jobs
+- Spark
+### Pipelines
+- Airflow (scheduled )
+
 ### APIs
 - FastAPI
 - Flask
 - gRPC
 
 ##   Inference
+
+### Batch
+- Spark
+### Streaming Inference 
+- Spark Structured Streaming
 
 ### Frameworks
 - TensorFlow Lite
@@ -392,6 +417,7 @@
 ##   Monitoring & Maintenance
 
 - Data Drift Monitoring
+  - Spark
 - Concept Drift Monitoring
 - Model Performance Monitoring
 - Latency Monitoring
@@ -420,7 +446,15 @@
 - Tokenization
 - Data Mixing & Curriculum
 - Synthetic Data Generation
-
+## Model Architecture and Design
+###  Transformer
+### Attention Mechanism
+### Positional Encodings
+  - Sinusoidal Positional Encoding
+  - Learned Positional Embedding
+  - Rotary Positional Embedding (RoPE)
+  - ALiBi
+    
 ## Pretraining
 
 ### Uncontrolled Pretraining
@@ -435,6 +469,9 @@
 - Domain-specific corpora (medical, legal, finance)
 - Instruction-style data
 - Safety-filtered data
+- Train with RoPE-enabled attention
+- Long-context learning
+- Token position generalization
 
 ### Objectives
 - Next Token Prediction (Causal LM)
@@ -444,12 +481,16 @@
 
 ##  Mid-Training (Continual / Domain Adaptation)
 - Domain adaptation (code, math, biomedical, legal)
-- Long-context training
+- Long-context fine tuning
 - Tool-use training
 - Multilingual training
 - Reasoning datasets (math, logic, chain-of-thought)
 - Synthetic data augmentation
-
+- Token Position Generalization
+### Long-Context Adaptation
+- RoPE scaling
+- NTK-aware RoPE
+- Long context fine-tuning (32k, 128k, 1M tokens)
 
 ##  Benchmarking & Evaluation
 ### Offline Evaluation 
