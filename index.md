@@ -297,6 +297,111 @@
 - Ensemble Models
 - Neural Networks
 - Generative Models
+
+## Model Architecture
+### Neural Networks
+### Layers
+* Input Layer
+* Linear (Dense) Layer
+* Sequential Layer
+* Convolutional Layer
+  * Conv1D
+  * Conv2D
+  * Conv3D
+* Transposed Convolution (Deconvolution) Layer
+* Pooling Layer
+  * Max Pooling
+  * Average Pooling
+  * Global Pooling
+* Embedding Layer
+* Recurrent Layer (RNN)
+* LSTM Layer
+* GRU Layer
+* Attention Layer
+* Multi-Head Attention Layer
+* Transformer Encoder Layer
+* Transformer Decoder Layer
+* Normalization Layer
+  * BatchNorm
+  * LayerNorm
+  * GroupNorm
+* Dropout Layer
+* Activation Layer
+* Residual / Skip Connection Layer
+* Flatten Layer
+* Reshape Layer
+* Concatenation Layer
+* Add / Merge Layer
+* Masking Layer
+* TimeDistributed Layer
+* Lambda / Custom Layer
+* Output Layer
+
+### Activation Functions
+- Binary Step
+- Linear
+- Sigmoid
+- Tanh
+- ReLU
+- Leaky ReLU
+- Parametric ReLU (PReLU)
+- ELU
+- SELU
+- GELU
+- Swish
+- Mish
+- Softplus
+- Softsign
+- Hard Sigmoid
+- Hard Swish
+- Maxout
+- LogSoftmax
+- Softmax
+### Training Configuration
+#### Loss Function
+- Mean Squared Error (MSE)
+- Mean Absolute Error (MAE)
+- Huber Loss
+- Log-Cosh Loss
+- Binary Cross-Entropy
+- Categorical Cross-Entropy
+- Sparse Categorical Cross-Entropy
+- Negative Log Likelihood (NLL)
+- Kullback–Leibler Divergence (KL Loss)
+- Hinge Loss
+- Squared Hinge Loss
+- Focal Loss
+- Dice Loss
+- Jaccard (IoU) Loss
+- Tversky Loss
+- Contrastive Loss
+- Triplet Loss
+- Cosine Similarity Loss
+- Poisson Loss
+- Quantile Loss
+- Earth Mover’s Distance (Wasserstein Loss)
+- Perplexity Loss
+- CTC Loss
+- Label Smoothing Loss
+#### Optimizer
+#### Learning Rate
+#### Batch Size
+#### Epochs
+#### Regularization
+
+### Training Loop
+- Forward Pass
+- Loss Computation
+- Backward Pass (Backpropagation)
+- Gradient Calculation
+- Weight Update by Optimizer 
+
+### Components
+- Loss Function
+- Optimizer
+- Learning Rate Scheduler
+- Regularization
+
 ### Distributed Training
 #### Spark ML Lib
 ### Hyperparameters
@@ -307,8 +412,22 @@
 - Regularization (L1, L2, Dropout)
 - Number of Layers
 - Hidden Units
+- Number of Estimators
+- Sample Size (bootstrap size)
+- Max Depth
 ####  Hyperparameter Tuning
 - Spark and Ray
+
+###  Ensemble Methods
+#### Bagging
+#### Random Forest 
+- bagging + feature randomness
+#### Boosting 
+- AdaBoost
+- Gradient Boosting
+- XGBoost
+#### Stacking
+#### Voting
 
 ##   Model Validation & Evaluation
 
@@ -329,7 +448,10 @@
 - Holdout Validation
 - K-Fold Cross Validation
 - Time Series Split
-
+- Bias–Variance Analysis
+- Cross Validation
+- OOB (Out-of-Bag) Error (Bagging)
+  
 ##   Explainability & Interpretability
 
 - Feature Importance
