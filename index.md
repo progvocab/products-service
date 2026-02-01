@@ -133,13 +133,20 @@
 ## Machine Learning
 ### Supervised
 #### Classification
-- Logistic Regression
-- K-Nearest Neighbors (KNN)
-- Support Vector Machine (SVM)
-- Decision Tree
-- Random Forest
-- XGBClassifier
-- Naive Bayes
+- Probabilistic and Linear
+  - Logistic Regression
+  - Naive Bayes
+- Deterministic
+  - Linear
+    - Linear Support Vector Machine (SVM)
+  - Non Linear
+    - K-Nearest Neighbors (KNN)
+    - Kernel based Support Vector Machine (SVM) RBF, polynomial
+  - Tree-Based
+    - Decision Tree
+    - Random Forest
+    - XGBClassifier
+
 #### Regression
 - Linear Regression
 - Ridge Regression
@@ -194,8 +201,12 @@
 ### Generative Models (Density Estimation)
 
 #### Explicit Density Models (Tractable)
-- Autoregressive Models (PixelRNN, PixelCNN)
-- Normalizing Flows (RealNVP, Glow)
+- Autoregressive Models
+  - PixelRNN
+  - PixelCNN
+- Normalizing Flows
+  - RealNVP
+  - Glow
 - NADE
 - MADE
 
