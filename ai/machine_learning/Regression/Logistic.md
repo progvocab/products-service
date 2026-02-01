@@ -21,6 +21,11 @@ Solvers often use **second-order or quasi-Newton methods** and aim for fast conv
 Think of it as: *same goal, different tooling and abstraction level*.
 
 
+The **learning rate** controls **how large a step the solver takes when updating model parameters during loss minimization**—too large may overshoot, too small slows convergence.
+
+Example: **With a learning rate of 0.1, the solver updates weights by moving 10% of the computed gradient direction at each optimization step.**
+
+
 
 * Error is **not prediction − label**; it is measured via **log-loss**.
 * Logistic regression does **not explicitly separate forward/backward passes** like neural networks, though the math is equivalent.
@@ -28,17 +33,15 @@ Think of it as: *same goal, different tooling and abstraction level*.
 
 
 
- Let’s walk through a **real-world simple use case of Logistic Regression** step by step, with explanation, math (logit), and Python code.
 
----
 
-## 🎯 Use Case: Predicting if a Student Passes an Exam
+### Use Case: Predicting if a Student Passes an Exam
 
 We want to predict whether a student **passes (1)** or **fails (0)** an exam based on the **number of study hours**.
 
----
 
-## 📊 The Data
+
+### The Data
 
 Suppose we collected data from students:
 
@@ -59,7 +62,7 @@ This is **binary classification**.
 
 ---
 
-## 📐 The Model
+### The Model
 
 Unlike linear regression, which predicts a continuous output, **logistic regression predicts probabilities**:
 
@@ -70,9 +73,9 @@ $$
 * $\beta_0$: intercept
 * $\beta_1$: slope (effect of study hours on passing)
 
----
 
-## 🧮 The Logit
+
+### The Logit
 
 Logistic regression uses the **logit (log-odds)** function:
 
