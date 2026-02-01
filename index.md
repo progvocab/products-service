@@ -384,6 +384,25 @@
 - CTC Loss
 - Label Smoothing Loss
 #### Optimizer
+* Gradient Descent
+* Stochastic Gradient Descent (SGD)
+* Mini-Batch Gradient Descent
+* Momentum
+* Nesterov Accelerated Gradient (NAG)
+* Adagrad
+* Adadelta
+* RMSProp
+* Adam
+* AdamW
+* Adamax
+* Nadam
+* LBFGS
+* Newton’s Method
+* Conjugate Gradient
+* Coordinate Descent
+* Proximal Gradient Descent
+* FTRL (Follow-The-Regularized-Leader)
+
 #### Learning Rate
 #### Batch Size
 #### Epochs
