@@ -133,16 +133,14 @@
 ## Machine Learning
 ### Supervised
 #### Classification
-- Probabilistic and Linear
+
   - Logistic Regression
   - Naive Bayes
-- Deterministic
-  - Linear
-    - Linear Support Vector Machine (SVM)
-  - Non Linear
-    - K-Nearest Neighbors (KNN)
-    - Kernel based Support Vector Machine (SVM) RBF, polynomial
-  - Tree-Based
+  - Linear Support Vector Machine (SVM)
+  
+  - K-Nearest Neighbors (KNN)
+  - Kernel based Support Vector Machine (SVM) RBF, polynomial
+  - Tree-Based 
     - Decision Tree
     - Random Forest
     - XGBClassifier
