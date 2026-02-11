@@ -133,17 +133,28 @@
 ## Machine Learning
 ### Supervised
 #### Classification
-
+- Deterministic 
   - Logistic Regression
   - Naive Bayes
-  - Linear Support Vector Machine (SVM)
-  
   - K-Nearest Neighbors (KNN)
+  - Linear Support Vector Machine (SVM)
   - Kernel based Support Vector Machine (SVM) RBF, polynomial
+  - Perceptron
+  - Linear Discriminant Analysis (LDA)
+  - Quadratic Discriminant Analysis (QDA)
   - Tree-Based 
     - Decision Tree
     - Random Forest
-    - XGBClassifier
+    - Gradient Boost
+      - XG Boost
+      - Light GBM
+      - Cat Boost
+- Stochastic 
+  - Bayesian Networks (with sampling inference)
+  - Probabilistic Graphical Models with Monte Carlo sampling
+  - Gaussian Process Classifier (with stochastic inference)
+  - Stochastic Gradient Descent Classifier (SGDClassifier, during training randomness)
+  - Bagging-based classifiers (with random sampling, if seed not fixed)
 
 #### Regression
 - Linear Regression
