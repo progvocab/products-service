@@ -158,9 +158,13 @@
 
 #### Regression
 - Linear Regression
-- Ridge Regression
-- Lasso Regression
-- Elastic Net
+  - Ordinary Least Square 
+  - Weighted Least Square 
+  - Ridge Regression
+  - Lasso Regression
+  - Robust Regression 
+  - Gradient Descent Optimization 
+  - Elastic Net
 - Support Vector Regression (SVR)
 - Decision Tree Regressor
 - Random Forest Regressor
