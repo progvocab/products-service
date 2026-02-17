@@ -1,3 +1,14 @@
+# Data
+## Mean
+## Median
+## Mode
+## Deviation 
+- Simple
+- Absolute 
+- Variance 
+- Standard Deviation 
+## Z score
+
 
 # Linear Regression
 - Supervised Learning
