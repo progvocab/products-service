@@ -7,7 +7,27 @@
 - Absolute 
 - Variance 
 - Standard Deviation 
+
 ## Z score
+
+## Random variable 
+- Discrete 
+- Continuous 
+## Probability 
+- Event 
+- Outcome 
+- Conditional Probability 
+
+# Probability Distribution 
+## Discrete 
+### Binomial 
+### Bernoulli
+### Poisson 
+
+## Continuous 
+### Gaussian / Normal 
+### 
+
 
 
 # Linear Regression
