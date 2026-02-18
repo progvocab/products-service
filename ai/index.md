@@ -27,7 +27,7 @@
 
 # Probability Distribution 
 ## Discrete 
-
+- Probability Mass Function 
 ### Bernoulli
 - 1 trial
 - Output is 0 or 1
@@ -48,6 +48,7 @@
 - rare event approximation of Binomial
 
 ## Continuous 
+- Probability Density Function 
 ### Gaussian / Normal 
 ### 
 
@@ -67,7 +68,8 @@
 
 - Prediction–Loss–Update Cycle
   - Forward pass: use linear equation (y = wX + b) to generate predictions
-  - Compute loss using loss function (e.g., MSE, with optional regularization)
+  - Compute loss using loss function
+    - MSE, with optional regularization
   - Backward pass (backpropagation):
     - Compute gradients using partial derivatives of loss w.r.t. weights and bias
   - Apply solver (e.g., Gradient Descent) to update parameters
