@@ -2,13 +2,20 @@
 ## Mean
 ## Median
 ## Mode
+## Range
 ## Deviation 
 - Simple
 - Absolute 
 - Variance 
 - Standard Deviation 
-
+- Median Absolute Deviation 
+- Gaussian Distribution 
 ## Z score
+
+## Skewness
+- positive 
+- negative 
+- symmetrical 
 
 ## Random variable 
 - Discrete 
@@ -20,9 +27,25 @@
 
 # Probability Distribution 
 ## Discrete 
-### Binomial 
+
 ### Bernoulli
+- 1 trial
+- Output is 0 or 1
+- Probability of Success 
+- Probability of Failure 
+
+
+### Binomial 
+- n trial
+- Output is 0 to n
+- sum of n independent Bernoulli variables 
+- count success in fixed n trails
+
 ### Poisson 
+- n trails , very large n
+- very small Probability of Success 
+- count rare events in fixed time space interval 
+- rare event approximation of Binomial
 
 ## Continuous 
 ### Gaussian / Normal 
