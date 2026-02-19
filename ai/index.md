@@ -56,6 +56,7 @@
 
 # Linear Regression
 - Supervised Learning
+- assumes Linear Relationship 
 
 ## Training
 - Prepare the dataset
@@ -66,14 +67,17 @@
   - Weights / coefficients
   - Bias (intercept)
 
-- Prediction–Loss–Update Cycle
-  - Forward pass: use linear equation (y = wX + b) to generate predictions
+
+- Forward Computation use linear equation (y = wX + b) to generate predictions
   - Compute loss using loss function
     - MSE, with optional regularization
-  - Backward pass (backpropagation):
-    - Compute gradients using partial derivatives of loss w.r.t. weights and bias
-  - Apply solver (e.g., Gradient Descent) to update parameters
-  - Repeat for multiple iterations (epochs)
+  
+- Solve Optimization Problem 
+  - Minimize MSE using Ordinary Least Square 
+- Apply solver to update parameters
+    - Compute parameters using matrix decomposition 
+      - SVD or QR
+- Parameters obtained in single shot
 
 - Monitor training
   - Track loss value
@@ -82,7 +86,10 @@
 - Stop training
   - When loss stabilizes or reaches acceptable minimum
 
+## Batch
 
+- Backward pass (backpropagation):
+    - Compute gradients using partial derivatives of loss w.r.t. weights and bias
   
 ## Loss functions 
  
