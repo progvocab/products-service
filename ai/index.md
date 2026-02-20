@@ -76,7 +76,17 @@
   - Minimize MSE using Ordinary Least Square 
 - Apply solver to update parameters
     - Compute parameters using matrix decomposition 
-      - SVD or QR
+      - SVD Singular Value Decomposition 
+        - divides features metrix into 3 metrics for 
+        - numerical stability
+        - psuedo inverse computation 
+        - handles multi collinearity
+        - Dimensionality Reduction 
+        - Geometric Insight 
+          - Direction ( First and third matrix)
+          - Importance ( second )
+          - Rotation Scaling 
+      - QR
 - Parameters obtained in single shot
 
 - Monitor training
