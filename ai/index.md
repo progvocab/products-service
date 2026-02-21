@@ -73,7 +73,8 @@
     - MSE, with optional regularization
   
 - Solve Optimization Problem 
-  - Minimize MSE using Ordinary Least Square 
+  - apply objective function to define goal
+    - Ordinary Least Square to minimize MSE
 - Apply solver to update parameters
     - Compute parameters using matrix decomposition 
       - SVD Singular Value Decomposition 
@@ -87,7 +88,8 @@
           - Importance ( second )
           - Rotation Scaling 
         - Eigen vector is a non zero matrix when multiplied by a Square Matrix,  it does not change direction
-        - Eigen values are 
+        - Eigen values are factors by which Eigen vectors are stretch during transformations 
+        - Compute weights using Ordinary Least Square 
       - QR
 - Parameters obtained in single shot
 
