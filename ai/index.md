@@ -86,6 +86,8 @@
           - Direction ( First and third matrix)
           - Importance ( second )
           - Rotation Scaling 
+        - Eigen vector is a non zero matrix when multiplied by a Square Matrix,  it does not change direction
+        - Eigen values are 
       - QR
 - Parameters obtained in single shot
 
