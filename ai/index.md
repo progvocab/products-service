@@ -100,7 +100,20 @@
 - Stop training
   - When loss stabilizes or reaches acceptable minimum
 
-## Batch
+## Ridge Regression 
+- Apply penalty to coefficients 
+- Solvers
+- lbfgs 
+  - Quasi-Newton solver 
+  - uses Gradient information and approximate the Hessian to minimize loss
+  
+- cholesky
+  - Ordinary Least Square using Cholesky factorization 
+
+- sparse_cg 
+  - iterative Conjugate Gradient Solvers without matrix inverse 
+
+## Stochastic Gradient Descent 
 
 - Backward pass (backpropagation):
     - Compute gradients using partial derivatives of loss w.r.t. weights and bias
