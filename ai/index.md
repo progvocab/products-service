@@ -176,4 +176,44 @@
  
  
 
+Ensemble Learning
+│
+├── 1️⃣ Bagging (Bootstrap Aggregating)
+│   ├── Train models independently
+│   ├── Random sampling with replacement
+│   ├── Reduces variance
+│   ├── Parallel training
+│   └── Example:
+│        └── Random Forest
+│
+├── 2️⃣ Boosting
+│   ├── Train models sequentially
+│   ├── Each model corrects previous errors
+│   ├── Reduces bias (and variance)
+│   ├── Weighted data updates
+│   └── Examples:
+│        ├── AdaBoost
+│        ├── Gradient Boosting
+│        ├── XGBoost
+│        ├── LightGBM
+│        └── CatBoost
+│
+├── 3️⃣ Stacking (Stacked Generalization)
+│   ├── Train multiple base models
+│   ├── Predictions used as features
+│   ├── Meta-model learns final output
+│   ├── Combines heterogeneous models
+│   └── Example:
+│        └── Logistic Regression as meta-learner
+│
+└── 4️⃣ Voting
+    ├── Train multiple models
+    ├── Combine predictions directly
+    ├── Simple aggregation
+    ├── Types:
+    │     ├── Hard Voting (majority class)
+    │     └── Soft Voting (average probabilities)
+    └── Works well with diverse models
+
+
 
