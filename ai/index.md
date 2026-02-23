@@ -174,7 +174,7 @@
 * Larger  lambda   → stronger shrinkage.
 
  
- 
+```txt
 
 Ensemble Learning
 │
@@ -214,6 +214,8 @@ Ensemble Learning
     │     ├── Hard Voting (majority class)
     │     └── Soft Voting (average probabilities)
     └── Works well with diverse models
+
+```
 
 
 
