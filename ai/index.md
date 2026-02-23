@@ -173,8 +173,9 @@
 > Shrinks coefficients toward zero but **never exactly zero**. Helps reduce **overfitting** and **multicollinearity**.
 * Larger  lambda   → stronger shrinkage.
 
- 
-```txt
+
+
+```shell
 
 Ensemble Learning
 │
