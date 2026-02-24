@@ -117,7 +117,11 @@
 
 - Backward pass (backpropagation):
     - Compute gradients using partial derivatives of loss w.r.t. weights and bias
-  
+
+## Support Vector Machines 
+- Kernel Trick
+  - enables handling non linearly separable data without explicitly computing high dimension feature mapping 
+
 ```shell
 
 SVM Training Process
