@@ -52,7 +52,16 @@
 ### Gaussian / Normal 
 ### 
 
+# Naive Bayes 
+- assumes features are independent , hence naive
+- calculates probability of each class 
+- predicts one with highest probability 
 
+
+## Bayes Theorem 
+
+- class Conditional independence 
+- class prior independence
 
 # Linear Regression
 - Supervised Learning
@@ -118,10 +127,10 @@
 - Backward pass (backpropagation):
     - Compute gradients using partial derivatives of loss w.r.t. weights and bias
 
-## Support Vector Machines 
+# Support Vector Machines 
 - Kernel Trick
   - enables handling non linearly separable data without explicitly computing high dimension feature mapping 
-
+  - simplifies computation by replacing high dimension dot product with Kernel function 
 ```shell
 
 SVM Training Process
@@ -224,6 +233,21 @@ Kernels Functions
     └── Advanced use cases
 
 ```
+
+## Decision Tree 
+- Pruning 
+  - Pre pruning 
+    - stop the tree from growing during training 
+    - constraints 
+      - max depth
+      - min samples
+    - prevents overfitting 
+    - prone to underfitting 
+  - Post pruning 
+    - grow full tree later cut unnecessary branches 
+    - Techniques 
+      - Cost complexity pruning 
+      - Reduced error pruning 
 
 ## Loss functions 
  
