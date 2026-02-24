@@ -143,11 +143,7 @@
   - Quadratic Discriminant Analysis (QDA)
   - Tree-Based 
     - Decision Tree
-    - Random Forest
-    - Gradient Boost
-      - XG Boost
-      - Light GBM
-      - Cat Boost
+    
 - Stochastic 
   - Passive Aggressive Classifier 
   - Perceptron 
@@ -169,8 +165,7 @@
   - Elastic Net
 - Support Vector Regression (SVR)
 - Decision Tree Regressor
-- Random Forest Regressor
-- XGBoost Regressor
+
 ### Unsupervised
 #### Clustering
 - K-Means
@@ -193,6 +188,25 @@
 - Isolation Forest
 - One-Class SVM
 - Local Outlier Factor (LOF)
+###  Ensemble Methods
+#### Bagging
+- Pasting
+- Random Forest 
+  - bagging + feature randomness
+- Isolation Forest 
+- Extra Trees
+
+#### Boosting 
+- AdaBoost
+- Gradient Boosting
+      - XG Boost
+      - Light GBM
+      - Cat Boost
+
+#### Stacking
+#### Voting
+
+
 ### Semi-Supervised Learning
 - Self-Training
 - Label Propagation
@@ -463,16 +477,6 @@
 ####  Hyperparameter Tuning
 - Spark and Ray
 
-###  Ensemble Methods
-#### Bagging
-#### Random Forest 
-- bagging + feature randomness
-#### Boosting 
-- AdaBoost
-- Gradient Boosting
-- XGBoost
-#### Stacking
-#### Voting
 
 ##   Model Validation & Evaluation
 
