@@ -118,6 +118,109 @@
 - Backward pass (backpropagation):
     - Compute gradients using partial derivatives of loss w.r.t. weights and bias
   
+```shell
+
+SVM Training Process
+│
+├── 1️⃣ Problem Setup
+│   ├── Classification or Regression (SVC / SVR)
+│   ├── Binary or Multi-class
+│   └── Choose kernel type
+│
+├── 2️⃣ Data Preparation
+│   ├── Feature scaling 
+│   │     ├── Standardization
+│   │     └── Normalization
+│   ├── Handle missing values
+│   └── Train–test split
+│
+├── 3️⃣ Choose Kernel
+│   ├── Linear
+│   ├── Polynomial
+│   ├── RBF
+│   ├── Sigmoid
+│   └── Precomputed
+│
+├── 4️⃣ Optimization Objective
+│   ├── Maximize margin
+│   ├── Minimize hinge loss
+│   ├── Soft margin formulation
+│   │     └── Slack variables (ξ)
+│   └── Regularization parameter (C)
+│
+├── 5️⃣ Hyperparameters
+│   ├── C (regularization strength)
+│   ├── gamma (RBF/poly/sigmoid)
+│   ├── degree (polynomial)
+│   └── coef0 (poly/sigmoid)
+│
+├── 6️⃣ Optimization Solver
+│   ├── Quadratic Programming (QP)
+│   ├── SMO (Sequential Minimal Optimization)
+│   └── Convergence criteria
+│
+├── 7️⃣ Support Vectors
+│   ├── Points on margin
+│   ├── Define decision boundary
+│   └── Sparse solution
+│
+├── 8️⃣ Model Evaluation
+│   ├── Accuracy / Precision / Recall
+│   ├── Cross-validation
+│   └── Hyperparameter tuning (GridSearch / RandomSearch)
+│
+└── 9️⃣ Final Model
+    ├── Decision function
+    ├── Predict new samples
+    └── Deployment
+
+
+Kernels Functions 
+│
+├── 1️⃣ Linear Kernel
+│   ├── Formula: K(x, y) = x · y
+│   ├── No feature transformation
+│   ├── Fast & scalable
+│   └── Use case:
+│        └── High-dimensional data (e.g., text classification)
+│
+├── 2️⃣ Polynomial Kernel
+│   ├── Formula: K(x, y) = (γ x·y + r)^d
+│   ├── Parameters:
+│   │     ├── degree (d)
+│   │     ├── gamma (γ)
+│   │     └── coef0 (r)
+│   ├── Captures feature interactions
+│   └── Use case:
+│        └── Non-linear but structured data
+│
+├── 3️⃣ RBF (Radial Basis Function) Kernel
+│   ├── Formula: K(x, y) = exp(-γ ||x - y||²)
+│   ├── Most commonly used
+│   ├── Parameter:
+│   │     └── gamma (γ)
+│   ├── Maps to infinite-dimensional space
+│   └── Use case:
+│        └── General-purpose non-linear classification
+│
+├── 4️⃣ Sigmoid Kernel
+│   ├── Formula: K(x, y) = tanh(γ x·y + r)
+│   ├── Related to neural networks
+│   ├── Parameters:
+│   │     ├── gamma
+│   │     └── coef0
+│   └── Less commonly used
+│
+└── 5️⃣ Precomputed Kernel
+    ├── User provides custom kernel matrix
+    ├── Enables:
+    │     ├── Graph kernels
+    │     ├── String kernels
+    │     └── Domain-specific similarity
+    └── Advanced use cases
+
+```
+
 ## Loss functions 
  
 
