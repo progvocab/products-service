@@ -137,8 +137,9 @@
   - Logistic Regression
   - Naive Bayes
   - K-Nearest Neighbors (KNN)
-  - Linear Support Vector Machine (SVM)
-  - Kernel based Support Vector Machine (SVM) RBF, polynomial
+  - Support Vector Machine (SVM)
+    - Linear
+    - Kernel based RBF, polynomial
   - Linear Discriminant Analysis (LDA)
   - Quadratic Discriminant Analysis (QDA)
   - Tree-Based 
@@ -147,11 +148,16 @@
 - Stochastic 
   - Passive Aggressive Classifier 
   - Perceptron 
-  - Bayesian Networks (with sampling inference)
-  - Probabilistic Graphical Models with Monte Carlo sampling
-  - Gaussian Process Classifier (with stochastic inference)
-  - Stochastic Gradient Descent Classifier (SGDClassifier, during training randomness)
-  - Decision Tree Classifier if splitter is random
+  - Bayesian Networks 
+    - with sampling inference
+  - Probabilistic Graphical Models
+    - Monte Carlo sampling
+  - Gaussian Process Classifier 
+    - with stochastic inference
+  - Stochastic Gradient Descent Classifier
+    - during training randomness
+  - Decision Tree Classifier 
+    - if splitter is random
   
 
 #### Regression
@@ -204,7 +210,14 @@
       - Cat Boost
 
 #### Stacking
+- Stacking Classifier 
+- Stacking Regressor 
 #### Voting
+- Voting Classifier 
+  - Hard
+  - Soft
+  - Weighted 
+- Voting Regressor 
 
 
 ### Semi-Supervised Learning
