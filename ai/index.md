@@ -249,6 +249,24 @@ Kernels Functions
       - Cost complexity pruning 
       - Reduced error pruning 
 
+# Apriori 
+- Association Rule Mining 
+- identity frequent patterns,  connection,  dependency 
+- Antecedent 
+  - first item or itemset
+- Consequent
+  - second item
+## Steps
+- frequent itemset generation 
+- expand and prune itemset
+- Repeat steps 1 and 2
+## Itemset 
+- different group of items
+- Measure using
+  - Support 
+  - Confidence 
+  - Lift
+
 ## Loss functions 
  
 
