@@ -368,4 +368,13 @@ Ensemble Learning
 ```
 
 
+# Semi Supervised Learning 
+- Labelled and Unlabelled Data 
+- Assumptions 
+### Cluster
+### Smoothness
+### Low Dimention 
+### Manifold
+
+
 
