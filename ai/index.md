@@ -52,6 +52,18 @@
 ### Gaussian / Normal 
 ### 
 
+# Supervised Learning 
+- Stochastic 
+  - Random sampling 
+  - different results for same input 
+- Probabilistic 
+  - Result is a probability 
+  - Cat : 85 % , Dog : 15%
+- Deterministic 
+  - Result is a single class 
+  - Same input produces same Result on each execution 
+
+
 # Naive Bayes 
 - assumes features are independent , hence naive
 - calculates probability of each class 
@@ -372,9 +384,22 @@ Ensemble Learning
 - Labelled and Unlabelled Data 
 - Assumptions 
 ### Cluster
+Unlabelled Data point is assigned the same class as it's nearest Labelled Data point.
 ### Smoothness
-### Low Dimention 
+Unlabelled Data point is assigned the same label as it's nearest Labelled Data point.
+### Low Density 
+Decision boundary should not pass through high Density region 
 ### Manifold
+High dimension input space comprises multiple  low dimension Manifold 
 
 
+### Transductive Learning 
+- Process of drawing conclusion about the new data from previous without creation of a model
+
+### Inductive Learning 
+- tries to create a general rule for a specific data
+
+### Label Propagation 
+- graph based algorithm tries to compute labels for Unlabelled Data based on their proximity to Labelled Data 
+- used Euclidean distance 
 
