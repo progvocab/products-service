@@ -140,6 +140,9 @@
     - Compute gradients using partial derivatives of loss w.r.t. weights and bias
 
 # Support Vector Machines 
+
+- Kernel Function 
+  - 
 - Kernel Trick
   - enables handling non linearly separable data without explicitly computing high dimension feature mapping 
   - simplifies computation by replacing high dimension dot product with Kernel function 
@@ -201,20 +204,18 @@ SVM Training Process
 
 
 Kernels Functions 
-│
-├── 1️⃣ Linear Kernel
-│   ├── Formula: K(x, y) = x · y
-│   ├── No feature transformation
-│   ├── Fast & scalable
-│   └── Use case:
-│        └── High-dimensional data (e.g., text classification)
-│
-├── 2️⃣ Polynomial Kernel
-│   ├── Formula: K(x, y) = (γ x·y + r)^d
-│   ├── Parameters:
-│   │     ├── degree (d)
-│   │     ├── gamma (γ)
-│   │     └── coef0 (r)
+
+Transform lower dimension non linearly separable data into 
+higher dimension spaces where Linear separator ( hyperplane ) can be found.
+-  Linear Kernel
+  - Formula: K(x, y) = x · y
+  - No feature transformation
+- Polynomial Kernel
+  - Formula: K(x, y) = (γ x·y + r)^d
+  - Parameters:
+    - degree (d)
+    - gamma (γ)
+    - coef0 (r)
 │   ├── Captures feature interactions
 │   └── Use case:
 │        └── Non-linear but structured data
