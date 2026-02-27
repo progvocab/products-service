@@ -141,61 +141,57 @@
 
 # Support Vector Machines 
 
-- Kernel Function 
-  - 
 - Kernel Trick
   - enables handling non linearly separable data without explicitly computing high dimension feature mapping 
   - simplifies computation by replacing high dimension dot product with Kernel function 
-```shell
+  - instead of transforming and then computing similarity,  Kernel functions directly calculate results.
 
-SVM Training Process
-│
-├── 1️⃣ Problem Setup
-│   ├── Classification or Regression (SVC / SVR)
-│   ├── Binary or Multi-class
-│   └── Choose kernel type
-│
-├── 2️⃣ Data Preparation
-│   ├── Feature scaling 
-│   │     ├── Standardization
-│   │     └── Normalization
-│   ├── Handle missing values
-│   └── Train–test split
-│
-├── 3️⃣ Choose Kernel
-│   ├── Linear
-│   ├── Polynomial
-│   ├── RBF
-│   ├── Sigmoid
-│   └── Precomputed
-│
-├── 4️⃣ Optimization Objective
-│   ├── Maximize margin
-│   ├── Minimize hinge loss
-│   ├── Soft margin formulation
-│   │     └── Slack variables (ξ)
-│   └── Regularization parameter (C)
-│
-├── 5️⃣ Hyperparameters
-│   ├── C (regularization strength)
-│   ├── gamma (RBF/poly/sigmoid)
-│   ├── degree (polynomial)
-│   └── coef0 (poly/sigmoid)
-│
-├── 6️⃣ Optimization Solver
-│   ├── Quadratic Programming (QP)
-│   ├── SMO (Sequential Minimal Optimization)
-│   └── Convergence criteria
-│
-├── 7️⃣ Support Vectors
-│   ├── Points on margin
-│   ├── Define decision boundary
-│   └── Sparse solution
-│
-├── 8️⃣ Model Evaluation
-│   ├── Accuracy / Precision / Recall
-│   ├── Cross-validation
-│   └── Hyperparameter tuning (GridSearch / RandomSearch)
+
+### SVM Training Process
+- Problem Setup
+  - Classification or Regression
+  - Binary or Multi-class
+  - Choose kernel type
+
+- Data Preparation
+  - Feature scaling 
+    - Standardization
+    - Normalization
+  - Handle missing values
+  - Train–test split
+
+- Choose Kernel
+  - Linear
+  - Polynomial
+  - RBF
+  - Sigmoid
+  - Precomputed
+
+- Optimization Objective
+  - Maximize margin
+  - Minimize hinge loss
+  - Soft margin formulation
+    - Slack variables (ξ)
+  - Regularization parameter (C)
+
+- Hyperparameters
+  - C (regularization strength)
+  - gamma (RBF/poly/sigmoid)
+  - degree (polynomial)
+  - coef0 (poly/sigmoid)
+
+- Optimization Solver
+  - Quadratic Programming (QP)
+  - SMO (Sequential Minimal Optimization)
+  - Convergence criteria
+- Support Vectors
+  - Points on margin
+  - Define decision boundary
+  - Sparse solution
+- Model Evaluation
+  - Accuracy / Precision / Recall
+  - Cross-validation
+  - Hyperparameter tuning (GridSearch / RandomSearch)
 │
 └── 9️⃣ Final Model
     ├── Decision function
