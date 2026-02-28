@@ -2,6 +2,8 @@
 ## Mean
 ## Median
 ## Mode
+- Bimodal
+- Multimodal 
 ## Range
 ## Deviation 
 - Simple
@@ -121,6 +123,13 @@
 - Stop training
   - When loss stabilizes or reaches acceptable minimum
 
+## Bayesian Linear Regression 
+- Regression coefficients as Probability Distribution instead of fixed point estimates.
+- Gaussian Distribution for components 
+  - Prior 
+  - Likelihood
+  - Posterior 
+
 ## Ridge Regression 
 - Apply penalty to coefficients 
 - Solvers
@@ -191,15 +200,20 @@
 - Model Evaluation
   - Accuracy / Precision / Recall
   - Cross-validation
-  - Hyperparameter tuning (GridSearch / RandomSearch)
-│
-└── 9️⃣ Final Model
-    ├── Decision function
-    ├── Predict new samples
-    └── Deployment
+    - K fold
+    - Stratified K fold
+    - Leave one out
+    - Shuffle 
+  - Hyperparameter tuning 
+    - GridSearch 
+    - RandomSearch
+- Final Model
+    - Decision function
+    - Predict new samples
+    - Deployment
 
 
-Kernels Functions 
+### Kernels Functions 
 
 Transform lower dimension non linearly separable data into 
 higher dimension spaces where Linear separator ( hyperplane ) can be found.
@@ -212,36 +226,33 @@ higher dimension spaces where Linear separator ( hyperplane ) can be found.
     - degree (d)
     - gamma (γ)
     - coef0 (r)
-│   ├── Captures feature interactions
-│   └── Use case:
-│        └── Non-linear but structured data
-│
-├── 3️⃣ RBF (Radial Basis Function) Kernel
-│   ├── Formula: K(x, y) = exp(-γ ||x - y||²)
-│   ├── Most commonly used
-│   ├── Parameter:
-│   │     └── gamma (γ)
-│   ├── Maps to infinite-dimensional space
-│   └── Use case:
-│        └── General-purpose non-linear classification
-│
-├── 4️⃣ Sigmoid Kernel
-│   ├── Formula: K(x, y) = tanh(γ x·y + r)
-│   ├── Related to neural networks
-│   ├── Parameters:
-│   │     ├── gamma
-│   │     └── coef0
-│   └── Less commonly used
-│
-└── 5️⃣ Precomputed Kernel
-    ├── User provides custom kernel matrix
-    ├── Enables:
-    │     ├── Graph kernels
-    │     ├── String kernels
-    │     └── Domain-specific similarity
-    └── Advanced use cases
+  - Captures feature interactions
+  - Use case:
+    - Non-linear but structured data
+- RBF (Radial Basis Function) Kernel
+  - Formula: K(x, y) = exp(-γ ||x - y||²)
+  - Most commonly used
+  - Parameter:
+    - gamma (γ)
+  - Maps to infinite-dimensional space
+  - Use case:
+    - General-purpose non-linear classification
+- Sigmoid Kernel
+  - Formula: K(x, y) = tanh(γ x·y + r)
+  - Related to neural networks
+  - Parameters:
+    - gamma
+    - coef0
+  - Less commonly used
+- Precomputed Kernel
+  - User provides custom kernel matrix
+  - Enables:
+    - Graph kernels
+    - String kernels
+    - Domain-specific similarity
+  - Advanced use cases
 
-```
+
 
 ## Decision Tree 
 - Pruning 
@@ -377,9 +388,30 @@ Ensemble Learning
 ```
 
 
+# Uncertainty Quantization 
+- Model level Uncertainty 
+- Data level Uncertainty 
+
+## Posterior Variance 
+- Change in model parameters After seeing the data
+- Model disagreement 
+### Ensemble Methods 
+
+### Bayesian Linear Regression 
+
+### Monte Carlo Sampling 
+
+### Monte Carlo Dropout 
+
+
+
+## Predictive Variance 
+- Change in model prediction 
+
+
 # Semi Supervised Learning 
 - Labelled and Unlabelled Data 
-- Assumptions 
+## Assumptions 
 ### Cluster
 Unlabelled Data point is assigned the same class as it's nearest Labelled Data point.
 ### Smoothness
