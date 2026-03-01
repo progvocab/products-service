@@ -81,6 +81,37 @@
 - Supervised Learning
 - assumes Linear Relationship 
 
+## Ordinary Least Square 
+- Find weights that minimizes the sum of squared errors 
+- Can be solved using 
+  - Normal Equation 
+    - closed form
+    - matrix inversion
+  - Gradient Descent 
+    - iterative Optimization 
+    - Types 
+      - Stochastic 
+      - Conjugate 
+  - Singular Value Decomposition 
+    - pseudo matrix inversion 
+  - QR Decomposition 
+    - Q : Orthogonal matrix 
+    - R : upper triangular 
+
+
+## Normal Equation 
+Here is the Normal Equation:
+
+genui{"math_block_widget":{"content":"w = (X^T X)^{-1} X^T y"}}
+
+
+
+- It computes the optimal weight vector **w** for linear regression directly.
+- (X^T X) captures relationships between features.
+- ((X^T X)^{-1}) adjusts for feature scaling and correlation.
+- (X^T y) measures how features relate to the target.
+- The result gives weights that minimize squared prediction error.
+
 ## Training
 - Prepare the dataset
   - Features: inputs (X)
