@@ -195,6 +195,8 @@ Here is the Normal Equation:
   - simplifies computation by replacing high dimension dot product with Kernel function 
   - instead of transforming and then computing similarity,  Kernel functions directly calculate results.
 
+- Margin 
+  - distance between Decision boundary and support vector : closest data point in each class 
 
 ### SVM Training Process
 - Problem Setup
