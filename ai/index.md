@@ -137,6 +137,15 @@ Here is the Normal Equation:
         - psuedo inverse computation 
         - handles multi collinearity
         - Dimensionality Reduction 
+        - U : left Singular vector 
+          - Orthogonal matrix m × m
+          - eigen vectors of A A transpose
+        - Sigma : Singular values
+          - Diagonal matrix mxn 
+          - eigen values of A transpose A
+        - V : right Singular vector 
+          - transpose of Orthogonal matrix
+          - Eigen vectors of A transpose A
         - Geometric Insight 
           - Direction ( First and third matrix)
           - Importance ( second )
@@ -283,7 +292,13 @@ higher dimension spaces where Linear separator ( hyperplane ) can be found.
     - Domain-specific similarity
   - Advanced use cases
 
-
+## Hinge Loss function 
+- encourages large margin while penalizing margin violation 
+- loss = 0
+  - when point is correctly classified and outside the margin 
+- loss increases linearly
+  - when point is misclassified 
+  - point is inside the margin 
 
 ## Decision Tree 
 - Pruning 
