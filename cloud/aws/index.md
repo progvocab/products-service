@@ -12,6 +12,7 @@
   - Automated search 
   - Search strategies 
   - Objective metric
+  - Parallel search 
   
 * Real-time Inference Endpoints
 * Batch Transform
@@ -47,9 +48,43 @@
 
 * Sentiment Analysis
 * Entity Recognition
+  - Type focused 
+  - performs classification 
+  - Pre trained Named Entity Recognition 
+  - Pre trained model to detect
+    - Person
+    - Location 
+    - Organization 
+    - Date 
+    - Quantity 
+    - Commercial Item
+    - Title
+    - Event
+  - Custom Entity Recognition 
+    - Train your Custom model
 * Key Phrase Extraction
+  - Works on 1 document 
+  - Topic focused 
+  - Finds : what is this text about 
+  - Extracts : meaningful noun Phrases
+
 * Topic Modeling
+  - works on multiple documents
+  - discover themes
+  - Extracts:
+    - Topic clusters 
+    - Keywords per Topic
+
 * Syntax Analysis
+  - identifies grammatical structure 
+  - Detects 
+    - Noun 
+    - Pronoun
+    - Adjective 
+    - Verb
+    - Adverb
+    - Proposition 
+    - Punctuation 
 * Custom Classification
 * Custom Entity Recognition
 * PII Detection
