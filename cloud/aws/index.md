@@ -23,11 +23,73 @@
 
 * Foundation Models (FM access)
 * Knowledge Bases
+  - Connects your private data to Foundation Models 
+  - simpler alternative to RAG,no code
+  - built in
+    - Document Parsing 
+    - citations 
+    - IAM Integration 
+    - Foundation Models Support 
+  - Architecture 
+    - User question to Embeddings 
+    - Vector search 
+    - Retrieve relevant Chunks
+    - send to Foundation Models 
+    - generate answer 
 * Agents for Bedrock
+  - allow models to autonomously 
+    - plan 
+    - reason 
+    - execute tasks
+  - breaks task into steps , call APIs and returns final response 
+  - automatically manage orchestration 
+    - tool call
+    - prompt engineering 
+    - retries 
+    - multi step flow
+
 * Guardrails
+  - enforce
+    - Safety 
+    - Compliance
+    - Domain restrictions 
+    - Data protection 
+  - attach to
+    - Foundation Model invocation 
+    - Agents 
+    - Knowledge Base response 
+  - controls
+    - Content Filter
+    - Sensitive Information PII 
+    - Topic Restriction
+    - Word block , Phrase block
+    - Contextual Grounding check
+  - Foundation Model can 
+    - generate Hallucination 
+    - produces unsafe content
+    - leak sensitive data
+    - respond outside policy boundary 
+  - Flow with Guardrails 
+    - User input
+    - Guardrail input check 
+    - Model response 
+    - Guardrail output check
+    - Final response 
 * Model Evaluation
 * Fine-tuning
 * RAG Integration
+ - RAG
+   - vector database
+   - Retrieval Pipeline 
+   - Embeddings 
+   - steps to build
+     - Chunk Documents
+     - Generate Embeddings 
+     - Store in vector database 
+     - Retrieve top K results 
+     - send context to LLM 
+     - generate response 
+  
 * Prompt Management
 
 
