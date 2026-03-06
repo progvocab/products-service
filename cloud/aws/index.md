@@ -17,7 +17,24 @@
 * Real-time Inference Endpoints
 * Batch Transform
 * Model Monitor
-
+  - stores the following metrics in cloud watch 
+    - Data distribution drift
+    - Feature drift 
+    - Prediction drift 
+    - Bias
+  - flow
+    - Model Monitor detect drift
+    - Event bridge triggers SageMaker pipelines 
+    - Retraining 
+* Pipelines 
+  - Data Processing 
+  - Feature Engineering 
+  - Training 
+  - Evaluation 
+  - Model Registry 
+  - Deployment 
+* SageMaker Endpoints 
+  - 
 
 ##  Amazon Bedrock
 
