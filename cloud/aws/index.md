@@ -3,6 +3,12 @@
 ## Amazon SageMaker
 
 * Studio
+  - Notebook 
+  - Experiment Tracking 
+  - Debugging 
+  - Model Registry 
+  - Pipelines 
+  - Deployment 
 * JumpStart
 * Autopilot
 * Data Wrangler
@@ -14,7 +20,11 @@
   - Objective metric
   - Parallel search 
   
-* Real-time Inference Endpoints
+* Inference Endpoints
+  - Real time 
+  - Batch
+  - serverless
+  - asynchronous 
 * Batch Transform
 * Model Monitor
   - stores the following metrics in cloud watch 
@@ -230,6 +240,7 @@
       - AI voices
 * Neural Voices
 * Speech Marks
+  - timing information about spoken text
 * SSML Support 
   - Speech synthesis Markup language 
     - supports
@@ -261,7 +272,7 @@
 * Custom Vocabulary
 * Language Identification
 
----
+
 
 ##  Amazon Translate
 
@@ -271,7 +282,7 @@
 * Active Custom Translation
 * Multi-language Support
 
----
+
 
 ##  Amazon Textract
 
@@ -282,23 +293,38 @@
 * Expense Analysis
 * Identity Document Analysis
 
----
+
 
 ## Amazon Kendra
 
 * Intelligent Search
+  - Enterprise Search 
 * FAQ Matching
 * Document Ranking
 * Connectors (S3, SharePoint, etc.)
 * Custom Document Enrichment
 * Semantic Search
 
----
+
 
 ## Amazon Personalize
-
+  - Flow 
+    - User activity 
+    - Application logs Event 
+    - Personalize Event Tracker
+    - Model Training 
+    - Recommendation API
+    - Personalized results to User 
 * Recommendation Engine
 * Real-time Recommendations
+  - prerequisites 
+    - train with existing data for all users
+
+  - training 
+    - User dataset 
+    - Item dataset 
+    - Interaction dataset 
+
 * User Personalization
 * Similar Items
 * Batch Recommendations
