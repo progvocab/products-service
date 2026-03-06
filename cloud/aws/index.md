@@ -156,8 +156,31 @@
 ##  Amazon Lex
 
 * Chatbot Builder
+  - Flow
+    - User input 
+    - compare with trained utterance 
+    - find close match
+    - Identity Intent 
 * Intent Recognition
+  - Classification of task
+  - Intent 
+    - what is to be done
+  - Slots 
+    - Details of Intent 
+* Entity Recognition 
+  - Details of task
+* Confidence scores 
+  - surety of Intent based on user text
+  - score
+     - > .8 : go ahead 
+     - .8 to .4 : ask clarification 
+     - < .4 : triggers fallback Intent 
+* utterance 
+  - Phrase or sentence by User to express Intent 
+  - utterance contains Slots
+
 * Slot Filling
+  - Lex collect information from User to complete Intent
 * Multi-language Bots
 * Voice Integration
 * Lambda Integration
@@ -170,7 +193,16 @@
 * Neural Voices
 * Speech Marks
 * SSML Support
+  - inline Speech formatting 
 * Custom Lexicons
+  - Custom pronunciation dictionary 
+  - Pronunciation Lexicon Specification
+    - alias
+      - replace with another word
+    - phoneme 
+      - specify exact phonetic pronunciation 
+  - upto 100 Lexicons per account 
+  - max size 40 kB per Lexicon
 * Brand Voice
 
 
