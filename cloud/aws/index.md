@@ -190,12 +190,41 @@
 ##  Amazon Polly
 
 * Text-to-Speech
+  - Steps
+    - Text Normalization 
+      - converts number abbreviation to words
+    - Phonetic Conversation 
+      - words to phonemes
+    - Prosody Generation 
+      - adds rhythm,  pitch, pauses
+    - Speech synthesis 
+      - Final audio Generation 
+      - formats
+        - mp3
+        - wav 
+        - ogg
+  - Types
+    - Standard 
+    - Neural 
+      - using Deep Learning 
+    - Long form
+      - long Content 
+    - Generative 
+      - AI voices
 * Neural Voices
 * Speech Marks
-* SSML Support
+* SSML Support 
+  - Speech synthesis Markup language 
+    - supports
+      - pauses
+      - pronunciation 
+      - pitch
+      - speed 
+      - emphasis 
   - inline Speech formatting 
+  - Speech effect 
 * Custom Lexicons
-  - Custom pronunciation dictionary 
+  - Custom reusable pronunciation dictionary 
   - Pronunciation Lexicon Specification
     - alias
       - replace with another word
