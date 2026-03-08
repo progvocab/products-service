@@ -61,8 +61,8 @@
   - Model Registry 
   - Deployment 
 * SageMaker Endpoints 
-* Metrics 
-  - Fairness 
+* Evaluation 
+  - Fairness Metrics 
     - Demographic Parity
     - Statistical Parity
     - Disparate Impact
