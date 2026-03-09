@@ -79,12 +79,30 @@
     - Equal opportunity 
     - Equalized odds 
   - LLM Evaluation
-    - **Correctness** – Measures whether the model’s response is **factually accurate and correct**.
-    - **Relevance** – Measures how **well the response matches the user’s prompt or question**.
-    - **Coherence** – Measures whether the generated text is **logically structured and easy to understand**.
-    - **Completeness** – Measures whether the response **fully answers the prompt with all necessary details**.
-    - **Faithfulness** – Measures whether the response is **grounded in the provided source data without hallucinating information**.
-    - **Toxicity** – Measures whether the response contains **harmful, offensive, or unsafe language**.
+    - **Correctness** 
+      - Measures whether the model’s response is **factually accurate and correct**.
+      - Metrics 
+        - Accuracy 
+        - Semantic similarity 
+      - LLM as a Judge 
+    - **Relevance** 
+      – Measures how **well the response matches the user’s prompt or question**.
+      - Semantic similarity 
+    - **Coherence** 
+      - Measures whether the generated text is **logically structured and easy to understand**.
+      - Language quality model 
+      - LLM judge 
+    - **Completeness** 
+      - Measures whether the response **fully answers the prompt with all necessary details**.
+      - compare with reference answer 
+    - **Faithfulness** 
+      - Measures whether the response is **grounded in the provided source data without hallucinating information**
+      - used in RAG
+      - response part of content 
+    - **Toxicity** 
+      - Measures whether the response contains **harmful, offensive, or unsafe language**.
+      - Toxicity Detection model 
+      - Safety classifier 
     - **Bias** – Measures whether the model output shows **unfair preference or discrimination toward certain groups**.
     - **Robustness** – Measures how **stable and reliable the model is when inputs are slightly modified or adversarial**.
 
