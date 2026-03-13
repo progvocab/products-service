@@ -112,6 +112,33 @@
 ##  Amazon Bedrock
 
 * Foundation Models (FM access)
+  - Claude
+    - 
+  - Open AI
+  - Deepseek
+  - Amazon
+    - Titan
+      - Text Embedding 
+      - RAG
+      - Semantic Search 
+      
+    - Nova
+      - Multi modal
+      - Low latency 
+  - Google
+    - Gemma
+      - Lightweight AI application 
+      - Smaller models
+      - Fine tuning 
+  - Nvidia 
+    - AI Research 
+    - Experiment 
+    - High Performance 
+  - AI 21
+    - Long context document processing 
+    - context Generation 
+    - context Summarization 
+
 * Knowledge Bases
   - Connects your private data to Foundation Models 
   - simpler alternative to RAG,no code
