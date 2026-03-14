@@ -106,6 +106,15 @@
     - **Bias** – Measures whether the model output shows **unfair preference or discrimination toward certain groups**.
     - **Robustness** – Measures how **stable and reliable the model is when inputs are slightly modified or adversarial**.
 
+* Fine-tuning
+  - Parameter Efficient Fine tuning 
+    - Prompt Tuning 
+      - Hard Prompt 
+        - human written text
+      - Soft Prompt 
+        - trainable prompt Embeddings 
+        - learned vector
+
 * Cards
   - 
 
@@ -193,7 +202,15 @@
     - Guardrail output check
     - Final response 
 * Model Evaluation
-* Fine-tuning
+
+* Customization 
+  - Fine Tuning 
+    - Parameters update 
+    - help models to recognize new patters
+  - Continued Pre training 
+    - Parameters 
+
+
 * RAG Integration
  - RAG
    - vector database
