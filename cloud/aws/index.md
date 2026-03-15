@@ -38,8 +38,12 @@
   - automate build and deployment whule using
     - Studio
     - API 
+  - automatically select algorithm 
 * Data Wrangler
+  - Data quality checks 
+    - checks the format of data
 * Feature Store
+  - shared features 
 * Training (Managed Training Jobs)
 * Hyperparameter Tuning
   - Automated search 
@@ -107,14 +111,22 @@
     - **Robustness** – Measures how **stable and reliable the model is when inputs are slightly modified or adversarial**.
 
 * Fine-tuning
+  - Full Fine Tuning 
+    - train all parameters 
   - Parameter Efficient Fine tuning 
+    - trains subset of parameters 
     - Prompt Tuning 
       - Hard Prompt 
         - human written text
       - Soft Prompt 
         - trainable prompt Embeddings 
         - learned vector
-
+  - Adapters 
+    - adds trainable Adapter layer in between model layers 
+    - Base model is frozen
+  - Low Rank Adaptation 
+    - add Low rank matrix to Transformer layer
+    - Train only those parameters 
 * Cards
   - 
 
@@ -205,10 +217,17 @@
 
 * Customization 
   - Fine Tuning 
-    - Parameters update 
+    - All Parameters updated
+    - Labelled Data is used 
     - help models to recognize new patters
   - Continued Pre training 
-    - Parameters 
+    - All Parameters updated
+    - Unlabelled Data is used 
+  - Prompt Engineering 
+    - Hard Prompt 
+      - update prompt during Inference 
+  - RAG
+    - Inject external Knowledge to prompt 
 
 
 * RAG Integration
