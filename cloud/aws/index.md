@@ -148,6 +148,23 @@
       - learns prompt Embeddings 
   - Prefix Tuning 
     - learns prefix Vector 
+* SageMaker Clarify
+  - Bias Detection
+    - Pre-Training Bias
+    - Post-Training Bias
+  - Bias Metrics
+    - CI
+    - DPL
+    - DI
+    - AD
+    - RD
+  - Explainability
+    - SHAP
+    - Global Explainability
+    - Local Explainability
+  - Processing Jobs
+  - Integration
+    - Model Monitor
 * Cards
   - 
 
