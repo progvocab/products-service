@@ -110,6 +110,22 @@
     - **Bias** – Measures whether the model output shows **unfair preference or discrimination toward certain groups**.
     - **Robustness** – Measures how **stable and reliable the model is when inputs are slightly modified or adversarial**.
 
+* Deployment 
+  - All at Once 
+    - Blue Green 
+    - traffic shifted immediately 
+  - Canary
+    - small Percentage of traffic shifted first
+    - if no issue whole traffic shifted gradually over time
+  - Linear 
+    - traffic shifted at fixed interval over time
+  - Shadow 
+    - Prod data is sent to new environment for testing
+    - response not returned to User 
+  - AB Testing 
+    - traffic split 50 50
+    - performance of both environments compared 
+    - if more models traffic is split equally between all and then performance is compared 
 * Fine-tuning
   - Full Fine Tuning 
     - train all parameters 
@@ -127,6 +143,11 @@
   - Low Rank Adaptation 
     - add Low rank matrix to Transformer layer
     - Train only those parameters 
+  - Prompt Tuning 
+    - Soft Prompt 
+      - learns prompt Embeddings 
+  - Prefix Tuning 
+    - learns prefix Vector 
 * Cards
   - 
 
