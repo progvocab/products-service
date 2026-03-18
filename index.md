@@ -618,7 +618,9 @@
 - Data Privacy
 - Access Control
 - Audit Logs
-- Compliance (GDPR, HIPAA)
+- Compliance 
+  - GDPR
+  - HIPAA
 - Model Risk Management
 
 # LLM Lifecycle
@@ -631,6 +633,16 @@
 - Data Mixing & Curriculum
 - Synthetic Data Generation
 ## Model Architecture and Design
+- Tokenizer 
+- Embedding Layer 
+- Positional Encoder
+- Transformer 
+  - Self Attention 
+  - Feed forward Network 
+  - Normalization 
+  - Residual Connection 
+- Output Layer 
+  - Activation Functions 
 ###  Transformer
 ### Attention Mechanism
 ### Positional Encodings
