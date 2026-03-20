@@ -40,8 +40,32 @@
     - API 
   - automatically select algorithm 
 * Data Wrangler
+  - modalities 
+
+    - **Tabular data** 
+      – structured data (rows & columns) used in databases and analytics.
+    - **Text data**  
+      – documents, emails, logs (processed using Amazon Comprehend).
+    - **Image data**  
+      – photos and visual content (analyzed with Amazon Rekognition).
+    -  **Video data** 
+      – streaming or recorded videos (processed via Rekognition Video).
+    - **Audio data** 
+      – speech and sound (handled by Amazon Transcribe).
+    - **Time-series data** 
+      – sequential data like IoT or metrics (used in monitoring/forecasting).
+    - **Graph data** 
+      – relationships and networks (via Amazon Neptune).
+    -  **Geospatial data** 
+      – location-based data (handled using Amazon Location Service).
+    - **Event/streaming data** 
+      – real-time data streams (via Amazon Kinesis).
+    - **Multimodal data** 
+      – combination of multiple types (used in advanced AI models in Amazon SageMaker).
+
   - Data quality checks 
     - checks the format of data
+
 * Feature Store
   - shared features 
 * Training (Managed Training Jobs)
