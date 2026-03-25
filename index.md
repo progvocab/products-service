@@ -297,6 +297,155 @@
         * Noise reduction
         * Bias correction
 
+### Generative AI (Mind Map)
+
+* **Generative AI**
+
+  * **Core Model Types**
+
+    * Transformer-based Models
+
+      * Large Language Models (LLMs)
+
+        * Text generation
+        * Chatbots
+      * Vision Transformers
+
+        * Image understanding
+        * Multimodal models
+    * Diffusion Models
+
+      * Image generation
+
+        * Text-to-image
+        * Image-to-image
+      * Denoising process
+
+        * Forward diffusion
+        * Reverse sampling
+    * GANs (Generative Adversarial Networks)
+
+      * Generator
+
+        * Data generation
+        * Noise → realistic output
+      * Discriminator
+
+        * Real vs fake detection
+        * Adversarial training
+    * VAEs (Variational Autoencoder)
+
+      * Encoder
+
+        * Input → latent space
+      * Decoder
+
+        * Latent → reconstruction
+      * Latent space learning
+
+        * Sampling
+        * Interpolation
+    * Normalizing Flows
+
+      * Invertible transformations
+
+        * Exact likelihood computation
+      * Latent mapping
+
+        * Simple → complex distribution
+  * **Data Modalities**
+
+    * Text
+
+      * Language generation
+      * Summarization
+    * Image
+
+      * Image synthesis
+      * Style transfer
+    * Audio
+
+      * Speech generation
+      * Music generation
+    * Video
+
+      * Video synthesis
+      * Frame prediction
+    * Multimodal
+
+      * Text + Image
+      * Text + Audio
+  * **Training Techniques**
+
+    * Pretraining
+
+      * Large-scale datasets
+      * Self-supervised learning
+    * Fine-tuning
+
+      * Instruction tuning
+      * Domain adaptation
+    * Reinforcement Learning
+
+      * Human feedback (RLHF)
+      * Reward modeling
+  * **Inference & Usage**
+
+    * Prompting
+
+      * Zero-shot
+      * Few-shot
+    * Retrieval Augmented Generation (RAG)
+
+      * External knowledge retrieval
+      * Context injection
+    * Agents
+
+      * Tool usage
+      * Autonomous workflows
+  * **Evaluation**
+
+    * Automatic metrics
+
+      * BLEU / ROUGE
+      * Perplexity
+    * Human evaluation
+
+      * Quality assessment
+      * Safety checks
+  * **Challenges**
+
+    * Hallucination
+
+      * Incorrect facts
+      * Fabricated outputs
+    * Bias & fairness
+
+      * Dataset bias
+      * Ethical concerns
+    * Cost & scalability
+
+      * High compute usage
+      * Latency optimization
+  * **Applications**
+
+    * Content generation
+
+      * Text, images, code
+    * Conversational AI
+
+      * Chatbots
+      * Virtual assistants
+    * Personalization
+
+      * Recommendations
+      * Adaptive systems
+    * Enterprise use cases
+
+      * Document processing
+      * Knowledge assistants
+
+
 
 ### Supervised
 #### Classification
