@@ -131,6 +131,173 @@
 
 # AI
 ## Machine Learning
+
+
+* **Machine Learning**
+
+  * **Incremental Learning**
+
+    * Instance-incremental
+
+      * Online learning
+
+        * Single sample updates
+        * Streaming pipelines
+      * Mini-batch updates
+
+        * Micro-batching
+        * Memory-buffer based updates
+    * Class-incremental
+
+      * New class addition
+
+        * Dynamic output layer expansion
+        * Class imbalance handling
+      * Label space expansion
+
+        * Open-set recognition
+        * Few-shot class addition
+    * Task-incremental
+
+      * With task identity
+
+        * Task-specific heads
+        * Multi-head architectures
+      * Without task identity
+
+        * Shared representation
+        * Catastrophic forgetting handling
+
+          * Replay methods
+          * Regularization methods
+  * **Batch (Offline) Learning**
+
+    * Full dataset training
+
+      * Static datasets
+
+        * Data warehouse based training
+        * Historical snapshot training
+      * Periodic retraining
+
+        * Scheduled jobs (cron)
+        * Drift-triggered retraining
+    * Model update strategy
+
+      * Retrain from scratch
+
+        * Full pipeline execution
+        * Versioned model replacement
+      * Scheduled retraining pipelines
+
+        * CI/CD for ML
+        * Automated validation checks
+  * **Online Learning**
+
+    * Streaming data learning
+
+      * Real-time prediction updates
+
+        * Low-latency inference
+        * Event-driven systems
+      * Continuous model updates
+
+        * Incremental gradient updates
+        * Adaptive learning rates
+    * Update methods
+
+      * Single instance updates
+
+        * SGD-based updates
+        * Immediate feedback loop
+      * Sliding window techniques
+
+        * Fixed window
+        * Time-decayed window
+  * **Transfer Learning**
+
+    * Fine-tuning
+
+      * Full model fine-tuning
+
+        * End-to-end training
+        * Large compute requirement
+      * Partial layer freezing
+
+        * Feature extractor reuse
+        * Layer-wise tuning
+    * Domain adaptation
+
+      * Feature-based adaptation
+
+        * Domain-invariant features
+        * Adversarial adaptation
+      * Instance-based adaptation
+
+        * Re-weighting samples
+        * Importance sampling
+    * Cross-domain transfer
+
+      * Vision → NLP embeddings
+      * Multimodal transfer
+  * **Reinforcement Learning**
+
+    * Learning type
+
+      * Model-free
+
+        * Value-based
+
+          * Q-learning
+          * Deep Q Networks (DQN)
+        * Policy-based
+
+          * Policy gradients
+          * Actor-Critic methods
+      * Model-based
+
+        * Environment modeling
+
+          * Transition dynamics learning
+          * Planning algorithms
+    * Strategy
+
+      * Exploration vs exploitation
+
+        * Epsilon-greedy
+        * Upper Confidence Bound (UCB)
+      * Reward optimization
+
+        * Discount factor tuning
+        * Long-term vs short-term rewards
+  * **Active Learning**
+
+    * Query strategies
+
+      * Uncertainty sampling
+
+        * Least confidence
+        * Margin sampling
+      * Query by committee
+
+        * Model disagreement
+        * Ensemble methods
+      * Diversity sampling
+
+        * Cluster-based selection
+        * Core-set selection
+    * Human interaction
+
+      * Labeling feedback loop
+
+        * Iterative retraining
+        * Annotation tools integration
+      * Dataset improvement
+
+        * Noise reduction
+        * Bias correction
+
+
 ### Supervised
 #### Classification
 - Deterministic 
