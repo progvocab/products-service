@@ -832,13 +832,21 @@
   
 ##   Explainability & Interpretability
 
+### Intrinsic Interpretable 
+- Naive Bayes 
+- Linear Regression 
+- Logistic Regression 
+- Decision Tree 
+### Global Explainability 
 - Feature Importance
-- Model Coefficients (Weights & Parameters)
+- Partial Dependence Plot (PDP)
+- Permutation Importance 
+### Local Explainability 
 - SHAP
 - LIME
-- Partial Dependence Plot (PDP)
 - ICE Plots
-
+- Attention Maps
+- Counterfactual 
 ### Bias & Variance
 - Bias Detection
 - Variance Analysis
