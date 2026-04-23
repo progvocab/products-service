@@ -1,3 +1,24 @@
+# Data structure 
+- Tuple
+- List
+- Linked list
+- Set
+- Hash table
+- Heap
+- Priority queue
+
+# Algorithm 
+
+### selection 
+- Greedy
+  - Local optimal choice lead to selection of global optimal
+- DP
+  - Need future decision
+- Backtracking 
+  - Need all permutation 
+  
+
+
 # Java
 ## Object Oriented Design
 ### Class
