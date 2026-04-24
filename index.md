@@ -29,6 +29,20 @@
     - Formula 
       - dp[i] = min( dp [i], 1+ dp[ i- c]) 
 
+### Greedy
+#### Jump Game
+- Inputs
+  - Array of jump lengths
+- Solution 
+  - find max reachable 
+  - if curr index > max reachable  , return false
+  - if max reachable > array size , return true
+
+#### Interval Scheduling
+- Inputs
+  - Array of intervals
+- Solution 
+  - sort by finish time
 
 # Java
 ## Object Oriented Design
