@@ -27,6 +27,11 @@
     - if end Bracket is found , pop the element on top of stack
     - if start bracket and end bracket is not the same type , return false
     - if stack is empty return false
+### Heap
+#### K way Merge
+- Solution 
+  - Stack with first element of each list 
+
 ### Dynamic Programming 
 #### Coin change
 - Inputs
