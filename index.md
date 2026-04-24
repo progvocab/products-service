@@ -17,6 +17,17 @@
 - Backtracking 
   - Need all permutation 
   
+## Examples
+### Dynamic Programming 
+#### Coin change
+- Inputs
+  - coin denominations
+  - amount
+- Solution 
+  - DP array 
+    - size = amount + 1
+    - Formula 
+      - dp[i] = min( dp [i], 1+ dp[ i- c]) 
 
 
 # Java
