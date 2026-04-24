@@ -18,6 +18,15 @@
   - Need all permutation 
   
 ## Examples
+
+### Stack
+#### Matching Brackets
+- Solution 
+  - Iterate through the input
+    - push the start bracket to stack
+    - if end Bracket is found , pop the element on top of stack
+    - if start bracket and end bracket is not the same type , return false
+    - if stack is empty return false
 ### Dynamic Programming 
 #### Coin change
 - Inputs
@@ -44,6 +53,13 @@
 - Solution 
   - sort by finish time
 
+
+### Directed Graph 
+#### Cycle Detection 
+- Solution 
+  - Topological Sort
+    - DFS
+    - BFS
 # Java
 ## Object Oriented Design
 ### Class
