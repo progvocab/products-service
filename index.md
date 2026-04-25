@@ -4,8 +4,7 @@
 - Linked list
 - Set
 - Hash table
-- Heap
-- Priority queue
+- Heap , Priority queue
 
 # Algorithm 
 
@@ -40,8 +39,17 @@
 - Solution 
   - DP array 
     - size = amount + 1
-    - Formula 
-      - dp[i] = min( dp [i], 1+ dp[ i- c]) 
+  - Formula 
+    - dp[i] = min( dp [i], 1+ dp[ i- c]) 
+
+#### 0 1 Knapsack 
+- Solution 
+  - DP array
+    - i : first i  items
+    - w : Maximum total weight
+    - size : n+1 × w+1
+  - Formula 
+    - DP [i, w] =
 
 ### Greedy
 #### Jump Game
@@ -58,6 +66,17 @@
 - Solution 
   - sort by finish time
 
+#### 0 1 Knapsack problem
+- Warning 
+  - Standard Solution uses DP , this is an alternate Solution 
+- Solution 
+  - Greedy with lookahead 
+    - strategy where the algorithm simulates several steps in future before committing to a current choice
+
+### Backtracking 
+#### N queens
+
+#### Power set 
 
 ### Directed Graph 
 #### Cycle Detection 
