@@ -7,7 +7,13 @@ A[Start: Read Problem Carefully] --> B{What is the input structure?}
 
 B -->|Array / String| C{Contiguous subarray / substring?}
 C -->|Yes| SW[Sliding Window]
-C -->|No| D{Need nearest greater/smaller or monotonic behavior?}
+C -->|No| D{Need nearest greater or smaller or monotonic behavior}
+C -->|Yes| C1{Are all numbers non-negative}
+C1 -->|Yes| SW
+C1 -->|No| C2{Looking for sum equals K or prefix based condition}
+
+C2 -->|Yes| HM[Prefix Sum + HashMap]
+C2 -->|No| DP
 D -->|Yes| ST[Stack]
 D -->|No| E{Optimization max min count ways}
 E -->|Yes| DP[Dynamic Programming]
