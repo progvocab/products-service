@@ -15,28 +15,28 @@ E -->|No| F{Greedy choice works?}
 F -->|Yes| GR[Greedy]
 F -->|No| BT[Backtracking]
 
-B -->|Graph like (nodes plus edges)| G{Traversal needed?}
+B -->|Graph like nodes plus edges | G{Traversal needed?}
 G -->|Yes| G1[BFS / DFS]
-G -->|Shortest path?| G2[Dijkstra / BFS]
-G -->|Cycle / components?| G3[DFS / Union-Find]
+G -->|Shortest path | G2[Dijkstra / BFS]
+G -->|Cycle / components | G3[DFS / Union-Find]
 
 B -->|Tree structure| T{Hierarchical relationships?}
-T -->|Yes| T1[DFS / BFS on Tree]
+T -->|Yes| T1[DFS or BFS on Tree]
 T -->|Need subtree info?| T2[Tree DP]
 
-B -->|Dictionary or Prefix search| TR{Prefix-based queries?}
+B -->|Dictionary or Prefix search| TR{Prefix-based queries}
 TR -->|Yes| TR1[Trie]
 
-B -->|Constraints small (n less than 20 to 25)| BT2{Try all possibilities?}
+B -->|Constraints small n less than 20 to 25| BT2{Try all possibilities?}
 BT2 -->|Yes| BT
 
-DP --> DP1{Overlapping subproblems + optimal substructure?}
+DP --> DP1{Overlapping subproblems and optimal substructure}
 DP1 -->|Yes| DP
 
-GR --> GR1{Local optimal leads to global optimal?}
+GR --> GR1{Local optimal leads to global optimal}
 GR1 -->|Yes| GR
 
-SW --> SW1{Fixed or variable window size?}
+SW --> SW1{Fixed or variable window size}
 SW1 -->|Yes| SW
 
 ST --> ST1{Next greater or smaller element?}
