@@ -15,7 +15,7 @@ E -->|No| F{Greedy choice works?}
 F -->|Yes| GR[Greedy]
 F -->|No| BT[Backtracking]
 
-B -->|Graph-like (nodes plus edges)| G{Traversal needed?}
+B -->|Graph like (nodes plus edges)| G{Traversal needed?}
 G -->|Yes| G1[BFS / DFS]
 G -->|Shortest path?| G2[Dijkstra / BFS]
 G -->|Cycle / components?| G3[DFS / Union-Find]
@@ -24,7 +24,7 @@ B -->|Tree structure| T{Hierarchical relationships?}
 T -->|Yes| T1[DFS / BFS on Tree]
 T -->|Need subtree info?| T2[Tree DP]
 
-B -->|Dictionary / Prefix search| TR{Prefix-based queries?}
+B -->|Dictionary or Prefix search| TR{Prefix-based queries?}
 TR -->|Yes| TR1[Trie]
 
 B -->|Constraints small (n less than 20 to 25)| BT2{Try all possibilities?}
