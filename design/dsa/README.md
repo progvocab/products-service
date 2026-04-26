@@ -6,6 +6,15 @@ flowchart TD
 A[Start: Read Problem Carefully] --> B{What is the input structure?}
 
 B -->|Array / String| C{Contiguous subarray / substring?}
+B -->|Array / String| S1{Subsequence (not necessarily contiguous)?}
+
+S1 -->|Yes| S2{Order matters plus include exclude choices}
+S2 -->|Yes| DP2[Dynamic Programming]
+S2 -->|No| S3{Need all possible subsequences}
+S3 -->|Yes| BT3[Backtracking]
+S3 -->|No| S4{Matching pattern between two strings}
+S4 -->|Yes| DP3[LCS  Edit Distance DP]
+S4 -->|No| GR2[Greedy  Binary Search LIS type]
 C -->|Yes| SW[Sliding Window]
 C -->|No| D{Need nearest greater or smaller or monotonic behavior}
 C -->|Yes| C1{Are all numbers non-negative}
