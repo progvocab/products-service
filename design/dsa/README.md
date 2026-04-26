@@ -9,7 +9,7 @@ B -->|Array / String| C{Contiguous subarray / substring?}
 C -->|Yes| SW[Sliding Window]
 C -->|No| D{Need nearest greater/smaller or monotonic behavior?}
 D -->|Yes| ST[Stack]
-D -->|No| E{Optimization (max min count ways)?}
+D -->|No| E{Optimization max min count ways}
 E -->|Yes| DP[Dynamic Programming]
 E -->|No| F{Greedy choice works?}
 F -->|Yes| GR[Greedy]
