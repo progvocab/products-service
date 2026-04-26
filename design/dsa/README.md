@@ -1,4 +1,77 @@
+Here’s a clean Mermaid decision tree you can use to decide which DSA technique fits a problem based on clues, constraints, and patterns:
 
+flowchart TD
+
+A[Start: Read Problem Carefully] --> B{What is the input structure?}
+
+B -->|Array / String| C{Contiguous subarray / substring?}
+C -->|Yes| SW[Sliding Window]
+C -->|No| D{Need nearest greater/smaller or monotonic behavior?}
+D -->|Yes| ST[Stack]
+D -->|No| E{Optimization (max/min/count ways)?}
+E -->|Yes| DP[Dynamic Programming]
+E -->|No| F{Greedy choice works?}
+F -->|Yes| GR[Greedy]
+F -->|No| BT[Backtracking]
+
+B -->|Graph-like (nodes + edges)| G{Traversal needed?}
+G -->|Yes| G1[BFS / DFS]
+G -->|Shortest path?| G2[Dijkstra / BFS]
+G -->|Cycle / components?| G3[DFS / Union-Find]
+
+B -->|Tree structure| T{Hierarchical relationships?}
+T -->|Yes| T1[DFS / BFS on Tree]
+T -->|Need subtree info?| T2[Tree DP]
+
+B -->|Dictionary / Prefix search| TR{Prefix-based queries?}
+TR -->|Yes| TR1[Trie]
+
+B -->|Constraints small (n ≤ 20-25)| BT2{Try all possibilities?}
+BT2 -->|Yes| BT
+
+DP --> DP1{Overlapping subproblems + optimal substructure?}
+DP1 -->|Yes| DP
+
+GR --> GR1{Local optimal leads to global optimal?}
+GR1 -->|Yes| GR
+
+SW --> SW1{Fixed/variable window size?}
+SW1 -->|Yes| SW
+
+ST --> ST1{Next greater/smaller element?}
+ST1 -->|Yes| ST
+
+BT --> BT1{All permutations / combinations?}
+BT1 -->|Yes| BT
+
+
+---
+
+How to actually use this in interviews
+
+Instead of memorizing the tree, map keywords → technique:
+
+“Subarray / substring / longest window” → Sliding Window
+
+“Next greater/smaller / histogram / monotonic” → Stack
+
+“All combinations / permutations / choices” → Backtracking
+
+“Min/Max with overlapping work” → DP
+
+“Take best at each step” → Greedy
+
+“Connections / shortest path / network” → Graph
+
+“Hierarchy / parent-child” → Tree
+
+“Prefix search / autocomplete” → Trie
+
+
+
+---
+
+If you want, I can turn this into a **1-page cheat sheet + 50 real problem mappings (Amazon-style)** so you can quickly identify patterns during OA.
 
 
 # Data Structure and Algorithms
