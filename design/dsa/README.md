@@ -9,13 +9,13 @@ B -->|Array / String| C{Contiguous subarray / substring?}
 C -->|Yes| SW[Sliding Window]
 C -->|No| D{Need nearest greater/smaller or monotonic behavior?}
 D -->|Yes| ST[Stack]
-D -->|No| E{Optimization (max/min/count ways)?}
+D -->|No| E{Optimization (max min count ways)?}
 E -->|Yes| DP[Dynamic Programming]
 E -->|No| F{Greedy choice works?}
 F -->|Yes| GR[Greedy]
 F -->|No| BT[Backtracking]
 
-B -->|Graph-like (nodes + edges)| G{Traversal needed?}
+B -->|Graph-like (nodes plus edges)| G{Traversal needed?}
 G -->|Yes| G1[BFS / DFS]
 G -->|Shortest path?| G2[Dijkstra / BFS]
 G -->|Cycle / components?| G3[DFS / Union-Find]
@@ -27,7 +27,7 @@ T -->|Need subtree info?| T2[Tree DP]
 B -->|Dictionary / Prefix search| TR{Prefix-based queries?}
 TR -->|Yes| TR1[Trie]
 
-B -->|Constraints small (n ≤ 20-25)| BT2{Try all possibilities?}
+B -->|Constraints small (n less than 20 to 25)| BT2{Try all possibilities?}
 BT2 -->|Yes| BT
 
 DP --> DP1{Overlapping subproblems + optimal substructure?}
@@ -36,13 +36,13 @@ DP1 -->|Yes| DP
 GR --> GR1{Local optimal leads to global optimal?}
 GR1 -->|Yes| GR
 
-SW --> SW1{Fixed/variable window size?}
+SW --> SW1{Fixed or variable window size?}
 SW1 -->|Yes| SW
 
-ST --> ST1{Next greater/smaller element?}
+ST --> ST1{Next greater or smaller element?}
 ST1 -->|Yes| ST
 
-BT --> BT1{All permutations / combinations?}
+BT --> BT1{All permutations or  combinations?}
 BT1 -->|Yes| BT
 
 ```
