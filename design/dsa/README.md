@@ -6,7 +6,7 @@ flowchart TD
 A[Start: Read Problem Carefully] --> B{What is the input structure?}
 
 B -->|Array / String| C{Contiguous subarray / substring?}
-B -->|Array / String| S1{Subsequence (not necessarily contiguous)?}
+B -->|Array / String| S1{Subsequence not necessarily contiguous?}
 
 S1 -->|Yes| S2{Order matters plus include exclude choices}
 S2 -->|Yes| DP2[Dynamic Programming]
