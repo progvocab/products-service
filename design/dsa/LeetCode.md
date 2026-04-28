@@ -484,3 +484,401 @@ Advantage over Brute Force:
 Single pass → O(n).
 No need to calculate length first.
 Efficient pointer manipulation.
+
+
+### 23
+
+Problem (Merge k Sorted Lists)
+Given an array of k sorted linked lists, merge them into one sorted list.
+Return the merged sorted linked list.
+Total number of nodes can be large.
+Lists may be empty.
+Maintain sorted order.
+
+
+---
+
+Solution Steps (Min Heap / Priority Queue):
+
+1. Initialize a min-heap.
+
+
+2. Push head of each non-empty list into heap.
+
+
+3. Create a dummy node and curr pointer.
+
+
+4. While heap is not empty:
+
+
+5. Pop smallest node from heap.
+
+
+6. Attach it to curr.next.
+
+
+7. Move curr forward.
+
+
+8. If popped node has next → push into heap.
+
+
+9. Continue until heap is empty.
+
+
+10. Return dummy.next.
+
+
+
+
+---
+
+Pattern:
+Heap (Priority Queue) + k-way Merge
+
+
+---
+
+Advantage over Brute Force:
+Reduces from O(nk) to O(n log k).
+Efficiently finds smallest among k lists.
+Scales well for large k.
+
+### 24
+
+
+Problem (Swap Nodes in Pairs)
+Given a linked list, swap every two adjacent nodes.
+Do not modify node values, only change pointers.
+Return the modified list head.
+If odd number of nodes, last node remains as is.
+List can be empty.
+
+
+---
+
+Solution Steps (Iterative Pointer Manipulation):
+
+1. Create a dummy node pointing to head.
+
+
+2. Initialize prev = dummy.
+
+
+3. While prev.next and prev.next.next exist:
+
+
+4. Let first = prev.next, second = first.next.
+
+
+5. Update first.next = second.next.
+
+
+6. Update second.next = first.
+
+
+7. Update prev.next = second.
+
+
+8. Move prev = first (next pair).
+
+
+9. Continue until no more pairs.
+
+
+10. Return dummy.next.
+
+
+
+
+---
+
+Pattern:
+Linked List Pointer Manipulation
+
+
+---
+
+Advantage over Brute Force:
+Single pass → O(n).
+No extra space required.
+Efficient in-place swapping without value changes.
+
+
+### 25
+
+Problem (Reverse Nodes in k-Group)
+Given a linked list, reverse nodes in groups of size k.
+If remaining nodes are fewer than k, keep them as is.
+Only modify pointers, not values.
+Return the modified list head.
+List length ≥ 0.
+
+
+---
+
+Solution Steps (Iterative Reversal in Groups):
+
+1. Create a dummy node pointing to head.
+
+
+2. Use prevGroupEnd to track previous group end.
+
+
+3. Find the kth node from current position.
+
+
+4. If less than k nodes → break.
+
+
+5. Mark group start and next group head.
+
+
+6. Reverse nodes within the group.
+
+
+7. Connect reversed group with previous part.
+
+
+8. Update prevGroupEnd to new end of group.
+
+
+9. Move to next group and repeat.
+
+
+10. Return dummy.next.
+
+
+
+
+---
+
+Pattern:
+Linked List + Reversal (Chunk Processing)
+
+
+---
+
+Advantage over Brute Force:
+Processes in-place → O(1) space.
+Avoids repeated traversal per group.
+Efficient O(n) single-pass approach.
+
+
+### 26
+
+Problem (Remove Duplicates from Sorted Array)
+Given a sorted array nums, remove duplicates in-place.
+Each unique element should appear only once.
+Return the number of unique elements k.
+First k elements should hold the result.
+Order must be preserved.
+
+
+---
+
+Solution Steps (Two Pointer):
+
+1. Initialize i = 0 (slow pointer).
+
+
+2. Iterate j from 1 to n-1 (fast pointer).
+
+
+3. If nums[j] != nums[i]:
+
+
+4. Increment i.
+
+
+5. Set nums[i] = nums[j].
+
+
+6. Continue till end.
+
+
+7. Return i + 1 as count of unique elements.
+
+
+
+
+---
+
+Pattern:
+Two Pointers (Slow & Fast)
+
+
+---
+
+Advantage over Brute Force:
+In-place → O(1) extra space.
+Single pass → O(n).
+Avoids shifting elements repeatedly.
+
+### 27
+
+
+Problem (Remove Element)
+Given an array nums and a value val, remove all occurrences of val in-place.
+Return the new length k after removal.
+First k elements should not contain val.
+Order of elements can be changed.
+Use O(1) extra space.
+
+
+---
+
+Solution Steps (Two Pointer):
+
+1. Initialize i = 0 (position for next valid element).
+
+
+2. Iterate j from 0 to n-1.
+
+
+3. If nums[j] != val:
+
+
+4. Assign nums[i] = nums[j].
+
+
+5. Increment i.
+
+
+6. Continue till end.
+
+
+7. Return i as new length.
+
+
+
+
+---
+
+Pattern:
+Two Pointers (Filter In-Place)
+
+
+---
+
+Advantage over Brute Force:
+Single pass → O(n).
+In-place → no extra space.
+Avoids costly element shifting repeatedly.
+
+### 28 
+
+Problem (Find the Index of the First Occurrence in a String)
+Given two strings haystack and needle, find the first occurrence of needle in haystack.
+Return the starting index if found, else return -1.
+Matching must be exact and contiguous.
+Both strings consist of lowercase letters.
+Return 0 if needle is empty.
+
+
+---
+
+Solution Steps (Sliding Window / Brute Optimized):
+
+1. Let n = len(haystack), m = len(needle).
+
+
+2. Iterate i from 0 to n - m.
+
+
+3. For each i, compare substring of length m.
+
+
+4. Check character by character.
+
+
+5. If all match → return i.
+
+
+6. If mismatch → move to next index.
+
+
+7. Continue till end.
+
+
+8. If no match found → return -1.
+
+
+
+
+---
+
+Pattern:
+Sliding Window (Fixed Size) / String Matching
+
+
+---
+
+Advantage over Brute Force:
+Avoids checking unnecessary indices beyond n - m.
+Simple and efficient for moderate input sizes.
+Time complexity O(n * m), optimized iteration bounds.
+
+### 29
+
+Problem (Divide Two Integers)
+Given two integers dividend and divisor, divide them without using multiplication, division, or mod.
+Return the quotient after division.
+Truncate toward zero.
+Handle overflow within 32-bit signed integer range.
+Return 2³¹ - 1 if overflow occurs.
+
+
+---
+
+Solution Steps (Bit Manipulation):
+
+1. Handle edge case: overflow (INT_MIN / -1).
+
+
+2. Convert both numbers to absolute long values.
+
+
+3. Initialize result = 0.
+
+
+4. Loop while dividend >= divisor:
+
+
+5. Use temp = divisor, multiple = 1.
+
+
+6. Double temp (temp << 1) while ≤ dividend.
+
+
+7. Subtract temp from dividend.
+
+
+8. Add multiple to result.
+
+
+9. Repeat until dividend < divisor.
+
+
+10. Apply sign and return result.
+
+
+
+
+---
+
+Pattern:
+Bit Manipulation + Greedy (Exponential Subtraction)
+
+
+---
+
+Advantage over Brute Force:
+Reduces repeated subtraction to logarithmic steps.
+Time complexity O(log n).
+Efficient handling of large values.
+
+
+
+
