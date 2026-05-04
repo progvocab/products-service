@@ -1,6 +1,11 @@
 #### LLM
 - Tokenization 
 
+#### Transformer Architecture 
+- Key Value Pair
+  - Key vector : attention each token should give
+  - Value vector : context
+
 ### Pretraining 
 
 - Soft Prompts 
@@ -51,9 +56,14 @@
 - GPU architecture 
 
 - Prompt Caching 
-
+  - Store Key Value Tensor generated during model pre fill phase
+  - avoids redundant computation 
+  - Steps
+    - 
 - Soft Prompt , part of Fine Tuning 
   - trained by optimising a small set of learnable embedding vector,  prepended to input Token,  using back Propagation,  keeping the main model weight frozen.
+
+
 
 
 
