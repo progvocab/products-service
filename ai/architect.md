@@ -12,6 +12,12 @@
   - Sentence 
   - paragraph 
   - page
+- Query Engine
+  - take the input and search the database and return most relevant Chunks 
+- Semantic Re-ranking 
+  - after receiving list of relevant Chunks, using Semantic Re-ranking find Relevance of each Chunk against the query
+- Chunks are passed to LLM
+
 - Vector Databases 
   - Faiss 
 
@@ -59,6 +65,14 @@
 - Approval steps
 
 
+#### Context
+
+LLM has limited Context window
+- Context Engineering 
+  - Summarization 
+  - Forget some part 
+  
+
 #### MCP server
 - multiple client can connect to it
 
@@ -86,3 +100,15 @@ That node calls the tool and returns results
 
 
 Key idea: Intent → Routing → Tool/Action execution
+
+#### Langgraph 
+- multi step Reasoning 
+- multi agent system 
+
+#### LangChain 
+- Prompt Orchestration 
+  - Chaining 
+  - Branching 
+  - Tool Use 
+
+#### Prompt Refinement using Claude 
