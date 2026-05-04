@@ -3,7 +3,7 @@
 
 ### Pretraining 
 
-#### Re-ranking 
+- Soft Prompts 
 
 
 #### RAG
