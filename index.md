@@ -137,16 +137,24 @@
 #### [Reenterant](backend/java/multi_threading/concurrent/lock/ReentrantLock.md)
 * Fair 
 * [Baised](backend/java/multi_threading/concurrent/lock/baised_lock.md)
+* CopyOnWriteArrayList
 #### [Conditional](backend/java/multi_threading/concurrent/lock/Conditions.md)
 - await
 - signal
 - signalAll
-### Atomic Operations
+### [Atomic Operations](backend/java/multi_threading/concurrent/Atomic.md)
+#### [Compare-And-Swap](backend/java/multi_threading/concurrent/CAS.md)
+- AtomicInteger
+- AtomicLong
+- ConcurrentHashMap
 # Spring Framework
+## [Spring boot](backend/spring-framework/spring-boot/README.md)
 # Oracle Database
 ## ACID
 ### Atomicity
-### 
+### Consistency
+### Isolation
+### Durablity
 ## Types
 ### Table
 #### Columns
@@ -161,6 +169,7 @@
 #### Constraint
 #### Primary Key
 #### Foreign Key
+#### Null
 ### View
 ### Materialized View
 
@@ -174,11 +183,12 @@
 ### TRUNCATE
 ### DROP
 ### ALTER
-## DML
+## [DML](database/oracle/query/README.md)
 ### SELECT
 ### INSERT
 ### UPDATE
 ### DELETE
+### [MERGE](database/oracle/query/merge_into.md)
 
 ## DCL
 ## Administration
