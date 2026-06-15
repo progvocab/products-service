@@ -1,7 +1,5 @@
-Excellent question — this is a subtle but *very important* distinction in Java concurrency.
-Let’s unpack the **difference between `volatile` and `AtomicLong`/`AtomicInteger`** clearly, with examples and memory-model explanation 👇
-
----
+* `volatile` ensures **freshness** of values (visibility).
+* `Atomic*` ensures **correctness** under concurrency (atomicity + visibility).
 
 ## 🧩 1. Conceptual Difference
 
@@ -85,8 +83,7 @@ So no update is ever lost.
 
 In short:
 
-* `volatile` ensures **freshness** of values (visibility).
-* `Atomic*` ensures **correctness** under concurrency (atomicity + visibility).
+
 
 ---
 

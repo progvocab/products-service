@@ -1,15 +1,15 @@
 Here’s a complete guide to the **core Object-Oriented Design (OOD) concepts** in Java, with simple explanations and Java code examples.
 
----
 
-## ✅ 1. **Class and Object**
 
-### 📌 Definition:
+### **Class and Object**
+
+
 
 * **Class** is a blueprint.
 * **Object** is an instance of a class.
 
-### ✅ Example:
+
 
 ```java
 class Car {
@@ -24,16 +24,16 @@ public class Main {
 }
 ```
 
----
 
-## ✅ 2. **Encapsulation**
 
-### 📌 Definition:
+### **Encapsulation**
+
+
 
 * Wrapping data and methods in one unit.
 * Use `private` fields with `public` getters/setters.
 
-### ✅ Example:
+
 
 ```java
 class Person {
@@ -49,16 +49,16 @@ class Person {
 }
 ```
 
----
 
-## ✅ 3. **Abstraction**
 
-### 📌 Definition:
+### **Abstraction**
+
+
 
 * Hiding internal implementation and showing only functionality.
 * Achieved using `abstract` classes or `interfaces`.
 
-### ✅ Example:
+
 
 ```java
 abstract class Animal {
@@ -72,15 +72,15 @@ class Dog extends Animal {
 }
 ```
 
----
 
-## ✅ 4. **Inheritance**
 
-### 📌 Definition:
+### **Inheritance**
+
+
 
 * One class inherits properties and behaviors from another.
 
-### ✅ Example:
+
 
 ```java
 class Animal {
@@ -96,16 +96,16 @@ class Dog extends Animal {
 }
 ```
 
----
 
-## ✅ 5. **Polymorphism**
 
-### 📌 Definition:
+### **Polymorphism**
+
+
 
 * One interface, many implementations.
 * Two types: Compile-time (method overloading), Runtime (method overriding)
 
-### ✅ Example (Runtime Polymorphism):
+#### Runtime Polymorphism
 
 ```java
 class Animal {
@@ -121,16 +121,17 @@ class Cat extends Animal {
 }
 ```
 
----
+ 
 
-## ✅ 6. **Association**
+###   **Association**
 
-### 📌 Definition:
 
-* General relationship between two classes.
+* Independent Lifecycle
+* General relationship ("uses a" / "knows a") between two classes.
+* Unidirectional or Bidirectional
 * Example: A `Teacher` teaches `Student`.
+* No Whole Part relationship
 
-### ✅ Example:
 
 ```java
 class Teacher {
@@ -143,16 +144,16 @@ class Student {
 }
 ```
 
----
 
-## ✅ 7. **Aggregation**
 
-### 📌 Definition:
+### **Aggregation**
+
+
 
 * A "has-a" relationship.
 * Child can exist independently of the parent.
+* Whole Part relationship.
 
-### ✅ Example:
 
 ```java
 class Department {
@@ -164,16 +165,16 @@ class School {
 }
 ```
 
----
 
-## ✅ 8. **Composition**
 
-### 📌 Definition:
+### **Composition**
 
+
+* A "has-a" relationship.
 * Stronger form of aggregation.
 * Child cannot exist without parent.
 
-### ✅ Example:
+
 
 ```java
 class Heart {
@@ -191,15 +192,15 @@ class Human {
 }
 ```
 
----
 
-## ✅ 9. **Dependency**
 
-### 📌 Definition:
+### **Dependency**
+
+
 
 * One class depends on another to perform its function.
 
-### ✅ Example:
+
 
 ```java
 class Engine {
@@ -221,12 +222,10 @@ class Car {
 }
 ```
 
----
-
-## ✅ Summary Table
+ 
 
 | Concept       | Definition                         | Example Keyword / Form      |
-| ------------- | ---------------------------------- | --------------------------- |
+| - | - |  |
 | Class/Object  | Blueprint / Instance               | `new`, `class`              |
 | Encapsulation | Hide data with accessors           | `private`, `get/set`        |
 | Abstraction   | Hide internal details              | `abstract`, `interface`     |
@@ -237,6 +236,5 @@ class Car {
 | Composition   | Has-a (cannot exist independently) | Strong ownership            |
 | Dependency    | One uses another                   | Constructor or method param |
 
----
 
-Let me know if you'd like UML diagrams or real-world examples for each.
+ 

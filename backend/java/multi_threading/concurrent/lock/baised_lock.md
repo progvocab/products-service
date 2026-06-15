@@ -1,8 +1,7 @@
 
 
----
 
-## **1. Fair Lock**
+### **1. Fair Lock**
   A lock that grants access to threads **in the order they requested it** (FIFO).
 
 * **Characteristics:**
@@ -21,9 +20,9 @@ ReentrantLock fairLock = new ReentrantLock(true); // true = fair
 
   * When fairness is critical, e.g., **thread scheduling fairness in server apps**.
 
----
+ 
 
-## **2. Biased Lock**
+###  **2. Biased Lock**
 
  A JVM optimization where a lock is **“biased” toward the first thread that acquires it**, assuming **no contention**.
 
@@ -37,7 +36,7 @@ ReentrantLock fairLock = new ReentrantLock(true); // true = fair
 
   * Optimizes performance for **uncontended locks**, which are extremely common in typical Java apps.
 
----
+
 
 
 
@@ -54,12 +53,7 @@ ReentrantLock fairLock = new ReentrantLock(true); // true = fair
 * **Fair Lock = fairness guaranteed, slower**.
 * **Biased Lock = fast for single-threaded access, low overhead, bias revoked under contention**.
 
-
-
-
----
-
-# 1️⃣ What is Biased Locking?
+ 
 
 **Biased locking** is an optimization in the HotSpot JVM to make **synchronized blocks faster** when **only a single thread repeatedly acquires a lock**.
 

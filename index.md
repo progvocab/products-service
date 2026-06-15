@@ -91,11 +91,11 @@
 ### Abstraction
 ### Inheritance
 ### Polymorphism
-### Association
+### [Association](design/Object-Oriented-Design.md)
 ### Aggregation
 ### Composition
 ### Dependency
-## Garbage Collector
+## [Garbage Collector](backend/java/memory/garbage_collector/README.md)
 ### Serial
 ### Concurrent Mark Sweep
 #### Fragmentation
@@ -122,6 +122,26 @@
 - Black Node
 - Red Node
 - Balencing
+## [Threads](backend/java/multi_threading/README.md)
+### Runnable
+### Callable
+### [Synchronized](backend/java/multi_threading/synchronized.md)
+- wait
+- notify
+- [notify all](backend/java/multi_threading/wait_notify/example.md)
+#### Object Lock
+#### Class Lock
+
+#### [DeadLock](backend/java/multi_threading/Deadlock/README.md)
+### [Locks](backend/java/multi_threading/concurrent/lock/README.md)
+#### [Reenterant](backend/java/multi_threading/concurrent/lock/ReentrantLock.md)
+* Fair 
+* [Baised](backend/java/multi_threading/concurrent/lock/baised_lock.md)
+#### [Conditional](backend/java/multi_threading/concurrent/lock/Conditions.md)
+- await
+- signal
+- signalAll
+### Atomic Operations
 # Spring Framework
 # Oracle Database
 ## ACID

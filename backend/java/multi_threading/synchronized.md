@@ -1,15 +1,12 @@
-Let’s go step by step into **class lock vs object lock in Java multithreading**.
 
----
 
-## 🔒 1. Object Lock (Instance Lock)
+### Object Lock (Instance Lock)
 
 * Every **Java object** has an **intrinsic monitor lock**.
 * When you declare a **synchronized instance method** or use a `synchronized (this)` block, the **object’s lock** is acquired.
 * Only **one thread per object instance** can hold the lock at a time.
 * Different objects of the same class have different locks.
-
-### Example: Object Lock
+* When a thread enters a synchronized instance method, it acquires that object's monitor; other threads cannot enter synchronized methods on the same object, but they can still execute non-synchronized methods on that object.
 
 ```java
 class Printer {
@@ -38,20 +35,20 @@ public class ObjectLockExample {
     }
 }
 ```
-
-👉 Here:
+ 
 
 * `t1` and `t2` share the same object (`printer1`) → they **synchronize** on the same object lock.
 * `t3` uses a different object (`printer2`) → runs **independently**.
 
----
+ 
 
-## 🔒 2. Class Lock (Static Lock)
+### Class Lock (Static Lock)
 
 * Every **Java class** has a **Class object** (in metaspace).
 * A `synchronized static` method uses the **class lock**, i.e., lock on the `Class` object.
 * Ensures only one thread can execute **any static synchronized method** of that class at a time.
 * The lock is **shared across all instances** of that class.
+* When a thread enters a synchronized static method, it acquires the class monitor (MyClass.class); other threads cannot enter other synchronized static methods of the same class that use the same class lock, but they can still execute synchronized instance methods and non-synchronized methods.
 
 ### Example: Class Lock
 
@@ -78,15 +75,12 @@ public class ClassLockExample {
     }
 }
 ```
-
-👉 Here:
+ 
 
 * Even though `db1` and `db2` are **different objects**, the **static synchronized method** locks on `Database.class`.
 * So `t1` and `t2` cannot run `updateRecord()` in parallel.
 
----
-
-## 📊 Comparison Table
+ 
 
 | Feature          | Object Lock (Instance Lock)                    | Class Lock (Static Lock)                                     |
 | ---------------- | ---------------------------------------------- | ------------------------------------------------------------ |
@@ -95,31 +89,21 @@ public class ClassLockExample {
 | Synchronization  | Only affects threads using the **same object** | Affects all threads using the class (regardless of instance) |
 | Example Use Case | Printing per printer (per object lock)         | Updating a shared DB schema (class-level lock)               |
 
----
 
-✅ **Rule of Thumb:**
 
 * Use **object locks** when synchronizing access to instance-specific data.
 * Use **class locks** when synchronizing access to static data shared across all objects.
 
----
-
-Would you like me to also **draw a diagram** (showing thread interactions with class lock vs object lock) to make it crystal clear?
 
 
-Excellent question 👍 — this is a common confusion when learning Java synchronization.
-Let’s clear it step by step.
-
----
-
-## 🔒 What is an **Object Lock**?
+### **Object Lock**?
 
 * In Java, every **object** has an **intrinsic lock** (a monitor lock).
 * When a thread enters a `synchronized` **instance method** (or a `synchronized (this)` block), it must **acquire the lock of that object**.
 * Only **one thread at a time** can hold that object’s lock.
 * Other threads trying to enter **any synchronized instance method** of the same object will be **blocked**, even if they’re different methods.
 
----
+
 
 ## 🧩 Scenario: Two Different Synchronized Methods in One Object
 

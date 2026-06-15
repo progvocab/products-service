@@ -1,10 +1,11 @@
+
+
 *non-synchronized* method does **not** acquire or associate with a monitor lock when it runs.
 
 Only **synchronized** methods (or synchronized blocks) use an object’s **monitor** (lock) mechanism.
 
----
 
-## What is a Monitor?
+### What is a Monitor?
 
 A **monitor** is a synchronization construct used by the JVM to enforce *mutual exclusion* and *coordination* between threads.
 
@@ -13,9 +14,9 @@ Every Java object has:
 * a **monitor** (used by `synchronized`)
 * and a **Mark Word** in its object header (which can store lock state, identity hash, age, etc.)
 
----
+ 
 
-## What Happens in a Synchronized vs Non-Synchronized Method
+### What Happens in a Synchronized vs Non-Synchronized Method
 
 ### Non-synchronized method
 
@@ -32,7 +33,7 @@ class Example {
 * The **Mark Word** of the object stays in the **unlocked** state (or possibly biased state if enabled).
 * There’s **no blocking**, **no ownership**, and **no waiting queue**.
 
----
+ 
 
 ### Synchronized instance method
 
@@ -59,9 +60,9 @@ try {
 * Other threads attempting to call any other synchronized method on the same object will block until the monitor is released.
 * The **Mark Word** of the object is updated to indicate the lock state.
 
----
 
-## 🔬 4. Mark Word States (Object Header View)
+
+### Mark Word States (Object Header View)
 
 The **Mark Word** in a 64-bit JVM typically looks like this (simplified):
 
@@ -76,9 +77,7 @@ The **Mark Word** in a 64-bit JVM typically looks like this (simplified):
 ➡️ **Non-synchronized methods** leave the mark word in *Unlocked* or *Biased* state.
 ➡️ **Synchronized methods** cause the mark word to temporarily change to *Lightweight* or *Heavyweight*.
 
----
-
-## 🧩 5. Summary Table
+ 
 
 | Aspect                   | Non-synchronized method             | Synchronized method                        |
 | ------------------------ | ----------------------------------- | ------------------------------------------ |
@@ -88,9 +87,7 @@ The **Mark Word** in a 64-bit JVM typically looks like this (simplified):
 | Allows wait/notify?      | ❌ No (IllegalMonitorStateException) | ✅ Yes (only when owning monitor)           |
 | Typical use case         | Non-critical sections               | Critical sections needing mutual exclusion |
 
----
-
-## 🚨 Important
+ 
 
 You **cannot call `wait()`, `notify()`, or `notifyAll()`** inside a non-synchronized method on the same object —
 because those methods require ownership of the monitor.
@@ -101,11 +98,7 @@ Otherwise, you’ll get:
 java.lang.IllegalMonitorStateException
 ```
 
----
 
-**difference between lightweight and heavyweight locks in Java (HotSpot JVM)**.
-
----
 
 ### Java Locks
 
@@ -118,9 +111,9 @@ java.lang.IllegalMonitorStateException
   3. **Heavyweight lock** (fat lock / monitor)
   4. **Biased lock** (optional optimization)
 
----
 
-## Lightweight Lock (Thin Lock)
+
+### Lightweight Lock (Thin Lock)
 
 * Used when **no contention exists** (only one thread trying to lock the object).
 * Implemented via **CAS (Compare-And-Swap) on the mark word**.
@@ -145,7 +138,7 @@ java.lang.IllegalMonitorStateException
 
 
 
-## Heavyweight Lock (Fat Lock / Monitor)
+### Heavyweight Lock (Fat Lock / Monitor)
 
 * Used when **multiple threads contend** for the same lock.
 * Implemented using **OS-level mutex / monitor**.
@@ -169,7 +162,7 @@ java.lang.IllegalMonitorStateException
 
 
 
-## JVM Lock Transition
+### JVM Lock Transition
 
 Java uses a **lock escalation strategy**:
 
@@ -183,7 +176,7 @@ Biased Lock (optional) --> Lightweight Lock --> Heavyweight Lock
 
 
 
-## Mark Word Representation
+### Mark Word Representation
 
 | Lock Type   | Mark Word (64-bit)                                                  |
 | ----------- | ------------------------------------------------------------------- |
@@ -202,16 +195,12 @@ Biased Lock (optional) --> Lightweight Lock --> Heavyweight Lock
 | Memory overhead | Low                                     | Higher (monitor object)              |
 | Usage           | Optimized path for single-threaded lock | Escalation for contention            |
 
----
+ 
 
-✅ **Key takeaway:**
+  
 
 * Lightweight locks = **fast, CAS-based, user-space**.
 * Heavyweight locks = **kernel-based, slow, used only under contention**.
 * HotSpot tries to **use the lightest lock possible** to improve performance.
 
----
-
-If you want, I can also draw a **diagram showing the JVM object header (mark word) for lightweight vs heavyweight locks**, so it’s very visual.
-
-Do you want me to do that?
+ 
