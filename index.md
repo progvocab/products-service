@@ -124,7 +124,8 @@
 - Balencing
 ## [Threads](backend/java/multi_threading/README.md)
 ### Runnable
-### Callable
+### [Callable](backend/java/multi_threading/concurrent/Callable.md)
+### [Completable Future](backend/java/versions/java8/CompletableFuture.md)
 ### [Synchronized](backend/java/multi_threading/synchronized.md)
 - wait
 - notify
