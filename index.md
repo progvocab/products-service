@@ -148,6 +148,9 @@
 - AtomicInteger
 - AtomicLong
 - ConcurrentHashMap
+### Utils
+#### [Executor Service](backend/java/multi_threading/concurrent/ExecutorService.md)
+#### [Completable Future](backend/java/versions/java8/CompletableFuture.md)
 # Spring Framework
 ## [Spring boot](backend/spring-framework/spring-boot/README.md)
 # Oracle Database
