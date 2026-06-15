@@ -1,6 +1,20 @@
-Perfect! Let’s explore **Spring Bean Lifecycle hooks** — including **concepts**, **annotations**, **interfaces**, **use cases**, **design patterns**, and **code examples**.
+## Sequence
 
----
+1. Instantiate Bean (Constructor called)
+2. Dependency Injection (Autowired / Setter Injection)
+3. BeanNameAware.setBeanName()
+4. BeanFactoryAware.setBeanFactory()
+5. ApplicationContextAware.setApplicationContext()
+6. BeanPostProcessor.postProcessBeforeInitialization()
+7. @PostConstruct
+8. InitializingBean.afterPropertiesSet()
+9. Custom init-method
+10. BeanPostProcessor.postProcessAfterInitialization()
+11. Bean is ready for use
+12. Bean destroy phase begins on context shutdown
+13. @PreDestroy
+14. DisposableBean.destroy()
+15. Custom destroy-method
 
 ## **1. Bean Lifecycle in Spring**
 
