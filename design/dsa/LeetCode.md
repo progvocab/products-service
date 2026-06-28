@@ -1,3 +1,563 @@
+### 1 
+
+Problem (Two Sum)
+Given an integer array nums and a target, find two numbers whose sum equals target.
+Return their indices.
+Each input has exactly one solution.
+You may not use the same element twice.
+Order of answer does not matter.
+
+
+---
+
+Solution Steps (HashMap):
+
+1. Initialize an empty hashmap.
+
+
+2. Traverse array from left to right.
+
+
+3. For each nums[i], compute complement = target - nums[i].
+
+
+4. Check if complement exists in hashmap.
+
+
+5. If yes → return [map[complement], i].
+
+
+6. Else store nums[i] → i in hashmap.
+
+
+7. Continue until solution is found.
+
+
+
+
+---
+
+Pattern:
+Hashing (Lookup Optimization)
+
+
+---
+
+Advantage over Brute Force:
+Reduces from O(n²) pair checking to O(n).
+Constant-time lookup using hashmap.
+Single-pass efficient solution.
+
+### 2
+
+Problem (Add Two Numbers)
+Given two non-empty linked lists representing two non-negative integers.
+Digits are stored in reverse order.
+Add the two numbers and return the sum as a linked list.
+Each node contains a single digit.
+Handle carry properly.
+
+
+---
+
+Solution Steps (Linked List Traversal):
+
+1. Create a dummy node and curr pointer.
+
+
+2. Initialize carry = 0.
+
+
+3. Traverse both lists while nodes exist or carry remains.
+
+
+4. Take values from current nodes (0 if null).
+
+
+5. Compute sum = val1 + val2 + carry.
+
+
+6. Create new node with sum % 10.
+
+
+7. Update carry = sum / 10.
+
+
+8. Move pointers forward.
+
+
+9. Return dummy.next.
+
+
+
+
+---
+
+Pattern:
+Linked List Simulation
+
+
+---
+
+Advantage over Brute Force:
+Single traversal → O(max(n,m)).
+No conversion to integers (avoids overflow).
+Efficient carry handling node by node.
+
+
+### 3
+
+Problem (Longest Substring Without Repeating Characters)
+Given a string s, find the length of the longest substring without repeating characters.
+Substring must be contiguous.
+Characters can repeat outside the chosen substring.
+Return only the maximum length.
+String may be empty.
+
+
+---
+
+Solution Steps (Sliding Window):
+
+1. Use two pointers left and right.
+
+
+2. Maintain a hashmap/set for character positions.
+
+
+3. Expand right one character at a time.
+
+
+4. If duplicate found inside window:
+
+
+5. Move left to max(left, lastSeen[char] + 1).
+
+
+6. Update current character’s latest index.
+
+
+7. Compute window size = right - left + 1.
+
+
+8. Update maximum length.
+
+
+9. Continue until end.
+
+
+
+
+---
+
+Pattern:
+Sliding Window + HashMap
+
+
+---
+
+Advantage over Brute Force:
+Avoids checking all substrings O(n²).
+Single pass → O(n).
+Efficient duplicate tracking with hashmap.
+
+
+### 4
+
+
+Problem (Median of Two Sorted Arrays)
+Given two sorted arrays nums1 and nums2, find the median of the combined sorted array.
+Overall runtime must be O(log(m+n)).
+Arrays may have different sizes.
+Median is middle element(s) after merge.
+Avoid full merge.
+
+
+---
+
+Solution Steps (Binary Search Partition):
+
+1. Always binary search on the smaller array.
+
+
+2. Partition both arrays so left half size equals right half.
+
+
+3. Compute partition indices i and j.
+
+
+4. Find left max and right min around partitions.
+
+
+5. If maxLeft1 <= minRight2 and maxLeft2 <= minRight1:
+
+
+6. Correct partition found.
+
+
+7. If total length odd → median = max(left values).
+
+
+8. Else → median = average of max(left) and min(right).
+
+
+9. Adjust binary search if partition invalid.
+
+
+
+
+---
+
+Pattern:
+Binary Search on Partition
+
+
+---
+
+Advantage over Brute Force:
+Avoids full merge O(m+n).
+Achieves O(log(min(m,n))).
+Efficient for large sorted arrays.
+
+
+### 5
+
+
+Problem (Longest Palindromic Substring)
+Given a string s, find the longest palindromic substring.
+Substring must be contiguous.
+Palindrome reads same forward and backward.
+Return the longest such substring.
+If multiple exist, return any.
+
+
+---
+
+Solution Steps (Expand Around Center):
+
+1. Iterate through each index as palindrome center.
+
+
+2. Expand for odd-length palindrome (i, i).
+
+
+3. Expand for even-length palindrome (i, i+1).
+
+
+4. While chars match, expand outward.
+
+
+5. Track longest palindrome boundaries.
+
+
+6. Update max length if larger found.
+
+
+7. Continue for all centers.
+
+
+8. Return substring using saved boundaries.
+
+
+
+
+---
+
+Pattern:
+Two Pointers (Center Expansion)
+
+
+---
+
+Advantage over Brute Force:
+Avoids checking all substrings O(n³).
+Runs in O(n²).
+Simple and space-efficient O(1).
+
+
+### 6
+
+Problem (Zigzag Conversion)
+Given a string s and number of rows numRows, write the characters in zigzag pattern.
+Read row by row to form the result.
+Pattern alternates down and diagonally up.
+Return the converted string.
+If numRows == 1, return original string.
+
+
+---
+
+Solution Steps (Simulation):
+
+1. Create numRows string builders.
+
+
+2. Track current row and direction (down/up).
+
+
+3. Traverse each character in s.
+
+
+4. Append character to current row.
+
+
+5. If top row → move downward.
+
+
+6. If bottom row → move upward.
+
+
+7. Update current row based on direction.
+
+
+8. After traversal, concatenate all rows.
+
+
+9. Return final string.
+
+
+
+
+---
+
+Pattern:
+String Simulation / Matrix Traversal
+
+
+---
+
+Advantage over Brute Force:
+Avoids building full 2D grid.
+Single pass → O(n).
+Space optimized using row builders only.
+
+
+### 7
+
+Problem (Reverse Integer)
+Given a signed 32-bit integer x, reverse its digits.
+Preserve the sign.
+If reversed integer overflows 32-bit signed range, return 0.
+Do not use 64-bit storage for final answer.
+Return the reversed integer.
+
+
+---
+
+Solution Steps (Math / Digit Extraction):
+
+1. Initialize rev = 0.
+
+
+2. While x != 0:
+
+
+3. Extract last digit: digit = x % 10.
+
+
+4. Remove last digit: x = x / 10.
+
+
+5. Check overflow before updating rev.
+
+
+6. If overflow possible → return 0.
+
+
+7. Update rev = rev * 10 + digit.
+
+
+8. Continue until x becomes 0.
+
+
+9. Return rev.
+
+
+
+
+---
+
+Pattern:
+Math Simulation / Digit Manipulation
+
+
+---
+
+Advantage over Brute Force:
+Processes digits in single pass O(log n).
+No string conversion needed.
+Efficient overflow-safe reversal.
+
+
+### 8
+Problem (String to Integer (atoi))
+Convert a string into a 32-bit signed integer.
+Ignore leading spaces.
+Handle optional + or - sign.
+Stop reading at first invalid character.
+Clamp result within integer range if overflow occurs.
+
+
+---
+
+Solution Steps (String Parsing):
+
+1. Skip leading spaces.
+
+
+2. Check for optional sign (+/-).
+
+
+3. Initialize result = 0.
+
+
+4. Traverse digits until non-digit appears.
+
+
+5. Before adding digit, check overflow.
+
+
+6. If overflow → return INT_MAX or INT_MIN.
+
+
+7. Update result = result * 10 + digit.
+
+
+8. Continue until end or invalid character.
+
+
+9. Return sign * result.
+
+
+
+
+---
+
+Pattern:
+String Parsing / State Handling
+
+
+---
+
+Advantage over Brute Force:
+Single pass → O(n).
+Efficient overflow-safe conversion.
+Avoids unnecessary substring operations.
+
+
+### 9
+Problem (Palindrome Number)
+Given an integer x, determine if it is a palindrome.
+A palindrome reads the same forward and backward.
+Negative numbers are not palindromes.
+Do not convert integer to string.
+Return true if palindrome, else false.
+
+
+---
+
+Solution Steps (Reverse Half):
+
+1. If x < 0 or ends with 0 (except 0 itself) → return false.
+
+
+2. Initialize reversedHalf = 0.
+
+
+3. While x > reversedHalf:
+
+
+4. Extract last digit and append to reversedHalf.
+
+
+5. Remove last digit from x.
+
+
+6. Continue until half is reversed.
+
+
+7. For even digits: check x == reversedHalf.
+
+
+8. For odd digits: check x == reversedHalf / 10.
+
+
+9. Return result.
+
+
+
+
+---
+
+Pattern:
+Math / Two-Half Reversal
+
+
+---
+
+Advantage over Brute Force:
+Avoids full reversal.
+Runs in O(log n).
+No extra string conversion space.
+
+### 10
+Problem (Regular Expression Matching)
+Given a string s and pattern p, implement regex matching.
+. matches any single character.
+* matches zero or more of the preceding element.
+Match must cover the entire string.
+Return true if fully matched.
+
+
+---
+
+Solution Steps (Dynamic Programming):
+
+1. Create DP table dp[m+1][n+1].
+
+
+2. dp[0][0] = true (empty matches empty).
+
+
+3. Pre-fill patterns like a*, a*b* for empty string.
+
+
+4. Traverse s and p.
+
+
+5. If chars match or . → dp[i][j] = dp[i-1][j-1].
+
+
+6. If *:
+
+
+7. Treat as zero occurrence → dp[i][j] = dp[i][j-2].
+
+
+8. Or one/more occurrence if preceding char matches.
+
+
+9. Final answer is dp[m][n].
+
+
+
+
+---
+
+Pattern:
+Dynamic Programming (String Matching)
+
+
+---
+
+Advantage over Brute Force:
+Avoids exponential recursion/backtracking.
+Efficient O(m * n) solution.
+Stores overlapping subproblem states.
+
+
+### 11
+
 Problem (Container With Most Water)
 Given an array height[], each element represents a vertical line.
 Pick two lines such that they form a container with the x-axis.
