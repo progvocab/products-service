@@ -2,40 +2,57 @@ Flash Attention is an algorithm that computes the **same attention output** as s
 
 ## The standard attention algorithm
 
-Given:
 
-* Query matrix:
-    (Q \in \mathbb{R}^{N \times d})
-* Key matrix: (K \in \mathbb{R}^{N \times d})
-* Value matrix: (V \in \mathbb{R}^{N \times d})
+
+
+  Query matrix:
+  
+$$ (Q \in \mathbb{R}^{N \times d})  $$
+
+ Key matrix: 
+ 
+ $$   (K \in \mathbb{R}^{N \times d})  $$
+
+  Value matrix:
+
+ $$   (V \in \mathbb{R}^{N \times d})   $$
+
+
 
 Standard attention computes:
 
-[
+
+ $$   [
 \text{Attention}(Q,K,V)=\text{softmax}\left(\frac{QK^T}{\sqrt d}\right)V
-]
+]   $$   
+
 
 This involves three steps:
 
 1. Compute the score matrix
 
+ $$ 
 [
 S = QK^T
 ]
+ $$ 
 
-Shape: (N \times N)
+ 
+Shape: 
+
+ $$  (N \times N)  $$ 
 
 2. Apply softmax
 
-[
+ $$  [
 P = \text{softmax}(S)
-]
+]  $$ 
 
 3. Multiply by values
 
-[
+ $$ [
 O = PV
-]
+]  $$ 
 
 ### The problem
 
@@ -54,17 +71,17 @@ For example:
 
 One attention matrix is
 
-[
+ $$  [
 16384^2 \times 2 \approx 512\text{ MB}
-]
+]  $$ 
 
 Two such matrices exceed **1 GB**.
 
 Even worse, these matrices are repeatedly written to and read from GPU global memory.
 
----
+ 
 
-# Why GPUs become slow
+### Why GPUs become slow
 
 Modern GPUs have
 
@@ -101,10 +118,9 @@ Multiply by V
 ```
 
 There are many expensive memory transfers.
+ 
 
----
-
-# Flash Attention idea
+### Flash Attention idea
 
 Instead of computing the whole (N \times N) matrix:
 
@@ -133,9 +149,7 @@ After using the block:
 * never store it
 * discard it
 * move to next block
-
----
-
+ 
 ## Tiling
 
 Imagine
@@ -168,19 +182,22 @@ Flash Attention computes
 
 Each tile fits into SRAM.
 
----
+ 
 
-# But softmax needs the whole row...
+### But softmax needs the whole row...
 
 This is the clever part.
 
 Normally,
 
+ $$ 
 [
 \text{softmax}(x_i)=
 \frac{e^{x_i}}
 {\sum_j e^{x_j}}
 ]
+ $$ 
+ 
 
 You need every element before computing the denominator.
 
@@ -200,26 +217,23 @@ Update
 
 ### Running maximum
 
-[
-m_{\text{new}}
-==============
+$$
+m_{\text{new}} = \max(m_{\text{old}}, m_{\text{block}})
+$$
 
-\max(m_{\text{old}},m_{\text{block}})
-]
 
 Then rescale previous sums.
 
 Maintain
 
-[
+ $$ [
 l=\sum e^{x_i-m}
-]
+]  $$ 
 
 This gives the exact softmax without storing the whole row.
 
 Memory per row becomes constant.
-
----
+ 
 
 # Online softmax example
 
@@ -266,21 +280,21 @@ Exactly the same result as ordinary softmax.
 
 No large matrix stored.
 
----
+ 
 
-# Computing the output
+### Computing the output
 
 Flash Attention never stores
 
-[
+ $$ [
 P=\text{softmax}(QK^T)
-]
+]  $$ 
 
 Instead it immediately computes
 
-[
+ $$ [
 PV
-]
+]  $$ 
 
 inside the block.
 
@@ -314,49 +328,49 @@ Discard scores
 
 Nothing intermediate is written back.
 
----
+ 
 
-# Complexity
+### Complexity
 
 ### Standard
 
 Memory
 
-[
+ $$ [
 O(N^2)
-]
+]  $$ 
 
 Compute
 
-[
+ $$ [
 O(N^2d)
-]
+] $$ 
 
----
+ 
 
 ### Flash Attention
 
 Memory
 
-[
+ $$  [
 O(Nd)
-]
+]  $$ 
 
 Compute
 
 Still
 
-[
+ $$ [
 O(N^2d)
-]
+]  $$ 
 
 Notice:
 
 The algorithm performs essentially the **same amount of arithmetic**, but dramatically reduces memory traffic. Since GPUs are often memory-bandwidth limited, this yields large speedups.
 
----
+ 
 
-# Why it's faster despite the same FLOPs
+### Why it's faster despite the same FLOPs
 
 Suppose arithmetic costs
 
@@ -392,9 +406,9 @@ Same math.
 
 Much less waiting on memory.
 
----
+ 
 
-# GPU execution
+### GPU execution
 
 Each GPU thread block:
 
@@ -417,9 +431,9 @@ Write final output
 
 Every tile stays in SRAM while being processed.
 
----
+ 
 
-# Why it's called "Flash"
+### Why it's called "Flash"
 
 The name comes from the idea of making attention **I/O-aware**:
 
@@ -427,9 +441,9 @@ The name comes from the idea of making attention **I/O-aware**:
 * Keep data in fast on-chip memory as long as possible.
 * Fuse multiple operations (matrix multiplication, softmax, and value multiplication) into a single kernel, avoiding intermediate memory writes.
 
----
+ 
 
-# FlashAttention versions
+### FlashAttention versions
 
 * **FlashAttention (v1):** Introduced block-wise attention with online softmax, greatly reducing memory usage while preserving exact results.
 * **FlashAttention-2:** Improved GPU work partitioning and parallelism, increasing throughput on modern GPUs.
